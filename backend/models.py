@@ -60,3 +60,25 @@ class Consumables(models.Model):
 
     def __str__(self):
         return self.catigories
+
+
+class Rezident(models.Model):
+    company=models.CharField(max_length=60)
+    photo = models.ImageField(blank=True, upload_to='pictures/')
+    city=models.CharField(max_length=60)
+    name=models.CharField(max_length=60)
+    email=models.EmailField(blank=True)
+    phone = PhoneNumberField()
+    created_at = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.company
+
+
+class Finance(models.Model):
+    name=models.CharField(max_length=60)
+    sum=models.IntegerField(default=0)
+    created_at=models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
