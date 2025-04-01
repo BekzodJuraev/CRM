@@ -82,3 +82,22 @@ class Finance(models.Model):
 
     def __str__(self):
         return self.name
+
+
+
+class Debt(models.Model):
+    order=models.ForeignKey(Orders,on_delete=models.CASCADE, related_name='debt')
+    money_pay=models.DateField(blank=True,default=0)
+
+
+    def __str__(self):
+        return self.order.client
+
+
+
+
+# class Warehouse(models.Model):
+#     product=models.CharField(max_length=70)
+#     quantity=models.IntegerField(default=0)
+#     created_at=models.DateField(auto_now_add=True)
+#     update_time=m
