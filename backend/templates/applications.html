@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Заявки</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+            width: 500px;
+            text-align: center;
+        }
+        .header-btn {
+            background: gold;
+            color: black;
+            font-weight: bold;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .application {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .photo-placeholder {
+            width: 100px;
+            height: 100px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            object-fit: cover;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .approve, .reject {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 45%;
+        }
+        .approve {
+            background: green;
+            color: white;
+        }
+        .reject {
+            background: red;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="header-btn">Раздел заявок</button>
+        
+        <div class="applications">
+            <div class="application">
+                <img src="https://via.placeholder.com/100" alt="Фото сотрудника" class="photo-placeholder">
+                <div class="info">
+                    <p><strong>Фамилия:</strong> Иванов</p>
+                    <p><strong>Имя:</strong> Иван</p>
+                    <p><strong>Отчество:</strong> Иванович</p>
+                    <p><strong>Дата рождения:</strong> 21.03.1995</p>
+                    <p><strong>Телефон:</strong> +998 91 123 45 65</p>
+                    <p><strong>Адрес:</strong> Улица такая-то</p>
+                    <p><strong>Компания:</strong> "Креатив"</p>
+                    <p><strong>Опыт работы:</strong> 1 год</p>
+                    <p><strong>Хобби:</strong> Люблю неть</p>
+                    <p><strong>Желаемая должность:</strong> Менеджер</p>
+                </div>
+                <div class="buttons">
+                    <button class="approve">Одобрить</button>
+                    <button class="reject">Отклонить</button>
+                </div>
+            </div>
+
+            <div class="application">
+                <img src="https://via.placeholder.com/100" alt="Фото сотрудника" class="photo-placeholder">
+                <div class="info">
+                    <p><strong>Фамилия:</strong> Петров</p>
+                    <p><strong>Имя:</strong> Петр</p>
+                    <p><strong>Отчество:</strong> Петрович</p>
+                    <p><strong>Дата рождения:</strong> 15.07.1992</p>
+                    <p><strong>Телефон:</strong> +998 91 987 65 43</p>
+                    <p><strong>Адрес:</strong> Улица другая</p>
+                    <p><strong>Компания:</strong> "Инновация"</p>
+                    <p><strong>Опыт работы:</strong> 3 года</p>
+                    <p><strong>Хобби:</strong> Чтение</p>
+                    <p><strong>Желаемая должность:</strong> Аналитик</p>
+                </div>
+                <div class="buttons">
+                    <button class="approve">Одобрить</button>
+                    <button class="reject">Отклонить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

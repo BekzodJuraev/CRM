@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #141e30, #243b55);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            width: 400px;
+        }
+        .registration-form {
+            display: flex;
+            flex-direction: column;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        label {
+            margin: 10px 0 5px;
+        }
+        input, select, button {
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            outline: none;
+        }
+        input, select {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        button {
+            background: #00c6ff;
+            color: white;
+            cursor: pointer;
+            margin-top: 15px;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0072ff;
+        }
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form class="registration-form">
+            <h2>Регистрация</h2>
+            <label>Фамилия:</label>
+            <input type="text" placeholder="Введите фамилию">
+            
+            <label>Имя:</label>
+            <input type="text" placeholder="Введите имя">
+            
+            <label>Отчество:</label>
+            <input type="text" placeholder="Введите отчество">
+            
+            <label>Дата рождения:</label>
+            <input type="date">
+            
+            <label>Номер телефона:</label>
+            <input type="tel" placeholder="+7 (XXX) XXX-XX-XX">
+            
+            <label>Адрес проживания:</label>
+            <input type="text" placeholder="Введите адрес">
+            
+            <label>Предыдущее место работы:</label>
+            <input type="text" placeholder="Название компании">
+            
+            <label>Опыт работы:</label>
+            <input type="text" placeholder="Введите опыт">
+            
+            <label>Хобби:</label>
+            <input type="text" placeholder="Введите хобби">
+            
+            <label>Выберите желаемую должность:</label>
+            <select>
+                <option>Менеджер</option>
+                <option>Администратор</option>
+                <option>Снабженец</option>
+                <option>Главный цеха</option>
+                <option>Установщик</option>
+                <option>Технолог</option>
+                <option>Дизайнер</option>
+            </select>
+            
+            <label>Загрузить фото:</label>
+            <input type="file">
+            
+            <button type="submit">Далее</button>
+        </form>
+    </div>
+</body>
+</html>

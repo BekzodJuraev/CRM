@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM - Заказы</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #1e1e2f;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+        }
+        .sidebar {
+            background: #2a2a3a;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .sidebar a {
+            color: #fff;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            transition: 0.3s;
+        }
+        .sidebar a:hover {
+            background: #44445e;
+            border-radius: 8px;
+        }
+        .main-content {
+            background: #29293d;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .kanban {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+        }
+        .kanban-column {
+            background: #3a3a5c;
+            padding: 15px;
+            border-radius: 8px;
+            min-width: 250px;
+        }
+        .kanban-item {
+            background: #4b4b6a;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+        }
+        .btn-custom {
+            background: #ffcc00;
+            color: #000;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-2 sidebar">
+                <h3>CRM</h3>
+                <a href="#">📦 Заказы</a>
+                <a href="#">📊 Финансы</a>
+                <a href="#">📁 Склад</a>
+                <a href="#">💳 Задолженности</a>
+                <a href="#">👥 Сотрудники</a>
+                <a href="#">📝 Заявки</a>
+            </nav>
+            <main class="col-md-10 p-4">
+                <div class="main-content">
+                    <div class="d-flex justify-content-between">
+                        <h2>Заказы - Самарканд</h2>
+                        <button class="btn btn-custom">Создать заказ</button>
+                    </div>
+                    <div class="kanban mt-4">
+                        <div class="kanban-column">
+                            <h5>Принят</h5>
+                            <div class="kanban-item">ООО "Реклама Плюс"<br><small>Срок: 15.03.2025</small></div>
+                        </div>
+                        <div class="kanban-column">
+                            <h5>Проектирование</h5>
+                            <div class="kanban-item">ООО "Реклама Плюс"<br><small>Срок: 16.03.2025</small></div>
+                        </div>
+                        <div class="kanban-column">
+                            <h5>Технолог</h5>
+                            <div class="kanban-item">ООО "Реклама Плюс"<br><small>Срок: 17.03.2025</small></div>
+                        </div>
+                        <div class="kanban-column">
+                            <h5>Производство</h5>
+                            <div class="kanban-item">ООО "Реклама Плюс"<br><small>Срок: 18.03.2025</small></div>
+                        </div>
+                        <div class="kanban-column">
+                            <h5>Сборка</h5>
+                            <div class="kanban-item">ООО "Реклама Плюс"<br><small>Срок: 19.03.2025</small></div>
+                        </div>
+                        <div class="kanban-column">
+                            <h5>Доставка</h5>
+                            <div class="kanban-item">ООО "Реклама Плюс"<br><small>Срок: 20.03.2025</small></div>
+                        </div>
+                        <div class="kanban-column">
+                            <h5>Заказ готов</h5>
+                            <div class="kanban-item">ООО "Реклама Плюс"<br><small>Срок: 21.03.2025</small></div>
+                        </div>
+                        <div class="kanban-column">
+                            <h5>Завершён</h5>
+                            <div class="kanban-item">ООО "Реклама Плюс"<br><small>Срок: 22.03.2025</small></div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>
