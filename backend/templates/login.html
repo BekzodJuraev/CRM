@@ -61,12 +61,16 @@
 <body>
     <div class="container">
         <h2>Вход в систему</h2>
-        <form>
+        <form action="" method="POST">
+            {% csrf_token %}
             <label>Имя пользователя:</label>
-            <input type="text" placeholder="Введите имя пользователя">
+            <input type="text" placeholder="Введите имя пользователя" name="username" required>
             
             <label>Пароль:</label>
-            <input type="password" placeholder="Введите пароль">
+            <input type="password" placeholder="Введите пароль" name="password" required>
+            {% if errors.invalid %}
+            <p style="color: red;">{{ errors.invalid }}</p>
+            {% endif %}
             
             <button type="submit">Далее</button>
         </form>

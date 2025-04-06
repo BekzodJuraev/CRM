@@ -1,3 +1,4 @@
+{% if request.user.profile.approve %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -69,11 +70,14 @@
                 <a href="#">👥 Сотрудники</a>
                 <a href="#">📝 Заявки</a>
             </nav>
+
             <main class="col-md-10 p-4">
                 <div class="main-content">
+
                     <div class="d-flex justify-content-between">
                         <h2>Заказы - Самарканд</h2>
                         <button class="btn btn-custom">Создать заказ</button>
+
                     </div>
                     <div class="kanban mt-4">
                         <div class="kanban-column">
@@ -115,3 +119,40 @@
     </div>
 </body>
 </html>
+{% else %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Активация аккаунта</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .warning {
+            color: #d9534f;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p class="warning">⚠ Ваш аккаунт ещё не активирован администратором.</p>
+        <p>Пожалуйста, дождитесь подтверждения регистрации.</p>
+    </div>
+</body>
+</html>
+{% endif %}

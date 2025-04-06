@@ -23,6 +23,7 @@ class Profile(models.Model):
     last_job=models.CharField(max_length=200,blank=True)
     work_exp=models.CharField(max_length=200,blank=True)
     position = models.CharField(max_length=20, choices=POSITION_CHOICES)
+    hobby=models.CharField(max_length=60,blank=True)
     photo = models.ImageField(blank=True, upload_to='pictures/')
     approve=models.BooleanField(default=False)
 

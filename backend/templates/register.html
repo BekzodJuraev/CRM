@@ -42,7 +42,7 @@
         }
         input, select {
             background: rgba(255, 255, 255, 0.2);
-            color: white;
+            color: #b2b1b7;
         }
         button {
             background: #00c6ff;
@@ -61,50 +61,68 @@
 </head>
 <body>
     <div class="container">
-        <form class="registration-form">
+        <form class="registration-form"  method="POST" enctype="multipart/form-data">
+             {% csrf_token %}
             <h2>Регистрация</h2>
-            <label>Фамилия:</label>
-            <input type="text" placeholder="Введите фамилию">
-            
-            <label>Имя:</label>
-            <input type="text" placeholder="Введите имя">
-            
-            <label>Отчество:</label>
-            <input type="text" placeholder="Введите отчество">
-            
-            <label>Дата рождения:</label>
-            <input type="date">
-            
-            <label>Номер телефона:</label>
-            <input type="tel" placeholder="+7 (XXX) XXX-XX-XX">
-            
-            <label>Адрес проживания:</label>
-            <input type="text" placeholder="Введите адрес">
-            
-            <label>Предыдущее место работы:</label>
-            <input type="text" placeholder="Название компании">
-            
-            <label>Опыт работы:</label>
-            <input type="text" placeholder="Введите опыт">
-            
-            <label>Хобби:</label>
-            <input type="text" placeholder="Введите хобби">
-            
-            <label>Выберите желаемую должность:</label>
-            <select>
-                <option>Менеджер</option>
-                <option>Администратор</option>
-                <option>Снабженец</option>
-                <option>Главный цеха</option>
-                <option>Установщик</option>
-                <option>Технолог</option>
-                <option>Дизайнер</option>
-            </select>
-            
-            <label>Загрузить фото:</label>
-            <input type="file">
+
+<label>Фамилия:</label>
+<input type="text" placeholder="Введите фамилию" name="lastname" required>
+
+<label>Имя:</label>
+<input type="text" placeholder="Введите имя" name="name" required>
+
+<label>Отчество:</label>
+<input type="text" placeholder="Введите отчество" name="middle_name" required>
+
+<label>Дата рождения:</label>
+<input type="date" name="date_birth" required>
+
+<label>Номер телефона:</label>
+<input type="tel" placeholder="+7 (XXX) XXX-XX-XX" name="phone" required>
+
+<label>Адрес проживания:</label>
+<input type="text" placeholder="Введите адрес" name="adress" required>
+
+<label>Предыдущее место работы:</label>
+<input type="text" placeholder="Название компании" name="last_job" required>
+
+<label>Опыт работы:</label>
+<input type="text" placeholder="Введите опыт" name="work_exp" required>
+
+<label>Хобби:</label>
+<input type="text" placeholder="Введите хобби" name="hobby" required>
+
+<label>Выберите желаемую должность:</label>
+<select name="position" required>
+    <option value="" disabled selected>Выберите должность</option>
+    <option value="manager">Менеджер</option>
+    <option value="admin">Администратор</option>
+    <option value="supplier">Снабженец</option>
+    <option value="chief">Главный ЦЕХа</option>
+    <option value="installer">Установщик</option>
+    <option value="technologist">Технолог</option>
+    <option value="designer">Дизайнер</option>
+</select>
+
+<label>Пароль:</label>
+<input type="password" name="password" required>
+
+<label>Загрузить фото:</label>
+<input type="file" name="photo" required>
             
             <button type="submit">Далее</button>
+
+            {% if errors.username %}
+  <p style="color:red;">{{ errors.username }}</p>
+{% endif %}
+
+{% if errors.password %}
+  <p style="color:red;">{{ errors.password }}</p>
+{% endif %}
+
+{% if errors.photo %}
+  <p style="color:red;">{{ errors.photo }}</p>
+{% endif %}
         </form>
     </div>
 </body>
