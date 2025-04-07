@@ -1,3 +1,4 @@
+{% if request.user.profile.approve %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -77,48 +78,73 @@
 <body>
     <div class="container">
         <button class="header-btn">Раздел заявок</button>
-        
-        <div class="applications">
-            <div class="application">
-                <img src="https://via.placeholder.com/100" alt="Фото сотрудника" class="photo-placeholder">
-                <div class="info">
-                    <p><strong>Фамилия:</strong> Иванов</p>
-                    <p><strong>Имя:</strong> Иван</p>
-                    <p><strong>Отчество:</strong> Иванович</p>
-                    <p><strong>Дата рождения:</strong> 21.03.1995</p>
-                    <p><strong>Телефон:</strong> +998 91 123 45 65</p>
-                    <p><strong>Адрес:</strong> Улица такая-то</p>
-                    <p><strong>Компания:</strong> "Креатив"</p>
-                    <p><strong>Опыт работы:</strong> 1 год</p>
-                    <p><strong>Хобби:</strong> Люблю неть</p>
-                    <p><strong>Желаемая должность:</strong> Менеджер</p>
-                </div>
-                <div class="buttons">
-                    <button class="approve">Одобрить</button>
-                    <button class="reject">Отклонить</button>
-                </div>
-            </div>
 
+        <div class="applications">
+            {% for item in profile %}
+            <form action="" method="POST">
+             {% csrf_token %}
             <div class="application">
-                <img src="https://via.placeholder.com/100" alt="Фото сотрудника" class="photo-placeholder">
+                <img src="/{{item.photo}}" alt="Фото сотрудника" class="photo-placeholder">
                 <div class="info">
-                    <p><strong>Фамилия:</strong> Петров</p>
-                    <p><strong>Имя:</strong> Петр</p>
-                    <p><strong>Отчество:</strong> Петрович</p>
-                    <p><strong>Дата рождения:</strong> 15.07.1992</p>
-                    <p><strong>Телефон:</strong> +998 91 987 65 43</p>
-                    <p><strong>Адрес:</strong> Улица другая</p>
-                    <p><strong>Компания:</strong> "Инновация"</p>
-                    <p><strong>Опыт работы:</strong> 3 года</p>
-                    <p><strong>Хобби:</strong> Чтение</p>
-                    <p><strong>Желаемая должность:</strong> Аналитик</p>
+                    <p><strong>Фамилия:</strong> {{item.lastname}}</p>
+                    <p><strong>Имя:</strong> {{item.name}}</p>
+                    <p><strong>Отчество:</strong> {{item.middle_name}}</p>
+                    <p><strong>Дата рождения:</strong> {{ item.date_birth|date:"d.m.Y" }}</p>
+                    <p><strong>Телефон:</strong> {{item.phone}}</p>
+                    <p><strong>Адрес:</strong> {{item.adress}}</p>
+                    <p><strong>Компания:</strong> {{item.last_job}}</p>
+                    <p><strong>Опыт работы:</strong> {{item.work_exp}}</p>
+                    <p><strong>Хобби:</strong> {{item.hobby}}</p>
+                    <p><strong>Желаемая должность:</strong> {{item.get_position_display }}</p>
                 </div>
                 <div class="buttons">
-                    <button class="approve">Одобрить</button>
-                    <button class="reject">Отклонить</button>
+                    <input type="hidden" name="pk" value="{{ item.pk }}">
+                    <button class="approve" value="approve" name="action">Одобрить</button>
+                    <button class="reject" value="reject" name="action">Отклонить</button>
                 </div>
             </div>
+                 </form>
+            {% endfor %}
+
+
         </div>
     </div>
 </body>
 </html>
+{% else %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Активация аккаунта</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .warning {
+            color: #d9534f;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p class="warning">⚠ Ваш аккаунт ещё не активирован администратором.</p>
+        <p>Пожалуйста, дождитесь подтверждения регистрации.</p>
+    </div>
+</body>
+</html>
+{% endif %}

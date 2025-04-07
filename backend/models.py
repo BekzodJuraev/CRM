@@ -18,7 +18,7 @@ class Profile(models.Model):
     lastname = models.CharField(max_length=200, null=True, blank=True, default=None)
     middle_name = models.CharField(max_length=200, null=True, blank=True, default=None)
     date_birth = models.DateField(null=True, blank=True, default=None)
-    phone = PhoneNumberField()
+    phone = PhoneNumberField(blank=True)
     adress = models.CharField(max_length=200,blank=True)
     last_job=models.CharField(max_length=200,blank=True)
     work_exp=models.CharField(max_length=200,blank=True)

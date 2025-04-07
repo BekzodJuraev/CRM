@@ -6,9 +6,11 @@ from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
 
-
-class Dashboard(TemplateView):
+from django.contrib.auth.mixins import LoginRequiredMixin
+class Dashboard(LoginRequiredMixin,TemplateView):
+   login_url = reverse_lazy('login')
    template_name = 'dashboard.html'
+
 
 class Main(TemplateView):
    template_name = 'main.html'
@@ -90,7 +92,39 @@ class Register(TemplateView):
 
 
 
+class Order(LoginRequiredMixin,TemplateView):
+   template_name = 'order.html'
 
 
+
+class Applications(LoginRequiredMixin,TemplateView):
+   template_name = 'applications.html'
+   login_url = reverse_lazy('login')
+
+   def post(self, request, *args, **kwargs):
+      action=request.POST.get('action')
+      pk = request.POST.get('pk')
+
+      if action == "approve":
+         Profile.objects.filter(id=pk).update(approve=True)
+      else:
+         User.objects.filter(profile__id=pk).delete()
+         #Profile.objects.filter(id=pk).delete()
+
+
+      return redirect(request.path)
+
+
+
+
+
+
+
+   def get_context_data(self, *, object_list=None, **kwargs):
+      context = super().get_context_data(**kwargs)
+
+      context['profile']=Profile.objects.filter(approve=False)
+
+      return context
 
 
