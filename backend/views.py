@@ -166,3 +166,6 @@ class Rezident(LoginRequiredMixin,TemplateView):
 
 
 
+class Rezident_Create(LoginRequiredMixin,TemplateView):
+   template_name = 'rezident_add.html'
+   login_url = reverse_lazy('login')
