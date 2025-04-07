@@ -5,7 +5,7 @@ from .models import Profile
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
-
+from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
 class Dashboard(LoginRequiredMixin,TemplateView):
    login_url = reverse_lazy('login')
@@ -94,6 +94,7 @@ class Register(TemplateView):
 
 class Order(LoginRequiredMixin,TemplateView):
    template_name = 'order.html'
+   login_url = reverse_lazy('login')
 
 
 
@@ -128,3 +129,32 @@ class Applications(LoginRequiredMixin,TemplateView):
       return context
 
 
+class Staff(LoginRequiredMixin,TemplateView):
+   template_name = 'staff.html'
+   login_url = reverse_lazy('login')
+
+
+
+
+
+   def get_context_data(self, *, object_list=None, **kwargs):
+      context = super().get_context_data(**kwargs)
+      search=self.request.GET.get('search')
+
+      if search:
+         # Apply a case-insensitive search across multiple fields
+         context['profile'] = Profile.objects.filter(
+            approve=True
+         ).filter(
+            Q(name__icontains=search) |
+            Q(lastname__icontains=search) |
+            Q(middle_name__icontains=search)  # Add more fields as necessary
+         )
+      else:
+         # Return all profiles if no search term is provided
+         context['profile'] = Profile.objects.filter(approve=True)
+
+
+
+
+      return context

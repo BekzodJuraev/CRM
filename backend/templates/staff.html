@@ -1,0 +1,152 @@
+{% if request.user.profile.approve %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Заявки</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+            width: 500px;
+            text-align: center;
+        }
+        .header-btn {
+            background: gold;
+            color: black;
+            font-weight: bold;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            width:90%;
+            margin-bottom: 20px;
+        }
+        .application {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .photo-placeholder {
+            width: 100px;
+            height: 100px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            object-fit: cover;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .approve, .reject {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 45%;
+        }
+        .approve {
+            background: green;
+            color: white;
+        }
+        .reject {
+            background: red;
+            color: white;
+        }
+        .search-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Список сотрудников</h1>
+        <form action="" method="GET">
+            <input type="text" placeholder="Поиск" class="header-btn" name="search" value="{{request.GET.search}}">
+       </form>
+
+        <div class="applications">
+            {% for item in profile %}
+
+            <div class="application">
+                <img src="/{{item.photo}}" alt="Фото сотрудника" class="photo-placeholder">
+                <div class="info">
+                    <p><strong>Фамилия:</strong> {{item.lastname}}</p>
+                    <p><strong>Имя:</strong> {{item.name}}</p>
+                    <p><strong>Отчество:</strong> {{item.middle_name}}</p>
+                    <p><strong>Дата рождения:</strong> {{ item.date_birth|date:"d.m.Y" }}</p>
+                    <p><strong>Телефон:</strong> {{item.phone}}</p>
+                    <p><strong>Адрес:</strong> {{item.adress}}</p>
+                    <p><strong>Компания:</strong> {{item.last_job}}</p>
+                    <p><strong>Опыт работы:</strong> {{item.work_exp}}</p>
+                    <p><strong>Хобби:</strong> {{item.hobby}}</p>
+                    <p><strong>Желаемая должность:</strong> {{item.get_position_display }}</p>
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+
+        </div>
+    </div>
+</body>
+</html>
+{% else %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Активация аккаунта</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .warning {
+            color: #d9534f;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p class="warning">⚠ Ваш аккаунт ещё не активирован администратором.</p>
+        <p>Пожалуйста, дождитесь подтверждения регистрации.</p>
+    </div>
+</body>
+</html>
+{% endif %}
