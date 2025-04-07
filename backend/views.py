@@ -158,3 +158,11 @@ class Staff(LoginRequiredMixin,TemplateView):
 
 
       return context
+
+
+class Rezident(LoginRequiredMixin,TemplateView):
+   template_name = 'rezedent.html'
+   login_url = reverse_lazy('login')
+
+
+

@@ -9,5 +9,6 @@ urlpatterns=[
     path('dashboard/',views.Dashboard.as_view(),name='dashboard'),
     path('order/',views.Order.as_view(),name='order'),
     path('applications/',views.Applications.as_view(),name='apply'),
-    path('staff/',views.Staff.as_view(),name='staff')
+    path('staff/',views.Staff.as_view(),name='staff'),
+    path('rezident/',views.Rezident.as_view(),name='rezident')
 ]

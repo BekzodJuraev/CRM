@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Раздел резидентов</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        body {
+            background: #f3f4f6;
+            color: #333;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .title {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 30px;
+            color: #1f2937;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .add-btn {
+            background-color: #fbbf24;
+            color: #1f2937;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .add-btn:hover {
+            background-color: #f59e0b;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            max-width: 300px;
+        }
+
+        .residents-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .residents-table thead {
+            background-color: #1f2937;
+            color: white;
+        }
+
+        .residents-table th,
+        .residents-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .residents-table tbody tr:hover {
+            background-color: #f9fafb;
+            transition: background 0.2s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Список резидентов</h1>
+
+        <div class="controls">
+            <button class="btn add-btn">Добавить резидента</button>
+            <input type="text" placeholder="Поиск..." class="search-input">
+        </div>
+
+        <table class="residents-table">
+            <thead>
+                <tr>
+                    <th>Название компании</th>
+                    <th>Город</th>
+                    <th>Контактное лицо</th>
+                    <th>Email</th>
+                    <th>Дата регистрации</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>ООО "Реклама Плюс"</td>
+                    <td>Ташкент</td>
+                    <td>Иван Иванов</td>
+                    <td>example@email.com</td>
+                    <td>10.03.2024</td>
+                </tr>
+                <tr>
+                    <td>ИП "Бизнес Про"</td>
+                    <td>Самарканд</td>
+                    <td>Петр Петров</td>
+                    <td>example@email.com</td>
+                    <td>12.02.2024</td>
+                </tr>
+                <tr>
+                    <td>ООО "Альфа"</td>
+                    <td>Наманган</td>
+                    <td>Олег Сидоров</td>
+                    <td>example@email.com</td>
+                    <td>15.01.2024</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
