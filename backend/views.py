@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django.views.generic import View,TemplateView
-from .models import Profile
+from .models import Profile,Rezident
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
@@ -160,15 +160,59 @@ class Staff(LoginRequiredMixin,TemplateView):
       return context
 
 
-class Rezident(LoginRequiredMixin,TemplateView):
+class RezidentView(LoginRequiredMixin,TemplateView):
    template_name = 'rezedent.html'
    login_url = reverse_lazy('login')
+
+   def get_context_data(self, *, object_list=None, **kwargs):
+      context = super().get_context_data(**kwargs)
+      search=self.request.GET.get('search')
+
+      if search:
+         context['rezident'] = Rezident.objects.filter(
+            Q(company__icontains=search) |
+            Q(name__icontains=search) |
+            Q(email__icontains=search)
+         )
+      else:
+         context['rezident'] = Rezident.objects.all()
+
+
+
+
+      return context
 
 
 
 class Rezident_Create(LoginRequiredMixin,TemplateView):
    template_name = 'rezident_add.html'
    login_url = reverse_lazy('login')
+
+   def post(self, request, *args, **kwargs):
+      photo = request.FILES.get('photo')
+      company=request.POST.get('company')
+      city = request.POST.get('city')
+      name = request.POST.get('name')
+      phone = request.POST.get('phone')
+      email= request.POST.get('email')
+
+      print(photo)
+      Rezident.objects.create(
+         photo=photo,
+         company=company,
+         city=city,
+         name=name,
+         phone=phone,
+         email=email
+      )
+
+
+
+      return redirect('rezident')
+
+
+
+
 
 
 
@@ -178,4 +222,8 @@ class Money(LoginRequiredMixin,TemplateView):
 
 class Money_Create(LoginRequiredMixin,TemplateView):
    template_name = 'create_money.html'
+   login_url = reverse_lazy('login')
+
+class Debt(LoginRequiredMixin,TemplateView):
+   template_name = 'debt.html'
    login_url = reverse_lazy('login')

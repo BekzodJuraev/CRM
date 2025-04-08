@@ -10,9 +10,10 @@ urlpatterns=[
     path('order/',views.Order.as_view(),name='order'),
     path('applications/',views.Applications.as_view(),name='apply'),
     path('staff/',views.Staff.as_view(),name='staff'),
-    path('rezident/',views.Rezident.as_view(),name='rezident'),
+    path('rezident/',views.RezidentView.as_view(),name='rezident'),
     path('rezident/create',views.Rezident_Create.as_view(),name='create_rez'),
     path('money/',views.Money.as_view(),name='money'),
     path('money/create',views.Money_Create.as_view(),name='create_money'),
+    path('debt/',views.Debt.as_view(),name='debt')
 
 ]

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Таблица задолженностей</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f9fafb;
+      padding: 30px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid #e5e7eb;
+      padding: 12px;
+      text-align: center;
+      font-size: 15px;
+    }
+
+    th {
+      background: #f3f4f6;
+    }
+
+    button {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background: #10b981;
+      color: white;
+      font-weight: 600;
+    }
+
+    input[type="date"] {
+      padding: 6px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Общая сумма задолженности: <span id="total-debt">12 500 000 сум</span></h2>
+
+  <table id="debt-table">
+    <thead>
+      <tr>
+        <th>Клиент</th>
+        <th>Сумма задолженности</th>
+        <th>Дата завершения</th>
+        <th>Контакт</th>
+        <th>Срок погашения</th>
+        <th>Подтвердите оплату</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr data-id="1">
+        <td>ООО "Реклама Плюс"</td>
+        <td>500 000 сум</td>
+        <td><input type="date" value="2025-03-12" onchange="updateDate(1, this.value)"></td>
+        <td>+998 91 777 77 77</td>
+        <td>2024-03-10</td>
+        <td><button onclick="confirmPayment(1)">Оплачено</button></td>
+      </tr>
+      <tr data-id="2">
+        <td>ИП "Бизнес Про", ООО "Реклама Плюс"</td>
+        <td>800 000 сум</td>
+        <td><input type="date" value="2025-03-12" onchange="updateDate(2, this.value)"></td>
+        <td>+998 91 777 77 77</td>
+        <td>2024-02-12</td>
+        <td><button onclick="confirmPayment(2)">Оплачено</button></td>
+      </tr>
+      <tr data-id="3">
+        <td>ООО "Альфа"</td>
+        <td>1 000 000 сум</td>
+        <td><input type="date" value="2025-03-12" onchange="updateDate(3, this.value)"></td>
+        <td>+998 91 777 77 77</td>
+        <td>2024-01-15</td>
+        <td><button onclick="confirmPayment(3)">Оплачено</button></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  // Изменение даты завершения
+  function updateDate(clientId, newDate) {
+    fetch('/api/update-debt-date/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken') // если Django
+      },
+      body: JSON.stringify({
+        client_id: clientId,
+        new_date: newDate
+      })
+    }).then(response => {
+      if (!response.ok) throw new Error("Ошибка при отправке");
+      return response.json();
+    }).then(data => {
+      alert("Дата обновлена!");
+    }).catch(err => {
+      alert("Ошибка: " + err.message);
+    });
+  }
+
+  // Подтверждение оплаты
+  function confirmPayment(clientId) {
+    fetch('/api/confirm-payment/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
+      },
+      body: JSON.stringify({ client_id: clientId })
+    }).then(response => {
+      if (!response.ok) throw new Error("Ошибка при подтверждении");
+      return response.json();
+    }).then(data => {
+      alert("Оплата подтверждена!");
+      document.querySelector(`tr[data-id="${clientId}"]`).remove(); // Удаление строки
+    }).catch(err => {
+      alert("Ошибка: " + err.message);
+    });
+  }
+
+  // CSRF токен для Django
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      for (let cookie of document.cookie.split(';')) {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + '=')) {
+          cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+</script>
+
+</body>
+</html>

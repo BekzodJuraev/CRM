@@ -96,11 +96,12 @@
 <body>
     <div class="container">
         <h1 class="title">Список резидентов</h1>
-
+        <form action="" method="GET">
         <div class="controls">
             <a href="{% url 'create_rez' %}"><button class="btn add-btn">Добавить резидента</button></a>
-            <input type="text" placeholder="Поиск..." class="search-input">
+            <input type="text" placeholder="Поиск..." class="search-input" name="search">
         </div>
+            </form>
 
         <table class="residents-table">
             <thead>
@@ -113,27 +114,16 @@
                 </tr>
             </thead>
             <tbody>
+            {% for item in rezident %}
                 <tr>
-                    <td>ООО "Реклама Плюс"</td>
-                    <td>Ташкент</td>
-                    <td>Иван Иванов</td>
-                    <td>example@email.com</td>
-                    <td>10.03.2024</td>
+                    <td>{{item.company}}</td>
+                    <td>{{item.city}}</td>
+                    <td>{{item.name}}</td>
+                    <td>{{item.email}}</td>
+                    <td>{{item.created_at|date:"d.m.Y"}}</td>
                 </tr>
-                <tr>
-                    <td>ИП "Бизнес Про"</td>
-                    <td>Самарканд</td>
-                    <td>Петр Петров</td>
-                    <td>example@email.com</td>
-                    <td>12.02.2024</td>
-                </tr>
-                <tr>
-                    <td>ООО "Альфа"</td>
-                    <td>Наманган</td>
-                    <td>Олег Сидоров</td>
-                    <td>example@email.com</td>
-                    <td>15.01.2024</td>
-                </tr>
+            {% endfor %}
+
             </tbody>
         </table>
     </div>
