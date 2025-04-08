@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Раздел Финансы</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    body {
+      background-color: #f3f4f6;
+      margin: 0;
+      padding: 40px;
+      color: #1f2937;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    .dates {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .dates input {
+      padding: 10px 14px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      width: 48%;
+    }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat {
+      background-color: #f9fafb;
+      padding: 16px;
+      border-radius: 12px;
+      flex: 1;
+      min-width: 200px;
+      font-size: 15px;
+      font-weight: 500;
+      border: 1px solid #e5e7eb;
+    }
+
+    .add-button {
+      display: block;
+      width: 200px;
+      margin: 0 auto 30px;
+      padding: 12px;
+      background-color: #fbbf24;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .add-button:hover {
+      background-color: #f59e0b;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 14px;
+      border: 1px solid #e5e7eb;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    th {
+      background-color: #f3f4f6;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Финансы</h1>
+
+    <div class="dates">
+      <input type="date" value="2024-02-21">
+      <input type="date" value="2024-02-21">
+    </div>
+
+    <div class="stats">
+      <div class="stat">Сумма завершенных заказов за месяц: <br><strong>12 500 000 сум</strong></div>
+      <div class="stat">Количество завершенных заказов за месяц: <br><strong>10</strong></div>
+      <div class="stat">Маржа: <br><strong>3 750 000 сум</strong></div>
+      <div class="stat">Расходы: <br><strong>12 500 000 сум</strong></div>
+    </div>
+
+    <button class="add-button" onclick="window.location.href='{% url 'create_money' %}'">Добавить расход</button>
+
+    <h2 style="margin-bottom: 10px;">Таблица расходов</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Категория расхода</th>
+          <th>Дата</th>
+          <th>Сумма</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Обед</td>
+          <td>10.03.2025</td>
+          <td>50 000 сум</td>
+        </tr>
+        <tr>
+          <td>Бензин</td>
+          <td>12.03.2025</td>
+          <td>120 000 сум</td>
+        </tr>
+        <tr>
+          <td>Прочее</td>
+          <td>14.03.2025</td>
+          <td>30 000 сум</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
