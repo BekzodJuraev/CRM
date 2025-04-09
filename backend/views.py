@@ -7,6 +7,8 @@ from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Sum,Q,Count,F,Max,Prefetch
+from django.utils.timezone import now
 class Dashboard(LoginRequiredMixin,TemplateView):
    login_url = reverse_lazy('login')
    template_name = 'dashboard.html'
@@ -224,12 +226,17 @@ class Money(LoginRequiredMixin,TemplateView):
       context = super().get_context_data(**kwargs)
       first = self.request.GET.get('first')
       second=self.request.GET.get('second')
-      print(first,second)
+      today = now()
+      query=Finance.objects.filter(
+          created_at__year=today.year,
+          created_at__month=today.month
+      )
 
       if first and second:
-         context['money'] = Finance.objects.filter(created_at__range=(first, second))
-      else:
-         context['money'] = Finance.objects.all()
+         query = query.filter(created_at__range=(first, second))
+
+      context['money'] = query
+      context['cost']=query.aggregate(total_sum=Sum('sum'))['total_sum'] or 0
 
       return context
 
