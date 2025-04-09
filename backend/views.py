@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django.views.generic import View,TemplateView
-from .models import Profile,Rezident
+from .models import Profile,Rezident,Finance
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
@@ -196,7 +196,7 @@ class Rezident_Create(LoginRequiredMixin,TemplateView):
       phone = request.POST.get('phone')
       email= request.POST.get('email')
 
-      print(photo)
+
       Rezident.objects.create(
          photo=photo,
          company=company,
@@ -220,9 +220,35 @@ class Money(LoginRequiredMixin,TemplateView):
    template_name = 'money.html'
    login_url = reverse_lazy('login')
 
+   def get_context_data(self, *, object_list=None, **kwargs):
+      context = super().get_context_data(**kwargs)
+      first = self.request.GET.get('first')
+      second=self.request.GET.get('second')
+      print(first,second)
+
+      if first and second:
+         context['money'] = Finance.objects.filter(created_at__range=(first, second))
+      else:
+         context['money'] = Finance.objects.all()
+
+      return context
+
+
+
 class Money_Create(LoginRequiredMixin,TemplateView):
    template_name = 'create_money.html'
    login_url = reverse_lazy('login')
+
+   def post(self, request, *args, **kwargs):
+      name=request.POST.get('category')
+      sum=request.POST.get('amount')
+      Finance.objects.create(
+         name=name,
+         sum=sum
+      )
+      return redirect('money')
+
+
 
 class Debt(LoginRequiredMixin,TemplateView):
    template_name = 'debt.html'

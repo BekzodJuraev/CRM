@@ -80,7 +80,8 @@
   <div class="container">
     <h1>Добавить расход</h1>
 
-    <form id="expenseForm">
+    <form action="" method="POST">
+      {% csrf_token %}
       <label for="category">Введите категорию расхода:</label>
       <input type="text" id="category" name="category" required>
 
