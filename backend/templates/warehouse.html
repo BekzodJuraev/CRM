@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Склад | Управление остатками</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            background-color: #f4f6f9;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .actions {
+            margin-top: 10px;
+        }
+
+        .actions button {
+            padding: 10px 20px;
+            margin-right: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            border-radius: 10px;
+            background: #4f46e5;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .actions button:hover {
+            background: #3730a3;
+        }
+
+        .filters {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            gap: 20px;
+        }
+
+        .filters select,
+        .filters input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 200px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: #f9fafb;
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .low-stock {
+            color: #e11d48;
+            font-weight: 600;
+        }
+
+        .dot {
+            height: 10px;
+            width: 10px;
+            background-color: #e11d48;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        tr.low-item {
+            background-color: #fff5f5;
+        }
+
+        @media (max-width: 768px) {
+            .filters {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .filters select,
+            .filters input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Склад</h1>
+
+    <div class="actions">
+        <button>Добавить поступление</button>
+        <button>Установить лимит</button>
+    </div>
+
+    <div class="filters">
+        <select>
+            <option>Самарканд</option>
+
+        </select>
+        <input type="text" placeholder="Поиск...">
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Материал</th>
+                <th>Количество</th>
+                <th>Последнее поступление</th>
+                <th>Цена за единицу</th>
+                <th>Оставшийся запас</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="low-item">
+                <td>Акрил 3 мм (красный)</td>
+                <td>50 листов</td>
+                <td>07.03.2025</td>
+                <td>12 000 сум</td>
+                <td><span class="dot"></span><span class="low-stock">10 шт.</span></td>
+            </tr>
+            <tr>
+                <td>Акрил 3 мм (красный)</td>
+                <td>50 листов</td>
+                <td>07.03.2025</td>
+                <td>12 000 сум</td>
+                <td>5 шт.</td>
+            </tr>
+            <tr>
+                <td>Акрил 3 мм (красный)</td>
+                <td>50 листов</td>
+                <td>07.03.2025</td>
+                <td>12 000 сум</td>
+                <td>50 шт.</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

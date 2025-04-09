@@ -14,6 +14,7 @@ urlpatterns=[
     path('rezident/create',views.Rezident_Create.as_view(),name='create_rez'),
     path('money/',views.Money.as_view(),name='money'),
     path('money/create',views.Money_Create.as_view(),name='create_money'),
-    path('debt/',views.Debt.as_view(),name='debt')
+    path('debt/',views.Debt.as_view(),name='debt'),
+    path('warehouse/',views.WarehouseView.as_view(),name='warehouse')
 
 ]

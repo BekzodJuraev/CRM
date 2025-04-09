@@ -260,3 +260,8 @@ class Money_Create(LoginRequiredMixin,TemplateView):
 class Debt(LoginRequiredMixin,TemplateView):
    template_name = 'debt.html'
    login_url = reverse_lazy('login')
+
+
+class WarehouseView(LoginRequiredMixin, TemplateView):
+   template_name = 'warehouse.html'
+   login_url = reverse_lazy('login')
