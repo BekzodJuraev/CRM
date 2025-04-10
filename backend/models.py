@@ -37,7 +37,7 @@ class Stage(models.Model):
 class Orders(models.Model):
     client=models.CharField(max_length=250)
     adress=models.CharField(max_length=250)
-    order_sum=models.IntegerField(default=0)
+    order_sum=models.DecimalField(max_digits=10, decimal_places=2,default=0)
     order_predoplata=models.IntegerField(default=0)
     category=models.CharField(max_length=250)
     description=models.TextField()
@@ -55,7 +55,7 @@ class Orders(models.Model):
 
 class Consumables(models.Model):
     add=models.CharField(max_length=50)
-    price=models.IntegerField()
+    price=models.DecimalField(max_digits=10, decimal_places=2,default=0)
     catigories=models.CharField(max_length=50)
     order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name='consumables')
 
@@ -78,7 +78,7 @@ class Rezident(models.Model):
 
 class Finance(models.Model):
     name=models.CharField(max_length=60)
-    sum=models.IntegerField(default=0)
+    sum=models.DecimalField(max_digits=10, decimal_places=2,default=0)
     created_at=models.DateField(auto_now_add=True)
 
     def __str__(self):
@@ -97,8 +97,25 @@ class Debt(models.Model):
 
 
 
-# class Warehouse(models.Model):
-#     product=models.CharField(max_length=70)
-#     quantity=models.IntegerField(default=0)
-#     created_at=models.DateField(auto_now_add=True)
-#     update_time=m
+class Warehouse(models.Model):
+    product=models.CharField(max_length=70)
+    quantity=models.IntegerField(default=0)
+    created_at=models.DateField()
+    category=models.CharField(max_length=70)
+    city=models.CharField(max_length=70)
+    deliver=models.CharField(max_length=70)
+
+
+
+
+    def __str__(self):
+        return self.product
+
+
+class WarehouseLimit(models.Model):
+    category = models.CharField(max_length=70)
+    product = models.CharField(max_length=70)
+    limit=models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.product

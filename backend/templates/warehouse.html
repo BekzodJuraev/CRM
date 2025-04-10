@@ -123,8 +123,8 @@
     <h1>Склад</h1>
 
     <div class="actions">
-        <button>Добавить поступление</button>
-        <button>Установить лимит</button>
+        <button onclick="window.location.href='{% url 'warehouse_create' %}'">Добавить поступление</button>
+        <button onclick="window.location.href='{% url 'warehouse_limit' %}'">Установить лимит</button>
     </div>
 
     <div class="filters">
@@ -139,34 +139,22 @@
         <thead>
             <tr>
                 <th>Материал</th>
-                <th>Количество</th>
+
                 <th>Последнее поступление</th>
-                <th>Цена за единицу</th>
+
                 <th>Оставшийся запас</th>
             </tr>
         </thead>
         <tbody>
+        {% for item in warehouse %}
             <tr class="low-item">
-                <td>Акрил 3 мм (красный)</td>
-                <td>50 листов</td>
-                <td>07.03.2025</td>
-                <td>12 000 сум</td>
-                <td><span class="dot"></span><span class="low-stock">10 шт.</span></td>
+                <td>{{item.product}}</td>
+
+                <td>{{item.last_added}}</td>
+
+                <td><span class="dot"></span><span class="low-stock">{{item.limit}}</span></td>
             </tr>
-            <tr>
-                <td>Акрил 3 мм (красный)</td>
-                <td>50 листов</td>
-                <td>07.03.2025</td>
-                <td>12 000 сум</td>
-                <td>5 шт.</td>
-            </tr>
-            <tr>
-                <td>Акрил 3 мм (красный)</td>
-                <td>50 листов</td>
-                <td>07.03.2025</td>
-                <td>12 000 сум</td>
-                <td>50 шт.</td>
-            </tr>
+        {% endfor %}
         </tbody>
     </table>
 </div>

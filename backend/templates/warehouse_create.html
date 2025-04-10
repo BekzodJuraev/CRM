@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Добавить резидента</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    body {
+      background-color: #f3f4f6;
+      padding: 40px;
+      color: #1f2937;
+    }
+
+    .form-container {
+      max-width: 600px;
+      margin: auto;
+      background-color: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 24px;
+      font-size: 28px;
+    }
+
+    form label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    form input,
+    form select {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    form input[type="file"] {
+      padding: 8px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 12px;
+      background-color: #fbbf24;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn-submit:hover {
+      background-color: #f59e0b;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Добавить поступление</h2>
+    <form action="" method="POST" >
+      {% csrf_token %}
+
+
+      <label for="city">Выберите город:</label>
+      <select id="city" name="city">
+        <option value="Самарканд" selected>Самарканд</option>
+
+      </select>
+      <label >Категория заказа:</label>
+      <select name="category">
+        <option value="Реклама">Реклама</option>
+        <option value="Печать">Печать</option>
+        <option value="Дизайн">Дизайн</option>
+
+      </select>
+      <label >Добавить расходники::</label>
+       <select  name="product">
+        <option value="АКРИЛ, 1 mm, Зеленый"> АКРИЛ, 1 mm, Зеленый</option>
+        <option value="АКРИЛ, 1 mm, Красный">  АКРИЛ, 1 mm, Красный</option>
+        <option value="АКРИЛ, 1 mm, Черный">  АКРИЛ, 1 mm, Черный</option>
+
+      </select>
+
+
+
+      <label >Укажите количество расходника:</label>
+      <input type="number"  name="quantity" required  />
+
+      <label >Дата поступления:</label>
+      <input type="date"  name="created_at"   required/>
+
+      <label >Поставщик:</label>
+      <input type="text"  name="deliver" required />
+
+
+
+
+
+      <button type="submit" class="btn-submit">Сохранить</button>
+    </form>
+  </div>
+</body>
+</html>

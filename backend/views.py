@@ -1,13 +1,13 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django.views.generic import View,TemplateView
-from .models import Profile,Rezident,Finance
+from .models import Profile,Rezident,Finance,Warehouse,WarehouseLimit
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
-from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Sum,Q,Count,F,Max,Prefetch
+from django.db.models import Sum,Q,Count,F,Max,Prefetch,OuterRef, Subquery
+
 from django.utils.timezone import now
 class Dashboard(LoginRequiredMixin,TemplateView):
    login_url = reverse_lazy('login')
@@ -265,3 +265,46 @@ class Debt(LoginRequiredMixin,TemplateView):
 class WarehouseView(LoginRequiredMixin, TemplateView):
    template_name = 'warehouse.html'
    login_url = reverse_lazy('login')
+
+   def get_context_data(self, *, object_list=None, **kwargs):
+      context = super().get_context_data(**kwargs)
+      search = self.request.GET.get('search')
+      limit_subquery = WarehouseLimit.objects.filter(product=OuterRef('product')).values('limit')[:1]
+      context['warehouse']=Warehouse.objects.values('product').annotate(
+         last_added=Max('created_at'),limit=Subquery(limit_subquery))
+
+
+      return context
+
+
+class WarehouseCreateView(LoginRequiredMixin, TemplateView):
+   template_name = 'warehouse_create.html'
+   login_url = reverse_lazy('login')
+
+
+   def post(self, request, *args, **kwargs):
+      city=request.POST.get('city')
+      category = request.POST.get('category')
+      product = request.POST.get('product')
+      quantity = request.POST.get('quantity')
+      deliver = request.POST.get('deliver')
+      created_at = request.POST.get('created_at')
+      Warehouse.objects.create(city=city,category=category,product=product,quantity=quantity,deliver=deliver,created_at=created_at)
+
+      return redirect('warehouse')
+
+
+
+
+class WarehouseLimitView(LoginRequiredMixin, TemplateView):
+   template_name = 'warehouse_limit.html'
+   login_url = reverse_lazy('login')
+
+   def post(self, request, *args, **kwargs):
+      category = request.POST.get('category')
+      product = request.POST.get('product')
+      limit = request.POST.get('limit')
+      WarehouseLimit.objects.create(category=category,product=product,limit=limit)
+
+      return redirect('warehouse')
+
