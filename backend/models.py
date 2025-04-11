@@ -32,13 +32,16 @@ class Profile(models.Model):
 
 class Orders(models.Model):
     Stage_CHOICES = [
-        ("manager", "Принят"),
-        ("admin", "Проектирование"),
-        ("supplier", "Производство"),
-        ("chief", "Сборка"),
-        ("installer", "Доставка"),
-        ("technologist", "Завершён"),
+        ("accepted", "Принят"),  # Accepted / Received
+        ("design", "Проектирование"),  # Project Design / Planning
+        ("technologist", "Технолог"),  # Technologist Stage
+        ("manufacturing", "Производство"),  # Manufacturing
+        ("assembly", "Сборка"),  # Assembly
+        ("delivery", "Доставка"),  # Delivery
+        ("order_ready", "Заказ готов"),  # Order Ready
+        ("finished", "Завершено"),  # Fully Completed / Finished
     ]
+
     Social_CHOICES = [
         ("social", "Социальные сети"),
         ("cold_calls", "Холодные звонки"),

@@ -84,8 +84,12 @@
                     <div class="kanban mt-4">
                         <div class="kanban-column">
                             <h5>Принят</h5>
-                            <div class="kanban-item">ООО "Реклама Плюс"<br><small>Срок: 15.03.2025</small></div>
+                            {% for item in accepted %}
+                            <div class="kanban-item">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                            {% endfor %}
                         </div>
+
+
                         <div class="kanban-column">
                             <h5>Проектирование</h5>
                             <div class="kanban-item">ООО "Реклама Плюс"<br><small>Срок: 16.03.2025</small></div>

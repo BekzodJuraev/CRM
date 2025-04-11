@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django.views.generic import View,TemplateView
-from .models import Profile,Rezident,Finance,Warehouse,WarehouseLimit,Consumables
+from .models import Profile,Rezident,Finance,Warehouse,WarehouseLimit,Consumables,Orders
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
@@ -12,6 +12,21 @@ from django.utils.timezone import now
 class Dashboard(LoginRequiredMixin,TemplateView):
    login_url = reverse_lazy('login')
    template_name = 'dashboard.html'
+
+   def get_context_data(self, *, object_list=None, **kwargs):
+      context = super().get_context_data(**kwargs)
+      context['accepted']=Orders.objects.filter(stage='accepted')
+      context['design'] = Orders.objects.filter(stage='design')
+      context['technologist'] = Orders.objects.filter(stage='technologist')
+      context['manufacturing'] = Orders.objects.filter(stage='manufacturing')
+      context['delivery'] = Orders.objects.filter(stage='delivery')
+      context['order_ready'] = Orders.objects.filter(stage='order_ready')
+      context['finished'] = Orders.objects.filter(stage='finished')
+
+      return context
+
+
+
 
 
 class Main(TemplateView):
