@@ -125,16 +125,24 @@
     <div class="actions">
         <button onclick="window.location.href='{% url 'warehouse_create' %}'">Добавить поступление</button>
         <button onclick="window.location.href='{% url 'warehouse_limit' %}'">Установить лимит</button>
+
     </div>
 
+ <form method="GET" action="">
     <div class="filters">
         <select>
             <option>Самарканд</option>
 
         </select>
-        <input type="text" placeholder="Поиск...">
+        <input type="text" name="search" placeholder="Поиск...">
+
+
     </div>
 
+     <div class="actions">
+        <button >Поиск</button>
+         </div>
+      </form>
     <table>
         <thead>
             <tr>
@@ -152,7 +160,11 @@
 
                 <td>{{item.last_added}}</td>
 
-                <td><span class="dot"></span><span class="low-stock">{{item.limit}}</span></td>
+                {% if item.limit > item.stock|default:item.quantity %}
+                <td><span class="dot"></span><span class="low-stock">{{ item.stock|default:item.quantity }}</span></td>
+                {% else %}
+                <td><span ></span><span >{{ item.stock|default:item.quantity }}</span></td>
+                {% endif %}
             </tr>
         {% endfor %}
         </tbody>

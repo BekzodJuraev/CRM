@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django.views.generic import View,TemplateView
-from .models import Profile,Rezident,Finance,Warehouse,WarehouseLimit
+from .models import Profile,Rezident,Finance,Warehouse,WarehouseLimit,Consumables
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
@@ -269,9 +269,18 @@ class WarehouseView(LoginRequiredMixin, TemplateView):
    def get_context_data(self, *, object_list=None, **kwargs):
       context = super().get_context_data(**kwargs)
       search = self.request.GET.get('search')
-      limit_subquery = WarehouseLimit.objects.filter(product=OuterRef('product')).values('limit')[:1]
-      context['warehouse']=Warehouse.objects.values('product').annotate(
-         last_added=Max('created_at'),limit=Subquery(limit_subquery))
+      limit_subquery = WarehouseLimit.objects.filter(product=OuterRef('product')).order_by('-id').values('limit')[:1]
+      stock_subquery = Consumables.objects.filter(add=OuterRef('product')).values('add').annotate(count=Count('id')).values('count')[:1]
+      if search:
+         context['warehouse'] = Warehouse.objects.filter(product__icontains=search).values('product').annotate(
+            last_added=Max('created_at'), limit=Subquery(limit_subquery), quantity=Sum('quantity'),
+            stock=F('quantity') - Subquery(stock_subquery))
+      else:
+         context['warehouse'] = Warehouse.objects.values('product').annotate(
+            last_added=Max('created_at'), limit=Subquery(limit_subquery), quantity=Sum('quantity'),
+            stock=F('quantity') - Subquery(stock_subquery))
+
+
 
 
       return context

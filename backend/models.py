@@ -29,21 +29,29 @@ class Profile(models.Model):
 
 
 
-class Stage(models.Model):
-    name=models.CharField(max_length=30)
 
-    def __str__(self):
-        return self.name
 class Orders(models.Model):
+    Stage_CHOICES = [
+        ("manager", "Принят"),
+        ("admin", "Проектирование"),
+        ("supplier", "Производство"),
+        ("chief", "Сборка"),
+        ("installer", "Доставка"),
+        ("technologist", "Завершён"),
+    ]
+    Social_CHOICES = [
+        ("social", "Социальные сети"),
+        ("cold_calls", "Холодные звонки"),
+        ("word_of_mouth", "Сарафанное радио"),
+    ]
     client=models.CharField(max_length=250)
     adress=models.CharField(max_length=250)
     order_sum=models.DecimalField(max_digits=10, decimal_places=2,default=0)
     order_predoplata=models.IntegerField(default=0)
-    category=models.CharField(max_length=250)
     description=models.TextField()
     phone=models.CharField(max_length=50)
-    social=models.CharField(max_length=60)
-    stage=models.ForeignKey(Stage,on_delete=models.CASCADE, related_name='order')
+    social=models.CharField(max_length=20, choices=Social_CHOICES)
+    stage = models.CharField(max_length=20, choices=Stage_CHOICES)
     add_order=models.DateField()
     complete_order=models.DateField()
 
