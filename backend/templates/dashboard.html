@@ -82,47 +82,78 @@
 
                     </div>
                     <div class="kanban mt-4">
-                        <div class="kanban-column">
+                         <div class="kanban-column" id="column1" ondrop="drop(event)" ondragover="allowDrop(event)">
                             <h5>Принят</h5>
+
                             {% for item in accepted %}
-                            <div class="kanban-item">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                            <div class="kanban-item" id="order1" draggable="true" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
                             {% endfor %}
                         </div>
 
 
-                        <div class="kanban-column">
+                        <div class="kanban-column" id="column2" ondrop="drop(event)" ondragover="allowDrop(event)">
                             <h5>Проектирование</h5>
-                            <div class="kanban-item">ООО "Реклама Плюс"<br><small>Срок: 16.03.2025</small></div>
+                           {% for item in design %}
+                           <div class="kanban-item" id="order1" draggable="true" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                            {% endfor %}
                         </div>
                         <div class="kanban-column">
                             <h5>Технолог</h5>
-                            <div class="kanban-item">ООО "Реклама Плюс"<br><small>Срок: 17.03.2025</small></div>
+                            {% for item in technologist %}
+                            <div class="kanban-item">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                            {% endfor %}
                         </div>
                         <div class="kanban-column">
                             <h5>Производство</h5>
-                            <div class="kanban-item">ООО "Реклама Плюс"<br><small>Срок: 18.03.2025</small></div>
+                            {% for item in manufacturing %}
+                            <div class="kanban-item">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                            {% endfor %}
                         </div>
                         <div class="kanban-column">
                             <h5>Сборка</h5>
-                            <div class="kanban-item">ООО "Реклама Плюс"<br><small>Срок: 19.03.2025</small></div>
+                            {% for item in assembly %}
+                            <div class="kanban-item">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                            {% endfor %}
                         </div>
                         <div class="kanban-column">
                             <h5>Доставка</h5>
-                            <div class="kanban-item">ООО "Реклама Плюс"<br><small>Срок: 20.03.2025</small></div>
+                            {% for item in delivery %}
+                            <div class="kanban-item">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                            {% endfor %}
                         </div>
                         <div class="kanban-column">
                             <h5>Заказ готов</h5>
-                            <div class="kanban-item">ООО "Реклама Плюс"<br><small>Срок: 21.03.2025</small></div>
+                           {% for item in order_ready %}
+                            <div class="kanban-item">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                            {% endfor %}
                         </div>
                         <div class="kanban-column">
                             <h5>Завершён</h5>
-                            <div class="kanban-item">ООО "Реклама Плюс"<br><small>Срок: 22.03.2025</small></div>
+                            {% for item in finished %}
+                            <div class="kanban-item">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
             </main>
         </div>
     </div>
+   <script>
+        function allowDrop(event) {
+            event.preventDefault();
+        }
+
+        function drag(event) {
+            event.dataTransfer.setData("text", event.target.id);
+        }
+
+        function drop(event) {
+            event.preventDefault();
+            var data = event.dataTransfer.getData("text");
+            var draggedItem = document.getElementById(data);
+            event.target.appendChild(draggedItem);
+        }
+    </script>
 </body>
 </html>
 {% else %}

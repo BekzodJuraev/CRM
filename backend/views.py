@@ -19,6 +19,7 @@ class Dashboard(LoginRequiredMixin,TemplateView):
       context['design'] = Orders.objects.filter(stage='design')
       context['technologist'] = Orders.objects.filter(stage='technologist')
       context['manufacturing'] = Orders.objects.filter(stage='manufacturing')
+      context['assembly'] = Orders.objects.filter(stage='assembly')
       context['delivery'] = Orders.objects.filter(stage='delivery')
       context['order_ready'] = Orders.objects.filter(stage='order_ready')
       context['finished'] = Orders.objects.filter(stage='finished')
