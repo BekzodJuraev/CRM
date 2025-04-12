@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Список заказов в проектировании</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Montserrat', sans-serif;
+      background-color: #f8fafc;
+      color: #333;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .search {
+      margin-bottom: 20px;
+    }
+
+    .search input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      font-size: 14px;
+    }
+
+    .order-card {
+      border: 1px solid #ddd;
+      padding: 16px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+    }
+
+    .order-card h2 {
+      font-size: 18px;
+      margin-top: 0;
+    }
+
+    .order-info {
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+
+    .order-info b {
+      font-weight: 600;
+    }
+
+    .btn-complete {
+      background-color: #4f46e5;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .btn-complete:hover {
+      background-color: #3730a3;
+    }
+
+    @media (max-width: 600px) {
+      .order-card {
+        padding: 12px;
+      }
+
+      .btn-complete {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Список заказов в проектировании:</h1>
+
+  <div class="search">
+    <input type="text" placeholder="Поиск...">
+  </div>
+
+  <div class="order-card">
+    <h2>ООО «Реклама Плюс»</h2>
+    <div class="order-info">
+      <p><b>Дата добавления:</b> 10.12.2024 | <b>Срок:</b> 12.03.2025</p>
+      <p><b>Предоплата:</b> 200 сум | <b>Сумма заказа:</b> 300 сум</p>
+      <p><b>Категория:</b> Наружная реклама</p>
+      <p><b>Адрес:</b> г. Ташкент, ул. Амир Темура, 15</p>
+      <p><b>Телефон:</b> +998917777777</p>
+      <p><b>Расходники:</b> Лента (200 000 сум)</p>
+      <p><b>Описание / ТЗ:</b> Баннер, размеры 3x5 м</p>
+    </div>
+    <button class="btn-complete">Завершить проектирование</button>
+  </div>
+
+  <div class="order-card">
+    <h2>ООО «Реклама Плюс»</h2>
+    <div class="order-info">
+      <p><b>Дата добавления:</b> 10.12.2024 | <b>Срок:</b> 12.03.2025</p>
+      <p><b>Предоплата:</b> 200 сум | <b>Сумма заказа:</b> 300 сум</p>
+      <p><b>Категория:</b> Наружная реклама</p>
+      <p><b>Адрес:</b> г. Ташкент, ул. Амир Темура, 15</p>
+      <p><b>Телефон:</b> +998917777777</p>
+      <p><b>Расходники:</b> Лента (200 000 сум)</p>
+      <p><b>Описание / ТЗ:</b> Баннер, размеры 3x5 м</p>
+    </div>
+    <button class="btn-complete">Завершить проектирование</button>
+  </div>
+
+</div>
+
+</body>
+</html>
