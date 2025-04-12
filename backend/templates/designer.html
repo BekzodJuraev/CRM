@@ -95,12 +95,14 @@
 
 <div class="container">
   <h1>Список заказов в проектировании:</h1>
-
+  <form action="" method="GET">
   <div class="search">
-    <input type="text" placeholder="Поиск...">
+    <input type="text" placeholder="Поиск..." name="search">
   </div>
+    </form>
   {% for item in design %}
-  <form action="">
+  <form action="" method="POST">
+       {% csrf_token %}
   <div class="order-card">
     <h2>{{item.client}}</h2>
     <div class="order-info">
@@ -125,7 +127,8 @@
 
       <p><b>Описание / ТЗ:</b> {{item.description}}</p>
     </div>
-    <button class="btn-complete">Завершить проектирование</button>
+    <input type="hidden" name="pk" value="{{ item.pk }}">
+    <button class="btn-complete" value="designer" name="action">Завершить проектирование</button>
   </div>
     </form>
   {% endfor %}

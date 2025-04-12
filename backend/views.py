@@ -7,22 +7,49 @@ from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum,Q,Count,F,Max,Prefetch,OuterRef, Subquery
-
 from django.utils.timezone import now
+
 class Dashboard(LoginRequiredMixin,TemplateView):
    login_url = reverse_lazy('login')
    template_name = 'dashboard.html'
 
+
+
+
+   def post(self,request):
+      action=request.POST.get('action')
+      if action == "designer":
+         pk=request.POST.get('pk')
+         Orders.objects.filter(pk=pk).update(stage="technologist")
+         return redirect(request.path)
+
+
+
    def get_context_data(self, *, object_list=None, **kwargs):
       context = super().get_context_data(**kwargs)
-      context['accepted']=Orders.objects.filter(stage='accepted')
-      context['design'] = Orders.objects.filter(stage='design').prefetch_related('consumables')
-      context['technologist'] = Orders.objects.filter(stage='technologist')
-      context['manufacturing'] = Orders.objects.filter(stage='manufacturing')
-      context['assembly'] = Orders.objects.filter(stage='assembly')
-      context['delivery'] = Orders.objects.filter(stage='delivery')
-      context['order_ready'] = Orders.objects.filter(stage='order_ready')
-      context['finished'] = Orders.objects.filter(stage='finished')
+      search = self.request.GET.get('search')
+
+      stages = [
+         'accepted', 'design', 'technologist', 'manufacturing',
+         'assembly', 'delivery', 'order_ready', 'finished'
+      ]
+
+      for stage in stages:
+         queryset = Orders.objects.filter(stage=stage)
+
+         # Add search filter if present
+         if search:
+            queryset = queryset.filter(client__icontains=search)
+
+         # Add prefetch for 'design' stage
+         if stage == 'design':
+            queryset = queryset.prefetch_related('consumables')
+
+         context[stage] = queryset
+
+      return context
+
+
 
       return context
 
