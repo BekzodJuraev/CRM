@@ -99,34 +99,37 @@
   <div class="search">
     <input type="text" placeholder="Поиск...">
   </div>
-
+  {% for item in design %}
+  <form action="">
   <div class="order-card">
-    <h2>ООО «Реклама Плюс»</h2>
+    <h2>{{item.client}}</h2>
     <div class="order-info">
-      <p><b>Дата добавления:</b> 10.12.2024 | <b>Срок:</b> 12.03.2025</p>
-      <p><b>Предоплата:</b> 200 сум | <b>Сумма заказа:</b> 300 сум</p>
-      <p><b>Категория:</b> Наружная реклама</p>
-      <p><b>Адрес:</b> г. Ташкент, ул. Амир Темура, 15</p>
-      <p><b>Телефон:</b> +998917777777</p>
-      <p><b>Расходники:</b> Лента (200 000 сум)</p>
-      <p><b>Описание / ТЗ:</b> Баннер, размеры 3x5 м</p>
+      <p><b>Дата добавления:</b> {{item.add_order|date:"d.m.Y"}}| <b>Срок:</b> {{item.complete_order|date:"d.m.Y"}}</p>
+      <p><b>Предоплата:</b> {{item.order_predoplata}} сум | <b>Сумма заказа:</b> {{item.order_sum}} сум</p>
+      <p><b>Адрес:</b>{{item.adress}}</p>
+      <p><b>Телефон:</b> {{item.phone}}</p>
+
+        {% with item.consumables.all as consumables %}
+  <p><b>Категория:</b>
+    {% for rek in consumables %}
+      {{ rek.catigories }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+  </p>
+
+  <p><b>Расходники:</b>
+    {% for rek in consumables %}
+      {{ rek.add }} ({{ rek.price }} сум)
+    {% endfor %}
+  </p>
+{% endwith %}
+
+      <p><b>Описание / ТЗ:</b> {{item.description}}</p>
     </div>
     <button class="btn-complete">Завершить проектирование</button>
   </div>
+    </form>
+  {% endfor %}
 
-  <div class="order-card">
-    <h2>ООО «Реклама Плюс»</h2>
-    <div class="order-info">
-      <p><b>Дата добавления:</b> 10.12.2024 | <b>Срок:</b> 12.03.2025</p>
-      <p><b>Предоплата:</b> 200 сум | <b>Сумма заказа:</b> 300 сум</p>
-      <p><b>Категория:</b> Наружная реклама</p>
-      <p><b>Адрес:</b> г. Ташкент, ул. Амир Темура, 15</p>
-      <p><b>Телефон:</b> +998917777777</p>
-      <p><b>Расходники:</b> Лента (200 000 сум)</p>
-      <p><b>Описание / ТЗ:</b> Баннер, размеры 3x5 м</p>
-    </div>
-    <button class="btn-complete">Завершить проектирование</button>
-  </div>
 
 </div>
 

@@ -16,7 +16,7 @@ class Dashboard(LoginRequiredMixin,TemplateView):
    def get_context_data(self, *, object_list=None, **kwargs):
       context = super().get_context_data(**kwargs)
       context['accepted']=Orders.objects.filter(stage='accepted')
-      context['design'] = Orders.objects.filter(stage='design')
+      context['design'] = Orders.objects.filter(stage='design').prefetch_related('consumables')
       context['technologist'] = Orders.objects.filter(stage='technologist')
       context['manufacturing'] = Orders.objects.filter(stage='manufacturing')
       context['assembly'] = Orders.objects.filter(stage='assembly')
