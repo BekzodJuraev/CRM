@@ -8,6 +8,7 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum,Q,Count,F,Max,Prefetch,OuterRef, Subquery
 from django.utils.timezone import now
+from django.http import JsonResponse
 
 class Dashboard(LoginRequiredMixin,TemplateView):
    login_url = reverse_lazy('login')
@@ -18,10 +19,19 @@ class Dashboard(LoginRequiredMixin,TemplateView):
 
    def post(self,request):
       action=request.POST.get('action')
+      pk = request.POST.get('pk')
+      stage=request.POST.get('stage')
+
       if action == "designer":
-         pk=request.POST.get('pk')
          Orders.objects.filter(pk=pk).update(stage="technologist")
          return redirect(request.path)
+
+      elif action == "admin":
+         Orders.objects.filter(pk=pk).update(stage=stage)
+         return JsonResponse({'status': 'success'})
+      return JsonResponse({'status': 'error', 'message': 'Invalid action'}, status=400)
+
+
 
 
 

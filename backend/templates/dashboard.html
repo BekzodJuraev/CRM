@@ -1,5 +1,5 @@
 {% if request.user.profile.approve %}
-{% if request.user.profile.position == "admin"%}
+{% if request.user.profile.position == "admin" or request.user.profile.position == "manager" %}
     {% include 'admin.html' %}
 {% elif request.user.profile.position == 'designer' %}
     {% include 'designer.html' %}

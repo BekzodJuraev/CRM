@@ -81,55 +81,55 @@
 
                     </div>
                     <div class="kanban mt-4">
-                         <div class="kanban-column" id="column1" ondrop="drop(event)" ondragover="allowDrop(event)">
+                         <div class="kanban-column"  data-stage="accepted" ondrop="drop(event)" ondragover="allowDrop(event)">
                             <h5>Принят</h5>
 
                             {% for item in accepted %}
-                            <div class="kanban-item" id="order1" draggable="true" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                            <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
                             {% endfor %}
                         </div>
 
 
-                        <div class="kanban-column" id="column2" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        <div class="kanban-column"  ondrop="drop(event)" data-stage="design" ondragover="allowDrop(event)">
                             <h5>Проектирование</h5>
                            {% for item in design %}
-                           <div class="kanban-item" id="order1" draggable="true" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                           <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
                             {% endfor %}
                         </div>
-                        <div class="kanban-column">
+                       <div class="kanban-column" ondrop="drop(event)" data-stage="technologist" ondragover="allowDrop(event)">
                             <h5>Технолог</h5>
                             {% for item in technologist %}
-                            <div class="kanban-item">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                           <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
                             {% endfor %}
                         </div>
-                        <div class="kanban-column">
+                       <div class="kanban-column" " ondrop="drop(event)" data-stage="manufacturing" ondragover="allowDrop(event)">
                             <h5>Производство</h5>
                             {% for item in manufacturing %}
-                            <div class="kanban-item">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                           <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
                             {% endfor %}
                         </div>
-                        <div class="kanban-column">
+                        <div class="kanban-column"  ondrop="drop(event)" data-stage="assembly" ondragover="allowDrop(event)">
                             <h5>Сборка</h5>
                             {% for item in assembly %}
-                            <div class="kanban-item">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                           <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
                             {% endfor %}
                         </div>
-                        <div class="kanban-column">
+                        <div class="kanban-column"  ondrop="drop(event)" data-stage="delivery" ondragover="allowDrop(event)">
                             <h5>Доставка</h5>
                             {% for item in delivery %}
-                            <div class="kanban-item">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                           <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
                             {% endfor %}
                         </div>
-                        <div class="kanban-column">
+                        <div class="kanban-column" id="" ondrop="drop(event)" data-stage="order_ready" ondragover="allowDrop(event)">
                             <h5>Заказ готов</h5>
                            {% for item in order_ready %}
-                            <div class="kanban-item">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                           <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
                             {% endfor %}
                         </div>
-                        <div class="kanban-column">
+                        <div class="kanban-column"  ondrop="drop(event)" data-stage="finished" ondragover="allowDrop(event)">
                             <h5>Завершён</h5>
                             {% for item in finished %}
-                            <div class="kanban-item">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                           <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
                             {% endfor %}
                         </div>
                     </div>
@@ -138,20 +138,44 @@
         </div>
     </div>
    <script>
-        function allowDrop(event) {
-            event.preventDefault();
-        }
+function allowDrop(event) {
+    event.preventDefault();
+}
 
-        function drag(event) {
-            event.dataTransfer.setData("text", event.target.id);
-        }
+function drag(event) {
+    event.dataTransfer.setData("text", event.target.id);
+}
 
-        function drop(event) {
-            event.preventDefault();
-            var data = event.dataTransfer.getData("text");
-            var draggedItem = document.getElementById(data);
-            event.target.appendChild(draggedItem);
-        }
-    </script>
+function drop(event) {
+    event.preventDefault();
+
+    const data = event.dataTransfer.getData("text");
+    const draggedItem = document.getElementById(data);
+
+    const dropZone = event.target.closest(".kanban-column");
+    if (dropZone && draggedItem) {
+        dropZone.appendChild(draggedItem);
+
+        const stage = dropZone.dataset.stage;
+        const pk = draggedItem.dataset.pk;
+
+        fetch("{% url 'dashboard' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: new URLSearchParams({
+                action: 'admin',
+                stage: stage,
+                pk: pk
+            })
+        })
+        .then(res => res.json())
+        .then(data => console.log("Updated:", data))
+        .catch(err => console.error("Error:", err));
+    }
+}
+</script>
 </body>
 </html>
