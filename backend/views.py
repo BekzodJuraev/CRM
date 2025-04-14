@@ -25,6 +25,17 @@ class Dashboard(LoginRequiredMixin,TemplateView):
       if action == "designer":
          Orders.objects.filter(pk=pk).update(stage="technologist")
          return redirect(request.path)
+      elif action == "technologist":
+         add = request.POST.getlist('add')
+         price = request.POST.getlist('price')
+         catigories = request.POST.getlist('catigories')
+         rezka=request.POST.get('rezka')
+         svarka = request.POST.get('svarka')
+         fill = request.POST.get('fill')
+         print = request.POST.get('print')
+
+         Orders.objects.filter(pk=pk).update(stage="manufacturing")
+         return redirect(request.path)
 
       elif action == "admin":
          Orders.objects.filter(pk=pk).update(stage=stage)
