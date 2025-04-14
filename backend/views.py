@@ -152,6 +152,45 @@ class Order(LoginRequiredMixin,TemplateView):
    login_url = reverse_lazy('login')
 
 
+   def post(self,request):
+      add=request.POST.getlist('add')
+      price=request.POST.getlist('price')
+      catigories = request.POST.getlist('catigories')
+
+
+
+      client = request.POST.get('client')
+      adress= request.POST.get('adress')
+      order_sum = request.POST.get('order_sum')
+      order_predoplata = request.POST.get('order_predoplata')
+      description = request.POST.get('description')
+      phone = request.POST.get('phone')
+      social = request.POST.get('social')
+      stage = request.POST.get('stage')
+      add_order = request.POST.get('add_order')
+      complete_order = request.POST.get('complete_order')
+
+
+      order=Orders.objects.create\
+         (client=client,
+          adress=adress,
+          order_sum=order_sum,
+          order_predoplata=order_predoplata,
+          description=description,
+          phone=phone,
+          social=social,
+          stage=stage,
+          add_order=add_order,
+          complete_order=complete_order)
+      consumables = [
+         Consumables(order=order, add=a, price=p, catigories=c)
+         for a, p, c in zip(add, price, catigories)
+      ]
+      Consumables.objects.bulk_create(consumables)
+
+      return redirect('dashboard')
+
+
 
 class Applications(LoginRequiredMixin,TemplateView):
    template_name = 'applications.html'

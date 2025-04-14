@@ -50,13 +50,16 @@ class Orders(models.Model):
     client=models.CharField(max_length=250)
     adress=models.CharField(max_length=250)
     order_sum=models.DecimalField(max_digits=10, decimal_places=2,default=0)
-    order_predoplata=models.IntegerField(default=0)
+    order_predoplata=models.DecimalField(max_digits=10, decimal_places=2,default=0)
     description=models.TextField()
     phone=models.CharField(max_length=50)
     social=models.CharField(max_length=20, choices=Social_CHOICES)
     stage = models.CharField(max_length=20, choices=Stage_CHOICES)
     add_order=models.DateField()
     complete_order=models.DateField()
+
+
+
 
 
 

@@ -51,36 +51,37 @@
 <body>
     <div class="container">
         <h2 class="text-center">Добавить новый заказ</h2>
-        <form>
+        <form action="" method="POST">
+            {% csrf_token %}
             <label>Клиент:</label>
-            <input type="text" class="form-control" placeholder="ООО 'Реклама Плюс'">
+            <input type="text" class="form-control" placeholder="ООО 'Реклама Плюс'" name="client">
             
             <label>Адрес:</label>
-            <input type="text" class="form-control" placeholder="Введите адрес">
+            <input type="text" class="form-control" placeholder="Введите адрес" name="adress">
 
             <label>Сумма заказа:</label>
-            <input type="number" class="form-control" value="100">
+            <input type="number" class="form-control" placeholder="100" name="order_sum" id="order_sum">
 
             <label>Сумма предоплаты (80% от суммы заказа):</label>
-            <input type="number" class="form-control" value="80" readonly>
+            <input type="number" class="form-control" placeholder="80" readonly name="order_predoplata" id="order_predoplata">
 
             <label>Категория заказа и Расходники:</label>
             <div id="categories-container">
                 <div class="category-group">
                     <label>Категория заказа:</label>
-                    <select class="form-select">
+                    <select class="form-select" name="catigories">
                         <option value="Реклама">Реклама</option>
                         <option value="Печать">Печать</option>
                         <option value="Дизайн">Дизайн</option>
                     </select>
                     <label>Расходник:</label>
                     <div class="input-group">
-                        <select class="form-select">
-                            <option value="АКРИЛ 1 мм, Белый">АКРИЛ 1 мм, Белый</option>
-                            <option value="АКРИЛ 2 мм, Красный">АКРИЛ 2 мм, Красный</option>
-                            <option value="ПВХ 3 мм">ПВХ 3 мм</option>
+                        <select class="form-select" name="add">
+                                 <option value="АКРИЛ, 1 mm, Зеленый"> АКРИЛ, 1 mm, Зеленый</option>
+                                    <option value="АКРИЛ, 1 mm, Красный">  АКРИЛ, 1 mm, Красный</option>
+                                    <option value="АКРИЛ, 1 mm, Черный">  АКРИЛ, 1 mm, Черный</option>
                         </select>
-                        <input type="number" class="form-control" placeholder="Стоимость">
+                        <input type="number" class="form-control" placeholder="Стоимость" name="price">
                         <button type="button" class="btn btn-remove" onclick="removeCategoryGroup(this)">-</button>
                     </div>
                 </div>
@@ -88,56 +89,71 @@
             <button type="button" class="btn-add" onclick="addCategoryGroup()">+ Добавить категорию и расходник</button>
 
             <label>Описание / ТЗ:</label>
-            <textarea class="form-control" rows="3"></textarea>
+            <textarea class="form-control" rows="3" name="description"></textarea>
 
             <label>Номер телефона заказчика:</label>
-            <input type="tel" class="form-control" placeholder="+79997777777">
+            <input type="tel" class="form-control" placeholder="+79997777777" name="phone">
 
             <label>Выберите источник заказа:</label>
-            <select class="form-select">
-                <option>Социальные сети</option>
-                <option>Клиентские визиты</option>
-                <option>Сарафанное радио</option>
+            <select class="form-select" name="social">
+                <option value="social">Социальные сети</option>
+                <option value="cold_calls">Холодные звонки</option>
+                <option value="word_of_mouth">Сарафанное радио</option>
             </select>
 
             <label>Выбор этапа:</label>
-            <select class="form-select">
-                <option>Проект</option>
-                <option>Производство</option>
-                <option>Доставка</option>
-                <option>Готово</option>
+            <select class="form-select" name="stage">
+                <option value="accepted">Принят</option>
+                <option value="design">Проектирование</option>
+                <option value="technologist">Технолог</option>
+                <option value="manufacturing">Производство</option>
+                 <option value="assembly">Сборка</option>
+                <option value="delivery">Доставка</option>
+                <option value="order_ready">Заказ готов</option>
+                <option value="finished">Завершено</option>
+
             </select>
 
             <label>Дата добавления заказа:</label>
-            <input type="date" class="form-control">
+            <input type="date" class="form-control" name="add_order">
 
             <label>Срок выполнения:</label>
-            <input type="date" class="form-control">
+            <input type="date" class="form-control" name="complete_order">
 
             <button type="submit" class="btn btn-primary w-100 mt-3">Сохранить</button>
         </form>
     </div>
 
     <script>
+     document.getElementById('order_sum').addEventListener('input', function () {
+    const orderSum = parseFloat(this.value);
+    const predoplataInput = document.getElementById('order_predoplata');
+
+    if (!isNaN(orderSum)) {
+      predoplataInput.value = (orderSum * 0.8).toFixed(2);
+    } else {
+      predoplataInput.value = '';
+    }
+  });
         function addCategoryGroup() {
             let container = document.getElementById("categories-container");
             let newGroup = document.createElement("div");
             newGroup.classList.add("category-group");
             newGroup.innerHTML = `
                 <label>Категория заказа:</label>
-                <select class="form-select">
+                <select class="form-select" name="catigories">
                     <option value="Реклама">Реклама</option>
                     <option value="Печать">Печать</option>
                     <option value="Дизайн">Дизайн</option>
                 </select>
                 <label>Расходник:</label>
                 <div class="input-group">
-                    <select class="form-select">
-                        <option value="АКРИЛ 1 мм, Белый">АКРИЛ 1 мм, Белый</option>
-                        <option value="АКРИЛ 2 мм, Красный">АКРИЛ 2 мм, Красный</option>
-                        <option value="ПВХ 3 мм">ПВХ 3 мм</option>
+                    <select class="form-select" name="add">
+                             <option value="АКРИЛ, 1 mm, Зеленый"> АКРИЛ, 1 mm, Зеленый</option>
+                            <option value="АКРИЛ, 1 mm, Красный">  АКРИЛ, 1 mm, Красный</option>
+                            <option value="АКРИЛ, 1 mm, Черный">  АКРИЛ, 1 mm, Черный</option>
                     </select>
-                    <input type="number" class="form-control" placeholder="Стоимость">
+                    <input type="number" class="form-control" placeholder="Стоимость" name="price">
                     <button type="button" class="btn btn-remove" onclick="removeCategoryGroup(this)">-</button>
                 </div>
             `;
