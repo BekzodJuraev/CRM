@@ -57,6 +57,11 @@ class Orders(models.Model):
     stage = models.CharField(max_length=20, choices=Stage_CHOICES)
     add_order=models.DateField()
     complete_order=models.DateField()
+    rezka=models.BooleanField(default=False)
+    svarka=models.BooleanField(default=False)
+    fill=models.BooleanField(default=False)
+    print=models.BooleanField(default=False)
+    sborka=models.BooleanField(default=False)
 
 
 

@@ -54,55 +54,55 @@
         <form action="" method="POST">
             {% csrf_token %}
             <label>Клиент:</label>
-            <input type="text" class="form-control" placeholder="ООО 'Реклама Плюс'" name="client">
+            <input type="text" class="form-control" placeholder="ООО 'Реклама Плюс'" name="client" required>
             
             <label>Адрес:</label>
-            <input type="text" class="form-control" placeholder="Введите адрес" name="adress">
+            <input type="text" class="form-control" placeholder="Введите адрес" name="adress" required>
 
             <label>Сумма заказа:</label>
-            <input type="number" class="form-control" placeholder="100" name="order_sum" id="order_sum">
+            <input type="number" class="form-control" placeholder="100" name="order_sum" id="order_sum" required>
 
             <label>Сумма предоплаты (80% от суммы заказа):</label>
-            <input type="number" class="form-control" placeholder="80" readonly name="order_predoplata" id="order_predoplata">
+            <input type="number" class="form-control" placeholder="80" readonly name="order_predoplata" id="order_predoplata" required>
 
             <label>Категория заказа и Расходники:</label>
             <div id="categories-container">
                 <div class="category-group">
                     <label>Категория заказа:</label>
-                    <select class="form-select" name="catigories">
+                    <select class="form-select" name="catigories" required>
                         <option value="Реклама">Реклама</option>
                         <option value="Печать">Печать</option>
                         <option value="Дизайн">Дизайн</option>
                     </select>
                     <label>Расходник:</label>
                     <div class="input-group">
-                        <select class="form-select" name="add">
+                        <select class="form-select" name="add" required>
                                  <option value="АКРИЛ, 1 mm, Зеленый"> АКРИЛ, 1 mm, Зеленый</option>
                                     <option value="АКРИЛ, 1 mm, Красный">  АКРИЛ, 1 mm, Красный</option>
                                     <option value="АКРИЛ, 1 mm, Черный">  АКРИЛ, 1 mm, Черный</option>
                         </select>
-                        <input type="number" class="form-control" placeholder="Стоимость" name="price">
+                        <input type="number" class="form-control" placeholder="Стоимость" name="price" required>
                         <button type="button" class="btn btn-remove" onclick="removeCategoryGroup(this)">-</button>
                     </div>
                 </div>
             </div>
-            <button type="button" class="btn-add" onclick="addCategoryGroup()">+ Добавить категорию и расходник</button>
+            <button type="button" class="btn-add" onclick="addCategoryGroup()" >+ Добавить категорию и расходник</button>
 
             <label>Описание / ТЗ:</label>
-            <textarea class="form-control" rows="3" name="description"></textarea>
+            <textarea class="form-control" rows="3" name="description" required></textarea>
 
             <label>Номер телефона заказчика:</label>
-            <input type="tel" class="form-control" placeholder="+79997777777" name="phone">
+            <input type="tel" class="form-control" placeholder="+79997777777" name="phone" required>
 
             <label>Выберите источник заказа:</label>
-            <select class="form-select" name="social">
+            <select class="form-select" name="social" required>
                 <option value="social">Социальные сети</option>
                 <option value="cold_calls">Холодные звонки</option>
                 <option value="word_of_mouth">Сарафанное радио</option>
             </select>
 
             <label>Выбор этапа:</label>
-            <select class="form-select" name="stage">
+            <select class="form-select" name="stage" required>
                 <option value="accepted">Принят</option>
                 <option value="design">Проектирование</option>
                 <option value="technologist">Технолог</option>
@@ -115,10 +115,10 @@
             </select>
 
             <label>Дата добавления заказа:</label>
-            <input type="date" class="form-control" name="add_order">
+            <input type="date" class="form-control" name="add_order" required>
 
             <label>Срок выполнения:</label>
-            <input type="date" class="form-control" name="complete_order">
+            <input type="date" class="form-control" name="complete_order" required>
 
             <button type="submit" class="btn btn-primary w-100 mt-3">Сохранить</button>
         </form>
@@ -141,19 +141,19 @@
             newGroup.classList.add("category-group");
             newGroup.innerHTML = `
                 <label>Категория заказа:</label>
-                <select class="form-select" name="catigories">
+                <select class="form-select" name="catigories" required>
                     <option value="Реклама">Реклама</option>
                     <option value="Печать">Печать</option>
                     <option value="Дизайн">Дизайн</option>
                 </select>
                 <label>Расходник:</label>
                 <div class="input-group">
-                    <select class="form-select" name="add">
+                    <select class="form-select" name="add" required>
                              <option value="АКРИЛ, 1 mm, Зеленый"> АКРИЛ, 1 mm, Зеленый</option>
                             <option value="АКРИЛ, 1 mm, Красный">  АКРИЛ, 1 mm, Красный</option>
                             <option value="АКРИЛ, 1 mm, Черный">  АКРИЛ, 1 mm, Черный</option>
                     </select>
-                    <input type="number" class="form-control" placeholder="Стоимость" name="price">
+                    <input type="number" class="form-control" placeholder="Стоимость" name="price" required>
                     <button type="button" class="btn btn-remove" onclick="removeCategoryGroup(this)">-</button>
                 </div>
             `;

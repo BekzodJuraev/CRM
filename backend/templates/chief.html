@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Производство</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to right, #f9f9f9, #eef1f7);
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            padding: 20px 0;
+            font-size: 28px;
+            color: #333;
+        }
+
+        .board {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        .column {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 15px;
+            width: 250px;
+            min-height: 400px;
+            flex-shrink: 0;
+            transition: box-shadow 0.3s;
+        }
+
+        .column h3 {
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: #444;
+        }
+
+        .card {
+            background: #f0f4ff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            cursor: grab;
+            transition: transform 0.2s, background 0.3s;
+        }
+
+        .card:hover {
+            background: #e0eaff;
+            transform: scale(1.02);
+        }
+
+        .popup {
+            position: fixed;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -30%);
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            display: none;
+            z-index: 1000;
+            min-width: 300px;
+        }
+
+        .popup button {
+            margin-top: 15px;
+            padding: 8px 14px;
+            border: none;
+            background-color: #1e88e5;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .popup button:hover {
+            background-color: #1565c0;
+        }
+
+        @media (max-width: 768px) {
+            .board {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<h1>Производство</h1>
+
+<div class="board">
+    <div class="column" ondragover="allowDrop(event)" ondrop="drop(event)">
+        <h3>Резка</h3>
+        <div class="card" data-pk="1" draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
+            <p><strong>Клиент:</strong> ООО "Реклама Плюс"</p>
+            <p><strong>Срок:</strong> 15.03.2025</p>
+        </div>
+    </div>
+    <div class="column" ondragover="allowDrop(event)" ondrop="drop(event)">
+        <h3>Сварка</h3>
+    </div>
+    <div class="column" ondragover="allowDrop(event)" ondrop="drop(event)">
+        <h3>Покраска</h3>
+    </div>
+    <div class="column" ondragover="allowDrop(event)" ondrop="drop(event)">
+        <h3>Печать</h3>
+    </div>
+    <div class="column" ondragover="allowDrop(event)" ondrop="drop(event)">
+        <h3>Сборка</h3>
+    </div>
+    <div class="column" ondragover="allowDrop(event)" ondrop="drop(event)">
+        <h3>Доставка и установка</h3>
+    </div>
+</div>
+
+<div class="popup" id="popup">
+    <div id="popup-content"></div>
+    <button onclick="closePopup()">Закрыть</button>
+</div>
+
+<script>
+    let dragged = null;
+
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+
+    function drag(ev) {
+        dragged = ev.target;
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        const targetColumn = ev.target.closest('.column');
+        if (dragged && targetColumn) {
+            targetColumn.appendChild(dragged);
+
+            const stage = targetColumn.querySelector('h3')?.textContent.trim() || "Unknown";
+            const pk = dragged.getAttribute('data-pk');
+
+            fetch('/api/update-stage/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'admin',
+                    stage: stage,
+                    pk: pk
+                })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Ошибка сети');
+                return response.json();
+            })
+            .then(data => {
+                console.log('Этап успешно обновлён:', data);
+            })
+            .catch(error => {
+                console.error('Ошибка при отправке:', error);
+            });
+        }
+    }
+
+    function showPopup(card) {
+        const popup = document.getElementById('popup');
+        const content = document.getElementById('popup-content');
+        content.innerHTML = card.innerHTML;
+        popup.style.display = 'block';
+    }
+
+    function closePopup() {
+        document.getElementById('popup').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>

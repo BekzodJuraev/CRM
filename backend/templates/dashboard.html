@@ -3,7 +3,10 @@
     {% include 'admin.html' %}
 {% elif request.user.profile.position == 'designer' %}
     {% include 'designer.html' %}
-
+{% elif request.user.profile.position == 'technologist' %}
+ {% include 'technolog.html' %}
+{% elif request.user.profile.position == 'chief' %}
+ {% include 'chief.html' %}
 {% endif %}
 {% else %}
 {% include 'waiting.html' %}
