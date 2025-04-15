@@ -9,7 +9,10 @@
  {% include 'chief.html' %}
 {% elif request.user.profile.position == 'installer' %}
  {% include 'dostavka.html' %}
-
+{% elif request.user.profile.position == 'supplier' %}
+ <script>
+        window.location.href = "{% url 'warehouse' %}";
+    </script>
 {% endif %}
 {% else %}
 {% include 'waiting.html' %}

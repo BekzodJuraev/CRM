@@ -9,6 +9,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum,Q,Count,F,Max,Prefetch,OuterRef, Subquery
 from django.utils.timezone import now
 from django.http import JsonResponse
+from django.contrib.auth.views import LogoutView
+
+
+def logout_view(request):
+   logout(request)
+   return redirect('main')
+
 
 class Dashboard(LoginRequiredMixin,TemplateView):
    login_url = reverse_lazy('login')
