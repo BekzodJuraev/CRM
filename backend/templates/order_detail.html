@@ -1,0 +1,179 @@
+{% if request.user.profile.approve %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{item.client}}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .btn-add, .btn-remove {
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+        .btn-add {
+            background: #007bff;
+            color: white;
+        }
+        .btn-add:hover {
+            background: #0056b3;
+        }
+        .btn-remove {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-remove:hover {
+            background: #a71d2a;
+        }
+        .category-group {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center">{{item.client}}</h2>
+        <form action="" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label>Клиент:</label>
+            <input type="text" class="form-control" placeholder="ООО 'Реклама Плюс'" value="{{item.client}}" name="client" required >
+            
+            <label>Адрес:</label>
+            <input type="text" class="form-control" placeholder="Введите адрес"  value="{{item.adress}}" name="adress" required>
+
+            <label>Сумма заказа:</label>
+            <input type="number" class="form-control" placeholder="100" name="order_sum"  value="{{item.order_sum}}" id="order_sum" required>
+
+            <label>Сумма предоплаты (80% от суммы заказа):</label>
+            <input type="number" class="form-control" placeholder="80" readonly name="order_predoplata" value="{{item.order_predoplata}}" id="order_predoplata" required>
+            {% for i in item.consumables.all %}
+            <label>Категория заказа и Расходники:</label>
+            <div id="categories-container">
+                <div class="category-group">
+                    <label>Категория заказа:</label>
+                    <select class="form-select" name="catigories" required>
+    <option value="Реклама" {% if i.catigories == "Реклама" %}selected{% endif %}>Реклама</option>
+    <option value="Печать" {% if i.catigories == "Печать" %}selected{% endif %}>Печать</option>
+    <option value="Дизайн" {% if i.catigories == "Дизайн" %}selected{% endif %}>Дизайн</option>
+            </select>
+
+                    <label>Расходник:</label>
+                    <div class="input-group">
+                       <select class="form-select" name="add" required>
+    <option value="АКРИЛ, 1 mm, Зеленый" {% if i.add == "АКРИЛ, 1 mm, Зеленый" %}selected{% endif %}>АКРИЛ, 1 mm, Зеленый</option>
+    <option value="АКРИЛ, 1 mm, Красный" {% if i.add == "АКРИЛ, 1 mm, Красный" %}selected{% endif %}>АКРИЛ, 1 mm, Красный</option>
+    <option value="АКРИЛ, 1 mm, Черный" {% if i.add == "АКРИЛ, 1 mm, Черный" %}selected{% endif %}>АКРИЛ, 1 mm, Черный</option>
+</select>
+
+                        <input type="number" class="form-control" placeholder="Стоимость" name="price"  value="{{i.price}}" required>
+                        <button type="button" class="btn btn-remove" onclick="removeCategoryGroup(this)">-</button>
+                    </div>
+                </div>
+            </div>
+               {% endfor %}
+            <button type="button" class="btn-add" onclick="addCategoryGroup()" >+ Добавить категорию и расходник</button>
+
+            <label>Описание / ТЗ:</label>
+            <textarea class="form-control" rows="3" name="description"   required >{{item.description}}</textarea>
+
+            <label>Номер телефона заказчика:</label>
+            <input type="tel" class="form-control" placeholder="+79997777777"  value="{{item.phone}}" name="phone" required>
+
+            <label>Выберите источник заказа:</label>
+            <select class="form-select" name="social" required>
+
+    <option value="social" {% if item.social == "social" %}selected{% endif %}>Социальные сети</option>
+    <option value="cold_calls" {% if item.social == "cold_calls" %}selected{% endif %}>Холодные звонки</option>
+    <option value="word_of_mouth" {% if item.social == "word_of_mouth" %}selected{% endif %}>Сарафанное радио</option>
+        </select>
+
+            <label>Выбор этапа:</label>
+            <select class="form-select" name="stage" required>
+    <option value="accepted" {% if item.stage == "accepted" %}selected{% endif %}>Принят</option>
+    <option value="design" {% if item.stage == "design" %}selected{% endif %}>Проектирование</option>
+    <option value="technologist" {% if item.stage == "technologist" %}selected{% endif %}>Технолог</option>
+    <option value="manufacturing" {% if item.stage == "manufacturing" %}selected{% endif %}>Производство</option>
+    <option value="assembly" {% if item.stage == "assembly" %}selected{% endif %}>Сборка</option>
+    <option value="delivery" {% if item.stage == "delivery" %}selected{% endif %}>Доставка</option>
+    <option value="order_ready" {% if item.stage == "order_ready" %}selected{% endif %}>Заказ готов</option>
+    <option value="finished" {% if item.stage == "finished" %}selected{% endif %}>Завершено</option>
+</select>
+
+
+            <label>Дата добавления заказа:</label>
+           <input type="date" class="form-control" name="add_order" required value="{{ item.add_order|date:'Y-m-d' }}">
+
+
+            <label>Срок выполнения:</label>
+            <input type="date" class="form-control" name="complete_order" required value="{{item.complete_order|date:'Y-m-d'}}">
+            {% if item.stage == "finished" or item.stage == "order_ready" %}
+            <label>Прикрепить фото:</label>
+            <input type="file" class="form-control" name="delivery_photo">
+            {% endif %}
+            <button type="submit" class="btn btn-primary w-100 mt-3">Сохранить</button>
+        </form>
+    </div>
+
+    <script>
+     document.getElementById('order_sum').addEventListener('input', function () {
+    const orderSum = parseFloat(this.value);
+    const predoplataInput = document.getElementById('order_predoplata');
+
+    if (!isNaN(orderSum)) {
+      predoplataInput.value = (orderSum * 0.8).toFixed(2);
+    } else {
+      predoplataInput.value = '';
+    }
+  });
+        function addCategoryGroup() {
+            let container = document.getElementById("categories-container");
+            let newGroup = document.createElement("div");
+            newGroup.classList.add("category-group");
+            newGroup.innerHTML = `
+                <label>Категория заказа:</label>
+                <select class="form-select" name="catigories" required>
+                    <option value="Реклама">Реклама</option>
+                    <option value="Печать">Печать</option>
+                    <option value="Дизайн">Дизайн</option>
+                </select>
+                <label>Расходник:</label>
+                <div class="input-group">
+                    <select class="form-select" name="add" required>
+                             <option value="АКРИЛ, 1 mm, Зеленый"> АКРИЛ, 1 mm, Зеленый</option>
+                            <option value="АКРИЛ, 1 mm, Красный">  АКРИЛ, 1 mm, Красный</option>
+                            <option value="АКРИЛ, 1 mm, Черный">  АКРИЛ, 1 mm, Черный</option>
+                    </select>
+                    <input type="number" class="form-control" placeholder="Стоимость" name="price" required>
+                    <button type="button" class="btn btn-remove" onclick="removeCategoryGroup(this)">-</button>
+                </div>
+            `;
+            container.appendChild(newGroup);
+        }
+
+        function removeCategoryGroup(button) {
+            button.closest(".category-group").remove();
+        }
+    </script>
+</body>
+</html>
+{% else %}
+{% include 'waiting.html' %}
+{% endif %}

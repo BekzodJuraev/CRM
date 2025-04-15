@@ -17,6 +17,7 @@ urlpatterns=[
     path('debt/',views.Debt.as_view(),name='debt'),
     path('warehouse/',views.WarehouseView.as_view(),name='warehouse'),
     path('warehouse/create', views.WarehouseCreateView.as_view(),name='warehouse_create'),
-    path('warehouse/limit',views.WarehouseLimitView.as_view(),name='warehouse_limit')
+    path('warehouse/limit',views.WarehouseLimitView.as_view(),name='warehouse_limit'),
+    path('order/<int:pk>',views.OrderDetail.as_view(),name='order_detail')
 
 ]

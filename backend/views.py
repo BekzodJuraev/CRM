@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
-from django.views.generic import View,TemplateView
+from django.views.generic import View,TemplateView,DetailView,UpdateView
 from .models import Profile,Rezident,Finance,Warehouse,WarehouseLimit,Consumables,Orders
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
@@ -162,7 +162,39 @@ class Register(TemplateView):
       return redirect('login')
 
 
+class OrderDetail(LoginRequiredMixin,DetailView):
+   model = Orders
+   login_url = reverse_lazy('login')
+   template_name = 'order_detail.html'
+   context_object_name = 'item'
 
+   def post(self, request, *args, **kwargs):
+      self.object = self.get_object()
+
+      # Handle date fields by converting them to the correct format
+
+
+      # Update fields
+      self.object.client = request.POST.get('client')
+      self.object.adress = request.POST.get('adress')
+      self.object.order_sum = request.POST.get('order_sum')
+      self.object.order_predoplata = request.POST.get('order_predoplata')
+      self.object.description = request.POST.get('description')
+      self.object.phone = request.POST.get('phone')
+      self.object.social = request.POST.get('social')
+      self.object.stage = request.POST.get('stage')
+      self.object.add_order = request.POST.get('add_order')
+      self.object.complete_order = request.POST.get('complete_order')
+
+      # If there are file fields (e.g., photo), handle them
+      if 'delivery_photo' in request.FILES:
+         self.object.delivery_photo = request.FILES.get('delivery_photo')
+
+      # Save the updated object
+      self.object.save()
+
+      # Redirect to dashboard or any other page
+      return redirect('dashboard')
 
 
 
@@ -371,6 +403,16 @@ class Money_Create(LoginRequiredMixin,TemplateView):
 class Debt(LoginRequiredMixin,TemplateView):
    template_name = 'debt.html'
    login_url = reverse_lazy('login')
+
+
+
+   def get_context_data(self, *, object_list=None, **kwargs):
+      context = super().get_context_data(**kwargs)
+
+
+      return context
+
+
 
 
 class WarehouseView(LoginRequiredMixin, TemplateView):
