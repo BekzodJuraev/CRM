@@ -110,37 +110,48 @@
 
 <div class="container">
     <h1>Доставка и установка</h1>
-
+     <form action="" method="GET">
     <div class="search-box">
-        <input type="text" placeholder="Поиск...">
+        <input type="text" placeholder="Поиск..." name="search">
     </div>
-
+     </form>
     <!-- Order Card -->
+    {% for item in delivery %}
+
     <div class="order-card">
-        <h2>ООО «Реклама Плюс»</h2>
+        <h2>{{item.client}}</h2>
         <div class="order-details">
-            <div><span class="bold">Дата добавления:</span> 10.12.2024 | <span class="bold">Срок:</span> 12.03.2025</div>
-            <div><span class="bold">Предоплата:</span> 200 сум | <span class="bold">Сумма заказа:</span> 300 сум</div>
-            <div><span class="bold">Категория:</span> Наружная реклама</div>
-            <div><span class="bold">Адрес:</span> г. Ташкент, ул. Амир Темура, 15</div>
-            <div><span class="bold">Телефон:</span> +998917777777</div>
-            <div><span class="bold">Расходники:</span> Лента (200 000 сум)</div>
-            <div><span class="bold">Описание / ТЗ:</span> Баннер, размеры 3x5 м</div>
+            <div><span class="bold">Дата добавления:</span> {{item.add_order|date:"d.m.Y"}}| <span class="bold">Срок:</span> {{item.complete_order|date:"d.m.Y"}}</div>
+            <div><span class="bold">Предоплата:</span> {{item.order_predoplata}} сум | <span class="bold">Сумма заказа:</span> {{item.order_sum}} сум</div>
+            <div><span class="bold">Адрес:</span> {{item.adress}}</div>
+            <div><span class="bold">Телефон:</span> {{item.phone}}</div>
+            {% with item.consumables.all as consumables %}
+            <div><span class="bold">Категория:</span>  {% for rek in consumables %}
+      {{ rek.catigories }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+            </div>
+            <div><span class="bold">Расходники:</span>  {% for rek in consumables %}
+      {{ rek.add }} ({{ rek.price }} сум)
+    {% endfor %}</div>
+            {% endwith %}
+            <div><span class="bold">Описание / ТЗ:</span> {{item.description}}</div>
         </div>
 
         <!-- Form for uploading photo and finishing order -->
-        <form method="post" action="/your-endpoint-url/" enctype="multipart/form-data" class="actions">
+        <form method="POST" action="" enctype="multipart/form-data" class="actions">
             {% csrf_token %}
-            <input type="hidden" name="pk" value="1">
-            <input type="hidden" name="stage" value="delivery">
-            <input type="hidden" name="action" value="admin">
+            <input type="hidden" name="pk" value="{{item.pk}}">
 
-            <input type="file" name="photo" id="photo-upload-1">
-            <label for="photo-upload-1" class="custom-upload-label">Загрузить фото</label>
+            <input type="hidden" name="action" value="delivery">
+
+            <input type="file" name="photo" id="photo-upload-{{item.pk}}" required>
+            <label for="photo-upload-{{item.pk}}" class="custom-upload-label">Загрузить фото</label>
 
             <button type="submit" class="complete-btn">Завершить заказ</button>
         </form>
+
     </div>
+    {% endfor %}
 </div>
 
 </body>

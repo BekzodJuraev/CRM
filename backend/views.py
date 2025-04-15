@@ -32,9 +32,17 @@ class Dashboard(LoginRequiredMixin,TemplateView):
          rezka=request.POST.get('rezka')
          svarka = request.POST.get('svarka')
          fill = request.POST.get('fill')
-         print = request.POST.get('print')
+         pechat = request.POST.get('print')
 
          Orders.objects.filter(pk=pk).update(stage="manufacturing")
+         return redirect(request.path)
+      elif action == "delivery":
+         photo = request.FILES.get('photo')
+         order=Orders.objects.filter(pk=pk).first()
+         order.stage="order_ready"
+         order.delivery_photo=photo
+         order.save(update_fields=['stage','delivery_photo'])
+
          return redirect(request.path)
 
       elif action == "admin":

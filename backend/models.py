@@ -57,6 +57,7 @@ class Orders(models.Model):
     stage = models.CharField(max_length=20, choices=Stage_CHOICES)
     add_order=models.DateField()
     complete_order=models.DateField()
+    delivery_photo=models.ImageField(blank=True, upload_to='delivery/')
     rezka=models.BooleanField(default=False)
     svarka=models.BooleanField(default=False)
     fill=models.BooleanField(default=False)
