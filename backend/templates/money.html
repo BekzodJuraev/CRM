@@ -1,3 +1,4 @@
+{% load humanize %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -111,10 +112,11 @@
       </form>
 
     <div class="stats">
-      <div class="stat">Сумма завершенных заказов за месяц: <br><strong>12 500 000 сум</strong></div>
-      <div class="stat">Количество завершенных заказов за месяц: <br><strong>10</strong></div>
-      <div class="stat">Маржа: <br><strong>3 750 000 сум</strong></div>
-      <div class="stat">Расходы: <br><strong>{{cost}} сум</strong></div>
+      <div class="stat">Сумма завершенных заказов за месяц: <br><strong>{{ total_sum|intcomma }}
+ сум</strong></div>
+      <div class="stat">Количество завершенных заказов за месяц: <br><strong>{{count}}</strong></div>
+      <div class="stat">Маржа: <br><strong>{{marja|intcomma}} сум</strong></div>
+      <div class="stat">Расходы: <br><strong>{{cost|intcomma}} сум</strong></div>
 
     </div>
 

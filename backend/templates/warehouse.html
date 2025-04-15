@@ -158,7 +158,7 @@
             <tr class="low-item">
                 <td>{{item.product}}</td>
 
-                <td>{{item.last_added}}</td>
+                <td>{{item.last_added|date:'Y-m-d'}}</td>
 
                 {% if item.limit > item.stock|default:item.quantity %}
                 <td><span class="dot"></span><span class="low-stock">{{ item.stock|default:item.quantity }}</span></td>

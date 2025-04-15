@@ -29,12 +29,17 @@ class Dashboard(LoginRequiredMixin,TemplateView):
          add = request.POST.getlist('add')
          price = request.POST.getlist('price')
          catigories = request.POST.getlist('catigories')
-         rezka=request.POST.get('rezka')
-         svarka = request.POST.get('svarka')
-         fill = request.POST.get('fill')
-         pechat = request.POST.get('print')
-
+         # rezka=request.POST.get('rezka')
+         # svarka = request.POST.get('svarka')
+         # fill = request.POST.get('fill')
+         # pechat = request.POST.get('print')
          Orders.objects.filter(pk=pk).update(stage="manufacturing")
+         consumables = [
+            Consumables(order_id=pk, add=a, price=p, catigories=c)
+            for a, p, c in zip(add, price, catigories)
+         ]
+         Consumables.objects.bulk_create(consumables)
+
          return redirect(request.path)
       elif action == "delivery":
          photo = request.FILES.get('photo')
@@ -171,10 +176,7 @@ class OrderDetail(LoginRequiredMixin,DetailView):
    def post(self, request, *args, **kwargs):
       self.object = self.get_object()
 
-      # Handle date fields by converting them to the correct format
-
-
-      # Update fields
+      # Update fields from form data
       self.object.client = request.POST.get('client')
       self.object.adress = request.POST.get('adress')
       self.object.order_sum = request.POST.get('order_sum')
@@ -186,14 +188,29 @@ class OrderDetail(LoginRequiredMixin,DetailView):
       self.object.add_order = request.POST.get('add_order')
       self.object.complete_order = request.POST.get('complete_order')
 
-      # If there are file fields (e.g., photo), handle them
+      # Handle uploaded file (delivery photo)
       if 'delivery_photo' in request.FILES:
          self.object.delivery_photo = request.FILES.get('delivery_photo')
 
-      # Save the updated object
+      # Save the updated order
       self.object.save()
 
-      # Redirect to dashboard or any other page
+      # Handle Consumables data
+      add = request.POST.getlist('add')
+      price = request.POST.getlist('price')
+      catigories = request.POST.getlist('catigories')
+
+      # Delete old consumables for this order to avoid duplication
+      Consumables.objects.filter(order=self.object).delete()
+
+      # Create new consumables
+      consumables = [
+         Consumables(order=self.object, add=a, price=p, catigories=c)
+         for a, p, c in zip(add, price, catigories)
+      ]
+      Consumables.objects.bulk_create(consumables)
+
+      # Redirect after successful update
       return redirect('dashboard')
 
 
@@ -375,10 +392,19 @@ class Money(LoginRequiredMixin,TemplateView):
           created_at__month=today.month
       )
 
+      order = Orders.objects.filter(stage="finished", complete_order__year=today.year,
+                                    complete_order__month=today.month)
+
       if first and second:
          query = query.filter(created_at__range=(first, second))
+         order=order.filter(complete_order__range=(first,second))
 
+      marja=Consumables.objects.filter(order__in=order).aggregate(total_sum=Sum('price'))['total_sum'] or 0
+      total_sum=order.aggregate(total_sum=Sum('order_sum'))['total_sum'] or 0
+      context['marja']=total_sum - marja
       context['money'] = query
+      context['count']=order.count()
+      context['total_sum']=total_sum
       context['cost']=query.aggregate(total_sum=Sum('sum'))['total_sum'] or 0
 
       return context
