@@ -205,8 +205,12 @@
                 })
             })
             .then(response => {
-                if (!response.ok) throw new Error('Ошибка сети');
-                return response.json();
+                if (!response.ok) {
+                 alert("Нельзя");  // Show alert
+                    window.location.reload();  // Reload the page
+                    throw new Error("Нельзя");
+                                }
+
             })
             .then(data => {
                 console.log('Этап успешно обновлён:', data);

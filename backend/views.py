@@ -70,6 +70,14 @@ class Dashboard(LoginRequiredMixin,TemplateView):
 
       elif action == 'chief':
          stage_pod=request.POST.get('pod_stage')
+         order=Orders.objects.filter(pk=pk).first()
+         check=getattr(order,stage_pod,None)
+
+         if check is False:
+            return JsonResponse({'status': 'Not allowed'}, status=401)
+
+
+
          if stage_pod:
             Orders.objects.filter(pk=pk).update(stage=stage,stage_pod=stage_pod)
          else:
