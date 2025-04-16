@@ -104,27 +104,61 @@
 <h1>Производство</h1>
 
 <div class="board">
-    <div class="column" ondragover="allowDrop(event)" ondrop="drop(event)">
+
+    <div class="column" ondragover="allowDrop(event)" data-stage="manufacturing" data-pod_stage="rezka"  ondrop="drop(event)">
         <h3>Резка</h3>
-        <div class="card" data-pk="1" draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
-            <p><strong>Клиент:</strong> ООО "Реклама Плюс"</p>
-            <p><strong>Срок:</strong> 15.03.2025</p>
+        {% for item in rezka %}
+        <div class="card" data-pk="{{item.pk}}" draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
+            <p><strong>Клиент:</strong> {{item.client}}</p>
+            <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
         </div>
+          {% endfor %}
     </div>
-    <div class="column" ondragover="allowDrop(event)" ondrop="drop(event)">
+
+    <div class="column" ondragover="allowDrop(event)"  data-stage="manufacturing" data-pod_stage="svarka" ondrop="drop(event)">
         <h3>Сварка</h3>
+          {% for item in svarka %}
+        <div class="card" data-pk="{{item.pk}}" draggable="true"  ondragstart="drag(event)" onclick="showPopup(this)">
+            <p><strong>Клиент:</strong> {{item.client}}</p>
+            <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
+        </div>
+          {% endfor %}
     </div>
-    <div class="column" ondragover="allowDrop(event)" ondrop="drop(event)">
+    <div class="column" ondragover="allowDrop(event)"  data-stage="manufacturing" data-pod_stage="fill" ondrop="drop(event)">
         <h3>Покраска</h3>
+          {% for item in fill %}
+        <div class="card" data-pk="{{item.pk}}" draggable="true"  ondragstart="drag(event)" onclick="showPopup(this)">
+            <p><strong>Клиент:</strong> {{item.client}}</p>
+            <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
+        </div>
+          {% endfor %}
     </div>
-    <div class="column" ondragover="allowDrop(event)" ondrop="drop(event)">
+    <div class="column" ondragover="allowDrop(event)" data-stage="manufacturing" data-pod_stage="print"  ondrop="drop(event)">
         <h3>Печать</h3>
+          {% for item in print %}
+        <div class="card" data-pk="{{item.pk}}" draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
+            <p><strong>Клиент:</strong> {{item.client}}</p>
+            <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
+        </div>
+          {% endfor %}
     </div>
-    <div class="column" ondragover="allowDrop(event)" ondrop="drop(event)">
+    <div class="column" ondragover="allowDrop(event)"  data-stage="assembly" data-pod_stage=""  ondrop="drop(event)">
         <h3>Сборка</h3>
+          {% for item in assembly %}
+        <div class="card" data-pk="{{item.pk}}" draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
+            <p><strong>Клиент:</strong> {{item.client}}</p>
+            <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
+        </div>
+          {% endfor %}
     </div>
-    <div class="column" ondragover="allowDrop(event)" ondrop="drop(event)">
+    <div class="column" ondragover="allowDrop(event)"  data-stage="delivery" data-pod_stage="" ondrop="drop(event)">
         <h3>Доставка и установка</h3>
+          {% for item in delivery %}
+        <div class="card" data-pk="{{item.pk}}" draggable="true"   ondragstart="drag(event)" onclick="showPopup(this)">
+            <p><strong>Клиент:</strong> {{item.client}}</p>
+            <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
+        </div>
+          {% endfor %}
     </div>
 </div>
 
@@ -145,23 +179,29 @@
     }
 
     function drop(ev) {
+
         ev.preventDefault();
         const targetColumn = ev.target.closest('.column');
         if (dragged && targetColumn) {
             targetColumn.appendChild(dragged);
 
-            const stage = targetColumn.querySelector('h3')?.textContent.trim() || "Unknown";
-            const pk = dragged.getAttribute('data-pk');
+            const stage = targetColumn.dataset.stage;
+            const pod_stage = targetColumn.dataset.pod_stage;
+            const pk = dragged.dataset.pk;
 
-            fetch('/api/update-stage/', {
+
+
+            fetch("{% url 'dashboard' %}", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}',
                 },
                 body: new URLSearchParams({
-                    action: 'admin',
+                    action: 'chief',
                     stage: stage,
-                    pk: pk
+                    pk: pk,
+                    pod_stage:pod_stage
                 })
             })
             .then(response => {

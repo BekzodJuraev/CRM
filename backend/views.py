@@ -36,11 +36,22 @@ class Dashboard(LoginRequiredMixin,TemplateView):
          add = request.POST.getlist('add')
          price = request.POST.getlist('price')
          catigories = request.POST.getlist('catigories')
-         # rezka=request.POST.get('rezka')
-         # svarka = request.POST.get('svarka')
-         # fill = request.POST.get('fill')
-         # pechat = request.POST.get('print')
-         Orders.objects.filter(pk=pk).update(stage="manufacturing")
+         rezka = request.POST.get('rezka') == 'on'
+         svarka = request.POST.get('svarka') == 'on'
+         fill = request.POST.get('fill') == 'on'
+         pechat = request.POST.get('print') == 'on'
+
+         if rezka:
+            pod_stage="rezka"
+         elif svarka:
+            pod_stage="svarka"
+         elif fill:
+            pod_stage="fill"
+         elif pechat:
+            pod_stage="print"
+
+
+         Orders.objects.filter(pk=pk).update(stage="manufacturing",stage_pod=pod_stage,rezka=rezka,svarka=svarka,fill=fill,print=pechat)
          consumables = [
             Consumables(order_id=pk, add=a, price=p, catigories=c)
             for a, p, c in zip(add, price, catigories)
@@ -56,6 +67,17 @@ class Dashboard(LoginRequiredMixin,TemplateView):
          order.save(update_fields=['stage','delivery_photo'])
 
          return redirect(request.path)
+
+      elif action == 'chief':
+         stage_pod=request.POST.get('pod_stage')
+         if stage_pod:
+            Orders.objects.filter(pk=pk).update(stage=stage,stage_pod=stage_pod)
+         else:
+            Orders.objects.filter(pk=pk).update(stage=stage)
+
+         return JsonResponse({'status': 'success'})
+
+
 
       elif action == "admin":
          Orders.objects.filter(pk=pk).update(stage=stage)
@@ -75,6 +97,7 @@ class Dashboard(LoginRequiredMixin,TemplateView):
          'assembly', 'delivery', 'order_ready', 'finished'
       ]
 
+
       for stage in stages:
          queryset = Orders.objects.filter(stage=stage)
 
@@ -87,6 +110,12 @@ class Dashboard(LoginRequiredMixin,TemplateView):
             queryset = queryset.prefetch_related('consumables')
 
          context[stage] = queryset
+
+      context['rezka'] = [o for o in context['manufacturing'] if o.stage_pod == 'rezka']
+      context['svarka'] = [o for o in context['manufacturing'] if o.stage_pod == 'svarka']
+      context['fill'] = [o for o in context['manufacturing'] if o.stage_pod == 'fill']
+      context['print'] = [o for o in context['manufacturing'] if o.stage_pod == 'print']
+
 
       return context
 

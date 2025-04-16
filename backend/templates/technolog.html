@@ -138,7 +138,7 @@
   </div>
     </form>
   {% for item in technologist %}
-  <form action="" method="POST">
+  <form action="" method="POST" id="myForm">
        {% csrf_token %}
   <div class="order-card">
     <h2>{{item.client}}</h2>
@@ -186,11 +186,11 @@
                 </div>
             </div>
       <p>Отметьте галочками этапы, которые необходимо выполнить для данного заказа перед передачей в производство.</p>
-        <input type="checkbox" name="rezka" class="form" > Резка<br>
-      <input type="checkbox" name="svarka" class="form" > Сварка<br>
-      <input type="checkbox" name="fill" class="form" > Покраска<br>
-      <input type="checkbox" name="print" class="form" > Печать<br>
-      <input type="checkbox" name="sborka" class="form" > Сборка<br>
+          <input type="checkbox" name="rezka" class="stage-checkbox"> Резка<br>
+  <input type="checkbox" name="svarka" class="stage-checkbox"> Сварка<br>
+  <input type="checkbox" name="fill" class="stage-checkbox"> Покраска<br>
+  <input type="checkbox" name="print" class="stage-checkbox"> Печать<br>
+
             <button type="button" class="btn-complete" onclick="addCategoryGroup()" >+ Добавить категорию и расходник</button>
     <button class="btn-complete" value="technologist" name="action">Передать на производство</button>
   </div>
@@ -228,6 +228,17 @@
         function removeCategoryGroup(button) {
             button.closest(".category-group").remove();
         }
+</script>
+<script>
+  document.getElementById('myForm').addEventListener('submit', function(e) {
+    const checkboxes = document.querySelectorAll('.stage-checkbox');
+    const atLeastOneChecked = Array.from(checkboxes).some(cb => cb.checked);
+
+    if (!atLeastOneChecked) {
+      e.preventDefault();
+      alert('Выберите хотя бы один этап!');
+    }
+  });
 </script>
 </body>
 </html>

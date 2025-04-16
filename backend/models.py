@@ -47,6 +47,12 @@ class Orders(models.Model):
         ("cold_calls", "Холодные звонки"),
         ("word_of_mouth", "Сарафанное радио"),
     ]
+    Stage_pod_CHOICES = [
+        ("rezka","Резка"),
+        ("svarka", "Сварка"),
+        ("fill", "Покраска"),
+        ("print", "Печать"),
+    ]
     client=models.CharField(max_length=250)
     adress=models.CharField(max_length=250)
     order_sum=models.DecimalField(max_digits=10, decimal_places=2,default=0)
@@ -62,7 +68,8 @@ class Orders(models.Model):
     svarka=models.BooleanField(default=False)
     fill=models.BooleanField(default=False)
     print=models.BooleanField(default=False)
-    sborka=models.BooleanField(default=False)
+    stage_pod=models.CharField(max_length=20, choices=Stage_pod_CHOICES,default="rezka")
+
 
 
 
