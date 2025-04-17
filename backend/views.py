@@ -500,7 +500,7 @@ class Debt(LoginRequiredMixin,TemplateView):
          query=query.filter(client__icontains=search)
       context['total_sum']=query.aggregate(total_sum=Sum(F('order_sum') - F('order_predoplata')))['total_sum'] or 0
       context['order']=query.values('client','complete_order','phone','payment_data','pk').annotate(dolg=F('order_sum') - F('order_predoplata'))
-      #print(query.values('phone').annotate(count=Count('id')))
+      #print(query.values('phone').annotate(sum=Sum('order_sum')))
 
       return context
 

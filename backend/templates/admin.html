@@ -86,6 +86,7 @@
                             <h5>Принят</h5>
 
                             {% for item in accepted %}
+
                             <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
                             {% endfor %}
                         </div>
