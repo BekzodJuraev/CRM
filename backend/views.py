@@ -475,10 +475,32 @@ class Debt(LoginRequiredMixin,TemplateView):
    login_url = reverse_lazy('login')
 
 
+   def post(self, request, *args, **kwargs):
+      pk=request.POST.get('pk')
+      action = request.POST.get('action')
+
+      if action == "update":
+         payment_data = request.POST.get('payment_data')
+         Orders.objects.filter(pk=pk).update(payment_data=payment_data)
+      elif action == "payment":
+         Orders.objects.filter(pk=pk).update(stage='finished')
+
+
+
+      return JsonResponse({'status': 'success'})
+
+
 
    def get_context_data(self, *, object_list=None, **kwargs):
       context = super().get_context_data(**kwargs)
+      search=self.request.GET.get("search")
 
+      query=Orders.objects.filter(stage='order_ready')
+      if search:
+         query=query.filter(client__icontains=search)
+      context['total_sum']=query.aggregate(total_sum=Sum(F('order_sum') - F('order_predoplata')))['total_sum'] or 0
+      context['order']=query.values('client','complete_order','phone','payment_data','pk').annotate(dolg=F('order_sum') - F('order_predoplata'))
+      #print(query.values('phone').annotate(count=Count('id')))
 
       return context
 

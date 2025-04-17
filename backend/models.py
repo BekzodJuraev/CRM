@@ -69,6 +69,7 @@ class Orders(models.Model):
     fill=models.BooleanField(default=False)
     print=models.BooleanField(default=False)
     stage_pod=models.CharField(max_length=20, choices=Stage_pod_CHOICES,default="rezka")
+    payment_data=models.DateField(null=True)
 
 
 

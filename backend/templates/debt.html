@@ -57,12 +57,21 @@
       border: 1px solid #ccc;
     }
   </style>
+
 </head>
 <body>
 
 <div class="container">
-  <h2>Общая сумма задолженности: <span id="total-debt">12 500 000 сум</span></h2>
-
+  <h2>Общая сумма задолженности: <span id="total-debt">{{total_sum}} сум</span></h2>
+  <form action="" method="GET">
+  <div class="flex w-full max-w-md mx-auto mb-4">
+  <input type="text" name="search" placeholder="Поиск..." class="flex-grow px-4 py-2 border border-gray-300 rounded-l-2xl focus:outline-none focus:ring-2 focus:ring-blue-400">
+  <button type="submit"
+          class="bg-blue-500 text-white px-4 py-2 rounded-r-2xl hover:bg-blue-600 transition">
+    🔍
+  </button>
+    </form>
+</div>
   <table id="debt-table">
     <thead>
       <tr>
@@ -75,30 +84,18 @@
       </tr>
     </thead>
     <tbody>
-      <tr data-id="1">
-        <td>ООО "Реклама Плюс"</td>
-        <td>500 000 сум</td>
-        <td><input type="date" value="2025-03-12" onchange="updateDate(1, this.value)"></td>
-        <td>+998 91 777 77 77</td>
-        <td>2024-03-10</td>
-        <td><button onclick="confirmPayment(1)">Оплачено</button></td>
+    {% for item in order %}
+      <tr data-id="{{item.pk}}">
+        <td>{{item.client}}</td>
+        <td>{{item.dolg}}сум</td>
+        <td>{{item.complete_order|date:"d.m.Y"}}</td>
+        <td>{{item.phone}}</td>
+
+
+        <td><input type="date" value="{{ item.payment_data|date:'Y-m-d' }}" onchange="updateDate({{ item.pk }}, this.value)"></td>
+        <td><button onclick="confirmPayment({{item.pk}})">Оплачено</button></td>
       </tr>
-      <tr data-id="2">
-        <td>ИП "Бизнес Про", ООО "Реклама Плюс"</td>
-        <td>800 000 сум</td>
-        <td><input type="date" value="2025-03-12" onchange="updateDate(2, this.value)"></td>
-        <td>+998 91 777 77 77</td>
-        <td>2024-02-12</td>
-        <td><button onclick="confirmPayment(2)">Оплачено</button></td>
-      </tr>
-      <tr data-id="3">
-        <td>ООО "Альфа"</td>
-        <td>1 000 000 сум</td>
-        <td><input type="date" value="2025-03-12" onchange="updateDate(3, this.value)"></td>
-        <td>+998 91 777 77 77</td>
-        <td>2024-01-15</td>
-        <td><button onclick="confirmPayment(3)">Оплачено</button></td>
-      </tr>
+    {% endfor %}
     </tbody>
   </table>
 </div>
@@ -106,21 +103,24 @@
 <script>
   // Изменение даты завершения
   function updateDate(clientId, newDate) {
-    fetch('/api/update-debt-date/', {
+
+
+    fetch('{% url 'debt' %}', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': getCookie('csrftoken') // если Django
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRFToken': '{{ csrf_token }}',
       },
-      body: JSON.stringify({
-        client_id: clientId,
-        new_date: newDate
+      body: new URLSearchParams({
+        pk: clientId,
+        payment_data: newDate,
+        action:'update'
       })
     }).then(response => {
       if (!response.ok) throw new Error("Ошибка при отправке");
       return response.json();
     }).then(data => {
-      alert("Дата обновлена!");
+      console.log("Дата обновлена!");
     }).catch(err => {
       alert("Ошибка: " + err.message);
     });
@@ -128,19 +128,23 @@
 
   // Подтверждение оплаты
   function confirmPayment(clientId) {
-    fetch('/api/confirm-payment/', {
+    fetch('{% url 'debt' %}', {
+
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': getCookie('csrftoken')
+        'Content-Type':'application/x-www-form-urlencoded',
+        'X-CSRFToken': '{{ csrf_token }}',
       },
-      body: JSON.stringify({ client_id: clientId })
+      body: new URLSearchParams(
+      { pk: clientId,
+        action:'payment'
+      })
     }).then(response => {
       if (!response.ok) throw new Error("Ошибка при подтверждении");
       return response.json();
     }).then(data => {
       alert("Оплата подтверждена!");
-      document.querySelector(`tr[data-id="${clientId}"]`).remove(); // Удаление строки
+      window.location.reload();
     }).catch(err => {
       alert("Ошибка: " + err.message);
     });
