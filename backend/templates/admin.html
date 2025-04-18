@@ -1,3 +1,5 @@
+{% load tz %}
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -71,6 +73,7 @@
                 <a href="{% url 'staff' %}">👥 Сотрудники</a>
                 <a href="{% url 'apply'%}">📝 Заявки</a>
                 <a href="{% url 'logout'%}"> Выйти</a>
+
             </nav>
 
             <main class="col-md-10 p-4">
@@ -86,9 +89,17 @@
                             <h5>Принят</h5>
 
                             {% for item in accepted %}
+                             {% if item.check %}
 
-                            <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
-                            {% endfor %}
+
+
+                              <div class="kanban-item"  style="background-color: red;" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                            {% else %}
+                              <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+
+
+                             {% endif %}
+                             {% endfor %}
                         </div>
 
 
