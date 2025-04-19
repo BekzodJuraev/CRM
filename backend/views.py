@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Sum,Q,Count,F,Max,Prefetch,OuterRef, Subquery
+from django.db.models import Sum,Q,Count,F,Max,Prefetch,OuterRef, Subquery,Value
 from django.utils.timezone import now
 from django.http import JsonResponse
 from django.contrib.auth.views import LogoutView
@@ -107,7 +107,7 @@ class Dashboard(LoginRequiredMixin,TemplateView):
 
 
       for stage in stages:
-         queryset = Orders.objects.filter(stage=stage)
+         queryset = Orders.objects.filter(stage=stage).annotate(today=Value(now().date()))
 
          # Add search filter if present
          if search:
@@ -172,6 +172,7 @@ class Register(TemplateView):
       lastname = request.POST.get('lastname')
       middle_name = request.POST.get('middle_name')
       date_birth = request.POST.get('date_birth')
+      login=request.POST.get('login')
       phone = request.POST.get('phone')
       adress = request.POST.get('adress')
       last_job = request.POST.get('last_job')
@@ -181,8 +182,8 @@ class Register(TemplateView):
       photo = request.FILES.get('photo')
       password=request.POST.get('password')
       errors={}
-      if User.objects.filter(username=name).exists():
-         errors['username'] = "Пользователь с таким именем уже существует"
+      if User.objects.filter(username=login).exists():
+         errors['username'] = "Пользователь с таким логином уже существует"
 
       if not password or len(password) < 6:
          errors['password'] = "Пароль должен содержать не менее 6 символов"
@@ -192,7 +193,7 @@ class Register(TemplateView):
 
       if errors:
          return render(request, self.template_name, {'errors': errors, 'data': request.POST})
-      user=User.objects.create_user(username=name,password=password)
+      user=User.objects.create_user(username=login,password=password)
       Profile.objects.create(
          username=user,
          name=name,

@@ -32,7 +32,7 @@
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            width:90%;
+            width:81%;
             margin-bottom: 20px;
         }
         .application {
@@ -83,7 +83,13 @@
     <div class="container">
         <h1>Список сотрудников</h1>
         <form action="" method="GET">
+            <div>
             <input type="text" placeholder="Поиск" class="header-btn" name="search" value="{{request.GET.search}}">
+            <button type="submit"
+          class="bg-blue-500 text-white px-4 py-2 rounded-r-2xl hover:bg-blue-600 transition">
+    🔍
+  </button>
+                </div>
        </form>
 
         <div class="applications">
