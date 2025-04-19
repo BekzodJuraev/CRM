@@ -111,6 +111,7 @@
         <div class="card" data-pk="{{item.pk}}" draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
             <p><strong>Клиент:</strong> {{item.client}}</p>
             <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
+
         </div>
           {% endfor %}
     </div>
@@ -164,6 +165,7 @@
 
 <div class="popup" id="popup">
     <div id="popup-content"></div>
+
     <button onclick="closePopup()">Закрыть</button>
 </div>
 

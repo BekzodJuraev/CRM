@@ -38,7 +38,7 @@
     }
 
     .search input {
-      width: 100%;
+      width: 90%;
       padding: 12px;
       border-radius: 8px;
       border: 1px solid #ddd;
@@ -135,6 +135,9 @@
   <form action="" method="GET">
   <div class="search">
     <input type="text" placeholder="Поиск..." name="search">
+      <button type="submit" class="btn-complete">
+    🔍
+  </button>
   </div>
     </form>
   {% for item in technologist %}
@@ -143,9 +146,9 @@
   <div class="order-card">
     <h2>{{item.client}}</h2>
     <div class="order-info">
-      <p><b>Дата добавления:</b> {{item.add_order|date:"d.m.Y"}}| <b>Срок:</b> {{item.complete_order|date:"d.m.Y"}}</p>
+      <p><b>Дата добавления:</b> {{item.add_order|date:"d.m.Y"}} | <b>Срок:</b> {{item.complete_order|date:"d.m.Y"}}</p>
       <p><b>Предоплата:</b> {{item.order_predoplata}} сум | <b>Сумма заказа:</b> {{item.order_sum}} сум</p>
-      <p><b>Адрес:</b>{{item.adress}}</p>
+      <p><b>Адрес: </b>{{item.adress}}</p>
       <p><b>Телефон:</b> {{item.phone}}</p>
 
         {% with item.consumables.all as consumables %}
@@ -166,24 +169,7 @@
     </div>
     <input type="hidden" name="pk" value="{{ item.pk }}">
        <div id="categories-container">
-                <div class="category-group">
-                    <label>Категория заказа:</label>
-                    <select class="form-select" name="catigories" required>
-                        <option value="Реклама">Реклама</option>
-                        <option value="Печать">Печать</option>
-                        <option value="Дизайн">Дизайн</option>
-                    </select>
-                    <label>Расходник:</label>
-                    <div class="input-group">
-                        <select class="form-select" name="add" required>
-                                 <option value="АКРИЛ, 1 mm, Зеленый"> АКРИЛ, 1 mm, Зеленый</option>
-                                    <option value="АКРИЛ, 1 mm, Красный">  АКРИЛ, 1 mm, Красный</option>
-                                    <option value="АКРИЛ, 1 mm, Черный">  АКРИЛ, 1 mm, Черный</option>
-                        </select>
-                        <input type="number" class="form-control" placeholder="Стоимость" name="price" required>
-                        <button type="button" class="btn btn-remove" onclick="removeCategoryGroup(this)">-</button>
-                    </div>
-                </div>
+                
             </div>
       <p>Отметьте галочками этапы, которые необходимо выполнить для данного заказа перед передачей в производство.</p>
           <input type="checkbox" name="rezka" class="stage-checkbox"> Резка<br>

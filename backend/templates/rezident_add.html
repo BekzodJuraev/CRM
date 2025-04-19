@@ -74,11 +74,10 @@
     <h2>Добавить резидента</h2>
     <form action="" method="POST" enctype="multipart/form-data">
       {% csrf_token %}
-      <label for="photo">Фотография (необязательно):</label>
-      <input type="file" id="photo" name="photo" />
+
 
       <label for="company">Название компании:</label>
-      <input type="text" id="company" name="company" value='ООО "Реклама Плюс"' />
+      <input type="text" id="company" name="company" placeholder='ООО "Реклама Плюс"' />
 
       <label for="city">Город:</label>
       <select id="city" name="city">
@@ -87,13 +86,13 @@
       </select>
 
       <label for="contact">Контактное лицо:</label>
-      <input type="text" id="contact" name="name" value="Иванов Иван" />
+      <input type="text" id="contact" name="name" placeholder="Иванов Иван" />
 
       <label for="email">Email:</label>
-      <input type="email" id="email" name="email" value="example@email.com" />
+      <input type="email" id="email" name="email" placeholder="example@email.com" />
 
       <label for="phone">Телефон:</label>
-      <input type="tel" id="phone" name="phone" value="+998917777777" />
+      <input type="tel" id="phone" name="phone" placeholder="+998917777777" />
 
       <button type="submit" class="btn-submit">Сохранить</button>
     </form>

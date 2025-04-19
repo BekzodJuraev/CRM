@@ -356,10 +356,10 @@ class Staff(LoginRequiredMixin,TemplateView):
             Q(name__icontains=search) |
             Q(lastname__icontains=search) |
             Q(middle_name__icontains=search)  # Add more fields as necessary
-         )
+         ).order_by('-id')
       else:
          # Return all profiles if no search term is provided
-         context['profile'] = Profile.objects.filter(approve=True)
+         context['profile'] = Profile.objects.filter(approve=True).order_by('-id')
 
 
 
@@ -435,7 +435,7 @@ class Money(LoginRequiredMixin,TemplateView):
       query=Finance.objects.filter(
           created_at__year=today.year,
           created_at__month=today.month
-      )
+      ).order_by('-id')
 
       order = Orders.objects.filter(stage="finished", complete_order__year=today.year,
                                     complete_order__month=today.month)

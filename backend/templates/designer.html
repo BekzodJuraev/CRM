@@ -36,7 +36,7 @@
     }
 
     .search input {
-      width: 100%;
+      width: 95%;
       padding: 12px;
       border-radius: 8px;
       border: 1px solid #ddd;
@@ -98,6 +98,10 @@
   <form action="" method="GET">
   <div class="search">
     <input type="text" placeholder="Поиск..." name="search">
+    <button type="submit"
+          class="bg-blue-500 text-white px-4 py-2 rounded-r-2xl hover:bg-blue-600 transition">
+    🔍
+  </button>
   </div>
     </form>
   {% for item in design %}
@@ -106,9 +110,9 @@
   <div class="order-card">
     <h2>{{item.client}}</h2>
     <div class="order-info">
-      <p><b>Дата добавления:</b> {{item.add_order|date:"d.m.Y"}}| <b>Срок:</b> {{item.complete_order|date:"d.m.Y"}}</p>
+      <p><b>Дата добавления:</b> {{item.add_order|date:"d.m.Y"}} | <b>Срок:</b> {{item.complete_order|date:"d.m.Y"}}</p>
       <p><b>Предоплата:</b> {{item.order_predoplata}} сум | <b>Сумма заказа:</b> {{item.order_sum}} сум</p>
-      <p><b>Адрес:</b>{{item.adress}}</p>
+      <p><b>Адрес: </b>{{item.adress}}</p>
       <p><b>Телефон:</b> {{item.phone}}</p>
 
         {% with item.consumables.all as consumables %}
