@@ -86,6 +86,11 @@ class Consumables(models.Model):
     price=models.DecimalField(max_digits=10, decimal_places=2,default=0)
     catigories=models.CharField(max_length=50)
     order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name='consumables')
+    quantity=models.IntegerField(default=1)
+
+
+
+
 
     def __str__(self):
         return self.catigories

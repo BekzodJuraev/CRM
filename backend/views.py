@@ -36,6 +36,7 @@ class Dashboard(LoginRequiredMixin,TemplateView):
          add = request.POST.getlist('add')
          price = request.POST.getlist('price')
          catigories = request.POST.getlist('catigories')
+         quantity=request.POST.getlist('quantity')
          rezka = request.POST.get('rezka') == 'on'
          svarka = request.POST.get('svarka') == 'on'
          fill = request.POST.get('fill') == 'on'
@@ -53,8 +54,8 @@ class Dashboard(LoginRequiredMixin,TemplateView):
 
          Orders.objects.filter(pk=pk).update(stage="manufacturing",stage_pod=pod_stage,rezka=rezka,svarka=svarka,fill=fill,print=pechat)
          consumables = [
-            Consumables(order_id=pk, add=a, price=p, catigories=c)
-            for a, p, c in zip(add, price, catigories)
+            Consumables(order_id=pk, add=a, price=p, catigories=c, quantity=d)
+            for a, p, c, d in zip(add, price, catigories, quantity)
          ]
          Consumables.objects.bulk_create(consumables)
 
@@ -244,14 +245,15 @@ class OrderDetail(LoginRequiredMixin,DetailView):
       add = request.POST.getlist('add')
       price = request.POST.getlist('price')
       catigories = request.POST.getlist('catigories')
+      quantity = request.POST.getlist('quantity')
 
       # Delete old consumables for this order to avoid duplication
       Consumables.objects.filter(order=self.object).delete()
 
       # Create new consumables
       consumables = [
-         Consumables(order=self.object, add=a, price=p, catigories=c)
-         for a, p, c in zip(add, price, catigories)
+         Consumables(order=self.object, add=a, price=p, catigories=c, quantity=d)
+         for a, p, c, d in zip(add, price, catigories, quantity)
       ]
       Consumables.objects.bulk_create(consumables)
 
@@ -269,7 +271,7 @@ class Order(LoginRequiredMixin,TemplateView):
       add=request.POST.getlist('add')
       price=request.POST.getlist('price')
       catigories = request.POST.getlist('catigories')
-
+      quantity=request.POST.getlist('quantity')
 
 
       client = request.POST.get('client')
@@ -284,6 +286,7 @@ class Order(LoginRequiredMixin,TemplateView):
       complete_order = request.POST.get('complete_order')
 
 
+
       order=Orders.objects.create\
          (client=client,
           adress=adress,
@@ -296,8 +299,8 @@ class Order(LoginRequiredMixin,TemplateView):
           add_order=add_order,
           complete_order=complete_order)
       consumables = [
-         Consumables(order=order, add=a, price=p, catigories=c)
-         for a, p, c in zip(add, price, catigories)
+         Consumables(order=order, add=a, price=p, catigories=c , quantity=d)
+         for a, p, c , d  in zip(add, price, catigories, quantity)
       ]
       Consumables.objects.bulk_create(consumables)
 
@@ -444,13 +447,14 @@ class Money(LoginRequiredMixin,TemplateView):
          query = query.filter(created_at__range=(first, second))
          order=order.filter(complete_order__range=(first,second))
 
-      marja=Consumables.objects.filter(order__in=order).aggregate(total_sum=Sum('price'))['total_sum'] or 0
+      marja=Consumables.objects.filter(order__in=order).aggregate(total_sum=Sum(F('price')*F('quantity')))['total_sum'] or 0
       total_sum=order.aggregate(total_sum=Sum('order_sum'))['total_sum'] or 0
+      cost=query.aggregate(total_sum=Sum('sum'))['total_sum'] or 0
       context['marja']=total_sum - marja
       context['money'] = query
       context['count']=order.count()
       context['total_sum']=total_sum
-      context['cost']=query.aggregate(total_sum=Sum('sum'))['total_sum'] or 0
+      context['cost']=cost+marja
 
       return context
 
@@ -516,7 +520,7 @@ class WarehouseView(LoginRequiredMixin, TemplateView):
       context = super().get_context_data(**kwargs)
       search = self.request.GET.get('search')
       limit_subquery = WarehouseLimit.objects.filter(product=OuterRef('product')).order_by('-id').values('limit')[:1]
-      stock_subquery = Consumables.objects.filter(add=OuterRef('product')).values('add').annotate(count=Count('id')).values('count')[:1]
+      stock_subquery = Consumables.objects.filter(add=OuterRef('product')).values('add').annotate(sum=Sum('quantity')).values('sum')[:1]
       if search:
          context['warehouse'] = Warehouse.objects.filter(product__icontains=search).values('product').annotate(
             last_added=Max('created_at'), limit=Subquery(limit_subquery), quantity=Sum('quantity'),

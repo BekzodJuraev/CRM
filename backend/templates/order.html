@@ -82,6 +82,8 @@
                                     <option value="АКРИЛ, 1 mm, Черный">  АКРИЛ, 1 mm, Черный</option>
                         </select>
                         <input type="number" class="form-control" placeholder="Стоимость" name="price" required>
+                        <input type="number" class="form-control" placeholder="Количество" name="quantity" min="1"  required>
+
                         <button type="button" class="btn btn-remove" onclick="removeCategoryGroup(this)">-</button>
                     </div>
                 </div>
@@ -92,7 +94,7 @@
             <textarea class="form-control" rows="3" name="description" required></textarea>
 
             <label>Номер телефона заказчика:</label>
-            <input type="tel" class="form-control" placeholder="+79997777777" name="phone" required>
+            <input type="tel" class="form-control" placeholder="+79997777777" name="phone"  required>
 
             <label>Выберите источник заказа:</label>
             <select class="form-select" name="social" required>
@@ -118,7 +120,7 @@
             <input type="date" class="form-control" name="add_order" required>
 
             <label>Срок выполнения:</label>
-            <input type="date" class="form-control" name="complete_order" required>
+            <input type="date" class="form-control" name="complete_order"  required>
 
             <button type="submit" class="btn btn-primary w-100 mt-3">Сохранить</button>
         </form>
@@ -154,6 +156,7 @@
                             <option value="АКРИЛ, 1 mm, Черный">  АКРИЛ, 1 mm, Черный</option>
                     </select>
                     <input type="number" class="form-control" placeholder="Стоимость" name="price" required>
+                   <input type="number" class="form-control" placeholder="Количество" name="quantity" min="1"   required>
                     <button type="button" class="btn btn-remove" onclick="removeCategoryGroup(this)">-</button>
                 </div>
             `;
@@ -163,6 +166,7 @@
         function removeCategoryGroup(button) {
             button.closest(".category-group").remove();
         }
+
     </script>
 </body>
 </html>
