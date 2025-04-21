@@ -108,57 +108,182 @@
     <div class="column" ondragover="allowDrop(event)" data-stage="manufacturing" data-pod_stage="rezka"  ondrop="drop(event)">
         <h3>Резка</h3>
         {% for item in rezka %}
-        <div class="card" data-pk="{{item.pk}}" draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
-            <p><strong>Клиент:</strong> {{item.client}}</p>
-            <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
+    <div class="card" data-pk="{{item.pk}}" draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
+        <div class="preview">
+        <p><strong>Клиент:</strong> {{item.client}}</p>
+        <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
+    </div>
+    <div class="details" style="display: none;">
+        <h2>{{item.client}}</h2>
+        <p><strong>Дата добавления:</strong> {{item.add_order|date:"d.m.Y"}} | <strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
+        <p><strong>Предоплата:</strong> {{item.order_predoplata}} сум | <strong>Сумма заказа:</strong> {{item.order_sum}} сум</p>
+        <p><strong>Адрес:</strong> {{item.adress}} </p>
+        <p><strong>Телефон:</strong> {{item.phone}} </p>
+        {% with item.consumables.all as consumables %}
+        <p><strong>Категория:</strong> {% for rek in consumables %}
+      {{ rek.catigories }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}</p>
+        <p><strong>Расходники:</strong> {% for rek in consumables %}
+      {{ rek.add }} ({{ rek.price }} сум)
+    {% endfor %} </p>
+        {% endwith %}
 
-        </div>
+
+
+        <p><strong>Описание / ТЗ:</strong> {{item.description}} </p>
+    </div>
+</div>
           {% endfor %}
     </div>
 
     <div class="column" ondragover="allowDrop(event)"  data-stage="manufacturing" data-pod_stage="svarka" ondrop="drop(event)">
         <h3>Сварка</h3>
-          {% for item in svarka %}
-        <div class="card" data-pk="{{item.pk}}" draggable="true"  ondragstart="drag(event)" onclick="showPopup(this)">
-            <p><strong>Клиент:</strong> {{item.client}}</p>
-            <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
-        </div>
+           {% for item in svarka %}
+    <div class="card" data-pk="{{item.pk}}" draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
+        <div class="preview">
+        <p><strong>Клиент:</strong> {{item.client}}</p>
+        <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
+    </div>
+    <div class="details" style="display: none;">
+        <h2>{{ item.client}}</h2>
+        <p><strong>Дата добавления:</strong> {{item.add_order|date:"d.m.Y"}} | <strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
+        <p><strong>Предоплата:</strong> {{item.order_predoplata}} сум | <strong>Сумма заказа:</strong> {{item.order_sum}} сум</p>
+        <p><strong>Адрес:</strong> {{item.adress}} </p>
+        <p><strong>Телефон:</strong> {{item.phone}} </p>
+        {% with item.consumables.all as consumables %}
+        <p><strong>Категория:</strong> {% for rek in consumables %}
+      {{ rek.catigories }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}</p>
+        <p><strong>Расходники:</strong> {% for rek in consumables %}
+      {{ rek.add }} ({{ rek.price }} сум)
+    {% endfor %} </p>
+        {% endwith %}
+
+
+
+        <p><strong>Описание / ТЗ:</strong> {{item.description}} </p>
+    </div>
+</div>
           {% endfor %}
     </div>
     <div class="column" ondragover="allowDrop(event)"  data-stage="manufacturing" data-pod_stage="fill" ondrop="drop(event)">
         <h3>Покраска</h3>
-          {% for item in fill %}
-        <div class="card" data-pk="{{item.pk}}" draggable="true"  ondragstart="drag(event)" onclick="showPopup(this)">
-            <p><strong>Клиент:</strong> {{item.client}}</p>
-            <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
-        </div>
+             {% for item in fill %}
+    <div class="card" data-pk="{{item.pk}}" draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
+        <div class="preview">
+        <p><strong>Клиент:</strong> {{item.client}}</p>
+        <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
+    </div>
+    <div class="details" style="display: none;">
+        <h2>{{ item.client}}</h2>
+        <p><strong>Дата добавления:</strong> {{item.add_order|date:"d.m.Y"}} | <strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
+        <p><strong>Предоплата:</strong> {{item.order_predoplata}} сум | <strong>Сумма заказа:</strong> {{item.order_sum}} сум</p>
+        <p><strong>Адрес:</strong> {{item.adress}} </p>
+        <p><strong>Телефон:</strong> {{item.phone}} </p>
+        {% with item.consumables.all as consumables %}
+        <p><strong>Категория:</strong> {% for rek in consumables %}
+      {{ rek.catigories }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}</p>
+        <p><strong>Расходники:</strong> {% for rek in consumables %}
+      {{ rek.add }} ({{ rek.price }} сум)
+    {% endfor %} </p>
+        {% endwith %}
+
+
+
+        <p><strong>Описание / ТЗ:</strong> {{item.description}} </p>
+    </div>
+</div>
           {% endfor %}
     </div>
     <div class="column" ondragover="allowDrop(event)" data-stage="manufacturing" data-pod_stage="print"  ondrop="drop(event)">
         <h3>Печать</h3>
-          {% for item in print %}
-        <div class="card" data-pk="{{item.pk}}" draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
-            <p><strong>Клиент:</strong> {{item.client}}</p>
-            <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
-        </div>
+              {% for item in print %}
+    <div class="card" data-pk="{{item.pk}}" draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
+        <div class="preview">
+        <p><strong>Клиент:</strong> {{item.client}}</p>
+        <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
+    </div>
+    <div class="details" style="display: none;">
+        <h2>{{ item.client}}</h2>
+        <p><strong>Дата добавления:</strong> {{item.add_order|date:"d.m.Y"}} | <strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
+        <p><strong>Предоплата:</strong> {{item.order_predoplata}} сум | <strong>Сумма заказа:</strong> {{item.order_sum}} сум</p>
+        <p><strong>Адрес:</strong> {{item.adress}} </p>
+        <p><strong>Телефон:</strong> {{item.phone}} </p>
+        {% with item.consumables.all as consumables %}
+        <p><strong>Категория:</strong> {% for rek in consumables %}
+      {{ rek.catigories }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}</p>
+        <p><strong>Расходники:</strong> {% for rek in consumables %}
+      {{ rek.add }} ({{ rek.price }} сум)
+    {% endfor %} </p>
+        {% endwith %}
+
+
+
+        <p><strong>Описание / ТЗ:</strong> {{item.description}} </p>
+    </div>
+</div>
           {% endfor %}
     </div>
     <div class="column" ondragover="allowDrop(event)"  data-stage="assembly" data-pod_stage=""  ondrop="drop(event)">
         <h3>Сборка</h3>
-          {% for item in assembly %}
-        <div class="card" data-pk="{{item.pk}}" draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
-            <p><strong>Клиент:</strong> {{item.client}}</p>
-            <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
-        </div>
+              {% for item in assembly %}
+    <div class="card" data-pk="{{item.pk}}"  draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
+        <div class="preview">
+        <p><strong>Клиент:</strong> {{item.client}}</p>
+        <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
+    </div>
+    <div class="details" style="display: none;">
+        <h2>{{ item.client}}</h2>
+        <p><strong>Дата добавления:</strong> {{item.add_order|date:"d.m.Y"}} | <strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
+        <p><strong>Предоплата:</strong> {{item.order_predoplata}} сум | <strong>Сумма заказа:</strong> {{item.order_sum}} сум</p>
+        <p><strong>Адрес:</strong> {{item.adress}} </p>
+        <p><strong>Телефон:</strong> {{item.phone}} </p>
+        {% with item.consumables.all as consumables %}
+        <p><strong>Категория:</strong> {% for rek in consumables %}
+      {{ rek.catigories }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}</p>
+        <p><strong>Расходники:</strong> {% for rek in consumables %}
+      {{ rek.add }} ({{ rek.price }} сум)
+    {% endfor %} </p>
+        {% endwith %}
+
+
+
+        <p><strong>Описание / ТЗ:</strong> {{item.description}} </p>
+    </div>
+</div>
           {% endfor %}
     </div>
-    <div class="column" ondragover="allowDrop(event)"  data-stage="delivery" data-pod_stage="" ondrop="drop(event)">
+    <div class="column" ondragover="allowDrop(event)"  data-stage="delivery" draggable="true" ondragstart="drag(event)" data-pod_stage="" ondrop="drop(event)">
         <h3>Доставка и установка</h3>
-          {% for item in delivery %}
-        <div class="card" data-pk="{{item.pk}}" draggable="true"   ondragstart="drag(event)" onclick="showPopup(this)">
-            <p><strong>Клиент:</strong> {{item.client}}</p>
-            <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
-        </div>
+             {% for item in delivery %}
+    <div class="card" data-pk="{{item.pk}}" onclick="showPopup(this)">
+        <div class="preview">
+        <p><strong>Клиент:</strong> {{item.client}}</p>
+        <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
+    </div>
+    <div class="details" style="display: none;">
+        <h2>{{ item.client}}</h2>
+        <p><strong>Дата добавления:</strong> {{item.add_order|date:"d.m.Y"}} | <strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
+        <p><strong>Предоплата:</strong> {{item.order_predoplata}} сум | <strong>Сумма заказа:</strong> {{item.order_sum}} сум</p>
+        <p><strong>Адрес:</strong> {{item.adress}} </p>
+        <p><strong>Телефон:</strong> {{item.phone}} </p>
+        {% with item.consumables.all as consumables %}
+        <p><strong>Категория:</strong> {% for rek in consumables %}
+      {{ rek.catigories }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}</p>
+        <p><strong>Расходники:</strong> {% for rek in consumables %}
+      {{ rek.add }} ({{ rek.price }} сум)
+    {% endfor %} </p>
+        {% endwith %}
+
+
+
+        <p><strong>Описание / ТЗ:</strong> {{item.description}} </p>
+    </div>
+</div>
           {% endfor %}
     </div>
 </div>
@@ -208,10 +333,9 @@
             })
             .then(response => {
                 if (!response.ok) {
-                 alert("Нельзя");  // Show alert
+                    alert("Нельзя");  // Show alert
                     window.location.reload();  // Reload the page
-                    throw new Error("Нельзя");
-                                }
+                    throw new Error("Нельзя");}
 
             })
             .then(data => {
@@ -224,15 +348,17 @@
     }
 
     function showPopup(card) {
-        const popup = document.getElementById('popup');
-        const content = document.getElementById('popup-content');
-        content.innerHTML = card.innerHTML;
-        popup.style.display = 'block';
+    const popup = document.getElementById('popup');
+    const content = document.getElementById('popup-content');
+    const details = card.querySelector('.details').innerHTML;
+    content.innerHTML = details;
+    popup.style.display = 'block';
     }
 
     function closePopup() {
-        document.getElementById('popup').style.display = 'none';
-    }
+        const popup = document.getElementById('popup');
+        popup.style.display = 'none';
+        }
 </script>
 
 </body>

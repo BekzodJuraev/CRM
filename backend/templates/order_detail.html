@@ -70,9 +70,10 @@
                 <div class="category-group">
                     <label>Категория заказа:</label>
                     <select class="form-select" name="catigories" required>
-    <option value="Реклама" {% if i.catigories == "Реклама" %}selected{% endif %}>Реклама</option>
-    <option value="Печать" {% if i.catigories == "Печать" %}selected{% endif %}>Печать</option>
-    <option value="Дизайн" {% if i.catigories == "Дизайн" %}selected{% endif %}>Дизайн</option>
+
+    <option value="Наружная реклама и макеты" {% if i.catigories == "Наружная реклама и макеты" %}selected{% endif %}>Наружная реклама и макеты</option>
+    <option value="Типография" {% if i.catigories == "Типография" %}selected{% endif %}>Типография</option>
+    <option value="Полиграфия" {% if i.catigories == "Полиграфия" %}selected{% endif %}>Полиграфия</option>
             </select>
 
                     <label>Расходник:</label>
@@ -151,9 +152,9 @@
             newGroup.innerHTML = `
                 <label>Категория заказа:</label>
                 <select class="form-select" name="catigories" required>
-                    <option value="Реклама">Реклама</option>
-                    <option value="Печать">Печать</option>
-                    <option value="Дизайн">Дизайн</option>
+              <option value="Наружная реклама и макеты">Наружная реклама и макеты</option>
+                        <option value="Типография">Типография</option>
+                        <option value=" Полиграфия">Полиграфия</option>
                 </select>
                 <label>Расходник:</label>
                 <div class="input-group">
