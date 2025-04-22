@@ -37,6 +37,7 @@ class Dashboard(LoginRequiredMixin,TemplateView):
          price = request.POST.getlist('price')
          catigories = request.POST.getlist('catigories')
          quantity=request.POST.getlist('quantity')
+         quantity=request.POST.getlist('quantity')
          rezka = request.POST.get('rezka') == 'on'
          svarka = request.POST.get('svarka') == 'on'
          fill = request.POST.get('fill') == 'on'
@@ -442,19 +443,26 @@ class Money(LoginRequiredMixin,TemplateView):
 
       order = Orders.objects.filter(stage="finished", complete_order__year=today.year,
                                     complete_order__month=today.month)
+      order1 = Orders.objects.filter(complete_order__year=today.year,
+                                    complete_order__month=today.month)
+
 
       if first and second:
          query = query.filter(created_at__range=(first, second))
          order=order.filter(complete_order__range=(first,second))
+         order1=order1.filter(complete_order__range=(first,second))
 
       marja=Consumables.objects.filter(order__in=order).aggregate(total_sum=Sum(F('price')*F('quantity')))['total_sum'] or 0
+      marja1 = Consumables.objects.filter(order__in=order1).aggregate(total_sum=Sum(F('price') * F('quantity')))[
+                 'total_sum'] or 0
+
       total_sum=order.aggregate(total_sum=Sum('order_sum'))['total_sum'] or 0
       cost=query.aggregate(total_sum=Sum('sum'))['total_sum'] or 0
       context['marja']=total_sum - marja
       context['money'] = query
       context['count']=order.count()
       context['total_sum']=total_sum
-      context['cost']=cost+marja
+      context['cost']=cost+marja1
 
       return context
 
