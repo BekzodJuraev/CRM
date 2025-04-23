@@ -75,8 +75,20 @@ class Dashboard(LoginRequiredMixin,TemplateView):
          order=Orders.objects.filter(pk=pk).first()
          check=getattr(order,stage_pod,None)
 
+
          if check is False:
-            return JsonResponse({'status': 'Not allowed'}, status=401)
+            services = []
+            if order.rezka:
+               services.append("Резка")
+            if order.svarka:
+               services.append("Сварка")
+            if order.fill:
+               services.append("Покраска")
+            if order.print:
+               services.append("Печать")
+
+            x = ",".join(services)
+            return JsonResponse({'message': f'Для данного проекта технолог выбрал только этапы:{x}'}, status=401)
 
 
 

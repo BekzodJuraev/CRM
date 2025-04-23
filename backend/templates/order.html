@@ -46,6 +46,101 @@
             margin-bottom: 10px;
             background: #f9f9f9;
         }
+        .custom-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.selected {
+  padding: 8px;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.dropdown-options {
+  display: none;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  width: 100%;
+  border: 1px solid #ccc;
+  background: white;
+  z-index: 10;
+}
+
+.dropdown-options li {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.dropdown-options li:hover {
+  background: #f1f1f1;
+}
+custom-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.selected {
+  padding: 8px;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.dropdown-options {
+  display: none;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  width: 100%;
+  border: 1px solid #ccc;
+  background: white;
+  z-index: 10;
+}
+
+.dropdown-options > li {
+  position: relative;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.dropdown-options > li:hover {
+  background: #f1f1f1;
+}
+
+/* Submenu styles */
+.has-submenu:hover .submenu {
+  display: none;
+}
+
+.submenu {
+  display: none;
+  position: absolute;
+  left: 100%;
+  top: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 150px;
+  border: 1px solid #ccc;
+  background: white;
+}
+
+.submenu li {
+  padding: 8px;
+  cursor: pointer;
+
+}
+
+.submenu li:hover {
+  background: #f1f1f1;
+}
     </style>
 </head>
 <body>
@@ -75,17 +170,18 @@
                         <option value=" Полиграфия">Полиграфия</option>
                     </select>
                     <label>Расходник:</label>
-                    <div class="input-group">
-                        <select class="form-select" name="add" required>
-                                 <option value="АКРИЛ, 1 mm, Зеленый"> АКРИЛ, 1 mm, Зеленый</option>
-                                    <option value="АКРИЛ, 1 mm, Красный">  АКРИЛ, 1 mm, Красный</option>
-                                    <option value="АКРИЛ, 1 mm, Черный">  АКРИЛ, 1 mm, Черный</option>
-                        </select>
-                        <input type="number" class="form-control" placeholder="Стоимость" name="price" required>
-                        <input type="number" class="form-control" placeholder="Количество" name="quantity" min="1"  required>
+                   <div class="input-group">
+ <div class="custom-dropdown">
+  <div class="selected" onclick="toggleDropdown()">-- Выберите --</div>
+  <ul class="dropdown-options" id="dropdown-list"></ul>
+  <input type="hidden" name="selectedValue" id="selectedValue">
+</div>
 
-                        <button type="button" class="btn btn-remove" onclick="removeCategoryGroup(this)">-</button>
-                    </div>
+  <input type="number" class="form-control" placeholder="Стоимость" name="price" required>
+  <input type="number" class="form-control" placeholder="Количество" name="quantity" min="1" required>
+  <button type="button" class="btn btn-remove" onclick="removeCategoryGroup(this)">-</button>
+</div>
+
                 </div>
             </div>
             <button type="button" class="btn-add" onclick="addCategoryGroup()" >+ Добавить категорию и расходник</button>
@@ -167,7 +263,127 @@
             button.closest(".category-group").remove();
         }
 
-    </script>
+</script>
+ <script>
+    const categories = [
+  {
+    label: "Бокал",
+    subItems: [
+      {
+        label: "Большой",
+        subItems: [
+          {
+            label: "Черный",
+            subItems: [
+              { label: "Тонкий" }
+            ]
+          },
+          { label: "1" },
+          { label: "2" }
+        ]
+      },
+      {
+        label: "Маленький",
+        subItems: [
+          { label: "3" },
+          { label: "4" }
+        ]
+      }
+    ]
+  },
+  {
+    label: "Тарелка",
+    subItems: [
+      {
+        label: "Плоская",
+        subItems: [
+          { label: "Серая" },
+          { label: "Голубая" }
+        ]
+      },
+      {
+        label: "Глубокая",
+        subItems: [
+          { label: "Белая" },
+          { label: "Желтая" }
+        ]
+      }
+    ]
+  }
+];
+
+// Track the parent label for each selection
+let selectedParentLabel = "";
+
+function buildMenu(items, container, path = []) {
+  items.forEach(item => {
+    const li = document.createElement("li");
+    li.textContent = item.label;
+
+    // Clone the current path and add this label
+    const currentPath = [...path, item.label];
+
+    if (item.subItems && item.subItems.length > 0) {
+      li.classList.add("has-submenu");
+      const subUl = document.createElement("ul");
+      subUl.className = "submenu";
+      buildMenu(item.subItems, subUl, currentPath);
+      li.appendChild(subUl);
+
+      // Hover to show submenu
+      li.addEventListener("mouseover", () => {
+        subUl.style.display = "block";
+      });
+      li.addEventListener("mouseleave", () => {
+        subUl.style.display = "none";
+      });
+    }
+
+    // Handle click on leaf node (no subItems)
+    li.addEventListener("click", function (e) {
+      e.stopPropagation();
+      if (!item.subItems || item.subItems.length === 0) {
+        selectOption(currentPath);
+      }
+    });
+
+    container.appendChild(li);
+  });
+}
+
+function selectOption(pathArray) {
+  const value = pathArray.join(", ");
+  document.querySelector(".selected").textContent = value;
+  document.getElementById("selectedValue").value = value;
+  document.getElementById("dropdown-list").style.display = "none";
+}
+function buildDropdown() {
+  const dropdown = document.getElementById("dropdown-list");
+  dropdown.innerHTML = "";
+  buildMenu(categories, dropdown);
+}
+
+function toggleDropdown() {
+  const dropdown = document.getElementById("dropdown-list");
+  dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+}
+
+// Initial build
+buildDropdown();
+
+// Close dropdown when clicking outside
+document.addEventListener("click", function (event) {
+  const dropdown = document.querySelector(".custom-dropdown");
+  if (!dropdown.contains(event.target)) {
+    document.getElementById("dropdown-list").style.display = "none";
+  }
+});
+
+
+ </script>
+
+
+
 </body>
 </html>
 {% else %}
