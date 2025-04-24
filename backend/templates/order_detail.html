@@ -127,8 +127,19 @@
             <label>Срок выполнения:</label>
             <input type="date" class="form-control" name="complete_order" required value="{{item.complete_order|date:'Y-m-d'}}">
             {% if item.stage == "finished" or item.stage == "order_ready" %}
+             <label>Загруженное доставщиком</label>
+             <div id="preview-container" class="preview-container" ">
+        <img id="preview-image" src="/{{item.delivery_photo}}" alt="Preview" style="max-width: 100%; max-height: 200px; display: block;">
+            </div>
+            <br>
             <label>Прикрепить фото:</label>
             <input type="file" class="form-control" name="delivery_photo">
+            <br>
+            {% if item.complete_photo %}
+             <div id="preview-container" class="preview-container" ">
+        <img id="preview-image" src="/{{item.complete_photo}}" alt="Preview" style="max-width: 100%; max-height: 200px; display: block;">
+            </div>
+    {% endif %}
             {% endif %}
             <button type="submit" class="btn btn-primary w-100 mt-3">Сохранить</button>
         </form>

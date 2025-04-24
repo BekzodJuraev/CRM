@@ -249,7 +249,7 @@ class OrderDetail(LoginRequiredMixin,DetailView):
 
       # Handle uploaded file (delivery photo)
       if 'delivery_photo' in request.FILES:
-         self.object.delivery_photo = request.FILES.get('delivery_photo')
+         self.object.complete_photo = request.FILES.get('delivery_photo')
 
       # Save the updated order
       self.object.save()
@@ -285,9 +285,7 @@ class Order(LoginRequiredMixin,TemplateView):
       price=request.POST.getlist('price')
       catigories = request.POST.getlist('catigories')
       quantity=request.POST.getlist('quantity')
-      print(add)
-      print(price)
-      print(catigories)
+
 
 
       client = request.POST.get('client')

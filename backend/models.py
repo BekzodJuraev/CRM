@@ -64,6 +64,7 @@ class Orders(models.Model):
     add_order=models.DateField()
     complete_order=models.DateField()
     delivery_photo=models.ImageField(blank=True, upload_to='delivery/')
+    complete_photo=models.ImageField(blank=True,upload_to='complete/')
     rezka=models.BooleanField(default=False)
     svarka=models.BooleanField(default=False)
     fill=models.BooleanField(default=False)

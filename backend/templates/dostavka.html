@@ -143,20 +143,45 @@
 
         <!-- Form for uploading photo and finishing order -->
         <form method="POST" action="" enctype="multipart/form-data" class="actions">
-            {% csrf_token %}
-            <input type="hidden" name="pk" value="{{item.pk}}">
+    {% csrf_token %}
+    <input type="hidden" name="pk" value="{{item.pk}}">
+    <input type="hidden" name="action" value="delivery">
 
-            <input type="hidden" name="action" value="delivery">
-
-            <input type="file" name="photo" id="photo-upload-{{item.pk}}" required>
-            <label for="photo-upload-{{item.pk}}" class="custom-upload-label">Загрузить фото</label>
-
-            <button type="submit" class="complete-btn">Завершить заказ</button>
-        </form>
-
+    <!-- Preview container -->
+    <div id="preview-container-{{item.pk}}" class="preview-container" style="display:none; margin-bottom: 10px;">
+        <img id="preview-image-{{item.pk}}" src="" alt="Preview" style="max-width: 100%; max-height: 200px; display: block;">
     </div>
-    {% endfor %}
-</div>
 
+    <!-- Submit button initially hidden -->
+    <button type="submit" id="submit-btn-{{item.pk}}" class="complete-btn" style="display: none;">Завершить заказ</button>
+
+    <!-- File upload -->
+    <input type="file" name="photo" id="photo-upload-{{item.pk}}" required onchange="handleFileChange(event, '{{item.pk}}')">
+    <label for="photo-upload-{{item.pk}}" class="custom-upload-label">Загрузить фото</label>
+</form>
+
+</div>
+    {% endfor %}
+
+<script>
+function handleFileChange(event, pk) {
+    const fileInput = event.target;
+    const previewContainer = document.getElementById(`preview-container-${pk}`);
+    const previewImage = document.getElementById(`preview-image-${pk}`);
+    const submitBtn = document.getElementById(`submit-btn-${pk}`);
+
+    if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            previewContainer.style.display = 'block';
+            submitBtn.style.display = 'block';
+        }
+
+        reader.readAsDataURL(fileInput.files[0]);
+    }
+}
+</script>
 </body>
 </html>
