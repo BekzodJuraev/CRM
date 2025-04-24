@@ -285,6 +285,9 @@ class Order(LoginRequiredMixin,TemplateView):
       price=request.POST.getlist('price')
       catigories = request.POST.getlist('catigories')
       quantity=request.POST.getlist('quantity')
+      print(add)
+      print(price)
+      print(catigories)
 
 
       client = request.POST.get('client')

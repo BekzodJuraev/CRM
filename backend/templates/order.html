@@ -132,15 +132,16 @@ custom-dropdown {
   background: white;
 }
 
-.submenu li {
+.submenu > li {
+  position: relative;
   padding: 8px;
   cursor: pointer;
-
 }
 
 .submenu li:hover {
   background: #f1f1f1;
 }
+
     </style>
 </head>
 <body>
@@ -164,7 +165,7 @@ custom-dropdown {
             <div class="category-container" id="categories-container">
                 <div class="category-group">
                     <label>Категория заказа:</label>
-                    <select class="form-select">
+                    <select class="form-select" name="catigories">
             <option value="Наружная реклама и макеты">Наружная реклама и макеты</option>
             <option value="Типография">Типография</option>
             <option value="Полиграфия">Полиграфия</option>
@@ -173,7 +174,7 @@ custom-dropdown {
                    <div class="input-group">
                 <div class="custom-dropdown">
             <div class="selected" onclick="toggleDropdown(this)">-- Выберите --</div>
-            <ul class="dropdown-options" id="dropdown-list"></ul>
+            <ul class="dropdown-options" id="dropdown-list"></ul><br>
             <input type="hidden" name="add" value="selectedValue" id="selectedValue">
         </div>
 
@@ -184,7 +185,9 @@ custom-dropdown {
 </div>
 
                 </div>
+
             </div>
+
 
 
 
@@ -244,12 +247,11 @@ custom-dropdown {
     newGroup.classList.add("category-group");
 
     // Create a unique ID for the new dropdown
-    const uniqueId = "dropdown-list-" + Date.now();
-    const uniqueValueId = "selectedValue-" + Date.now();
+
 
     newGroup.innerHTML = `
         <label>Категория заказа:</label>
-        <select class="form-select" name="catigories">
+        <select class="form-select" name="catigories" >
             <option value="Наружная реклама и макеты">Наружная реклама и макеты</option>
             <option value="Типография">Типография</option>
             <option value="Полиграфия">Полиграфия</option>
@@ -258,8 +260,8 @@ custom-dropdown {
         <div class="input-group">
             <div class="custom-dropdown">
                 <div class="selected" onclick="toggleDropdown(this)">-- Выберите --</div>
-                <ul class="dropdown-options" id="${uniqueId}"></ul>--
-                <input type="hidden" name="add" value="" id="${uniqueValueId}">
+                <ul class="dropdown-options" id="dropdown-list"></ul><br>
+                <input type="hidden" name="add" value="selectedValue" id="selectedValue">
             </div>
             <input type="number" class="form-control" placeholder="Стоимость" name="price" required>
             <input type="number" class="form-control" placeholder="Количество" name="quantity" min="1" required>
@@ -271,11 +273,19 @@ custom-dropdown {
 
     // Initialize the dropdown for this newly added group
     const select = newGroup.querySelector('.form-select');
-    const selectedCategory = select.value;
-    const dropdownList = newGroup.querySelector('.dropdown-options');
+const dropdownList = newGroup.querySelector('.dropdown-options');
+const selectedDisplay = newGroup.querySelector('.selected');
+const hiddenInput = newGroup.querySelector('input[type="hidden"]');
 
-    // Populate the dropdown with items from the selected category
-    buildDropdown(categoriesMap[selectedCategory] || [], dropdownList);
+// Initial dropdown build
+const selectedCategory = select.value;
+buildDropdown(categoriesMap[selectedCategory] || [], dropdownList, selectedDisplay, hiddenInput);
+
+// ⛳️ Add change listener to update dropdown on category switch
+select.addEventListener("change", () => {
+    const newCategory = select.value;
+    buildDropdown(categoriesMap[newCategory] || [], dropdownList, selectedDisplay, hiddenInput);
+});
 }
 
         function removeCategoryGroup(button) {
@@ -283,59 +293,343 @@ custom-dropdown {
         }
 
 </script>
-<script>   const categoriesMap = {
+<script>
+const categoriesMap = {
             "Наружная реклама и макеты": [
-                {
-                    label: "Бумага",
-                    subItems: [
-                        {
-                            label: "Большой",
-                            subItems: [
-                                {
-                                    label: "Черный",
-                                    subItems: [{ label: "Тонкий" }]
-                                },
-                                { label: "1" },
-                                { label: "2" }
-                            ]
-                        },
-                        {
-                            label: "Маленький",
-                            subItems: [{ label: "3" }, { label: "4" }]
-                        }
-                    ]
-                },
-                {
-                    label: "Переплеты",
-                    subItems: [
-                        {
-                            label: "Плоская",
-                            subItems: [{ label: "Серая" }, { label: "Голубая" }]
-                        },
-                        {
-                            label: "Глубокая",
-                            subItems: [{ label: "Белая" }, { label: "Желтая" }]
-                        }
-                    ]
-                }
-            ],
+                { label: "Материал",subItems:[
+                {label:"АКРИЛ",subItems:[
+
+                {label:"1 mm",subItems:[
+                 {label:"Зеленый"},
+                {label:"Белый"},
+                 {label:"Черный"},
+                {label:"Фиолетовый"},
+                 {label:"Красный"},
+                {label:"Желтый"},
+                 {label:"Оранжевый"},
+                {label:"Белый блек аут"},
+                {label:"День ночь"},
+                {label:"Синий"},
+                {label:"Голубой"},
+                {label:"Прозрачный"},
+                {label:"Золотой"},
+                {label:"Серебрянный"},
+                {label:"Коричневый"},
+
+                ]},
+                {label:"2 mm",subItems:[
+                 {label:"Зеленый"},
+                {label:"Белый"},
+                 {label:"Черный"},
+                {label:"Фиолетовый"},
+                 {label:"Красный"},
+                {label:"Желтый"},
+                 {label:"Оранжевый"},
+                {label:"Белый блек аут"},
+                {label:"День ночь"},
+                {label:"Синий"},
+                {label:"Голубой"},
+                {label:"Прозрачный"},
+                {label:"Золотой"},
+                {label:"Серебрянный"},
+                {label:"Коричневый"},
+
+                ]},
+                {label:"2.7 mm",subItems:[
+                 {label:"Зеленый"},
+                {label:"Белый"},
+                 {label:"Черный"},
+                {label:"Фиолетовый"},
+                 {label:"Красный"},
+                {label:"Желтый"},
+                 {label:"Оранжевый"},
+                {label:"Белый блек аут"},
+                {label:"День ночь"},
+                {label:"Синий"},
+                {label:"Голубой"},
+                {label:"Прозрачный"},
+                {label:"Золотой"},
+                {label:"Серебрянный"},
+                {label:"Коричневый"},]},
+                {label:"5 mm",subItems:[
+                 {label:"Зеленый"},
+                {label:"Белый"},
+                 {label:"Черный"},
+                {label:"Фиолетовый"},
+                 {label:"Красный"},
+                {label:"Желтый"},
+                 {label:"Оранжевый"},
+                {label:"Белый блек аут"},
+                {label:"День ночь"},
+                {label:"Синий"},
+                {label:"Голубой"},
+                {label:"Прозрачный"},
+                {label:"Золотой"},
+                {label:"Серебрянный"},
+                {label:"Коричневый"},
+                ]},
+
+                {label:"10 mm",subItems:[
+                {label:"Белый"},
+                {label:"Прозрачный"},
+                ]},
+                {label:"16 mm",subItems:[
+                {label:"Белый"},
+                {label:"Прозрачный"},
+                ]},
+
+                ]},
+                {label:"АБС",subItems:[
+                {label: "Золото"},
+                {label: "серебро"},
+                {label: "Тертое золото"},
+                {label: "Тертое серебро"},
+
+                ]},
+
+
+
+
+                {label:"Фомакс",subItems:[
+                {label: "3 mm"},
+                {label: "4 mm"},
+                {label: "5 mm"},
+                {label: "8 mm"},
+
+                ]},
+                {label:"Алюкапон",subItems:[
+               {label:"Зеленый"},
+                {label:"Белый"},
+                 {label:"Черный"},
+                {label:"Фиолетовый"},
+                 {label:"Красный"},
+                  {label:"Коричневый"},
+                {label:"Желтый"},
+                 {label:"Оранжевый"},
+
+
+                {label:"Синий"},
+                {label:"Голубой"},
+                {label:"Прозрачный"},
+                {label:"Золотой"},
+                {label:"Серебрянный"},
+                {label:"Серый"},
+
+                ]},
+                {label:"Пет"},
+                {label:"Фанера",subItems:[
+                 {label:"3 mm"},
+                 {label:"5 mm"},
+                ]},
+                {label:"Модули"},
+                {label:"Светодиодная лента"},
+                {label:"Неон",subItems:[
+                 {label:"Зеленый"},
+                {label:"Белый"},
+                 {label:"Черный"},
+                {label:"Фиолетовый"},
+                 {label:"Красный"},
+
+                {label:"Желтый"},
+                 {label:"Оранжевый"},
+                {label:"Синий"},
+                {label:"Голубой"},
+
+
+                ]},
+                {label:"Профиля",subItems:[
+                {label: "20х20mm"},
+                {label: "40x40mm"},
+                {label: "40x20mm"},
+                {label: "60x60mm"},
+
+                ]},
+                {label:"Рейки шлифованные",subItems:[
+                   {label: "40x40mm"},
+                ]},
+                {label:"Блок питания",subItems:[
+                   {label: "5,0"},
+                   {label: "8,5"},
+                   {label: "10"},
+                   {label: "12,5"},
+                   {label: "16,6"},
+                   {label: "25"},
+                   {label: "33,3"},
+                   {label: "41,6"},
+                ]},
+                {label:"Краска",onClick: showColorPicker},
+                {label: "Провода"}
+
+                ]},
+
+
+
+
+                { label: "Рулонный материал",subItems:[
+                {label:"Оракал",subItems:[
+                {label:"Оракал матовый",subItems:[
+                {label:"1.07"},
+                {label:"1.27"},
+                {label:"1.52"},
+                ]},
+                {label:"Оракал глянцевый"},
+                {label:"Оракал матовый black out"},
+                {label:"Оракал глянцевый black out"},
+                {label:"Оракал сетчатый"},
+                {label:"Оракал прозрачный"},
+                {label:"Оракал матовый цветной",subItems:[
+                {label:"1.07"}
+                ]},
+
+
+                {label:"Оракал глянцевый цветной"},
+                {label:"Оракал золотой"},
+                {label:"Оракал серебряный"}
+                ]},
+
+
+
+                {label:"Туманка",subItems:[
+                 {label:"1.07"},
+                {label:"1.27"},
+                {label:"1.52"},
+                ]},
+
+
+                {label:"Холст",subItems:[
+                {label:"1.07"},
+                {label:"1.27"},
+                {label:"1.52"},
+
+
+                ]},
+                {label:"Беклит",subItems:[
+                {label:"1.07"},
+                {label:"1.27"},
+
+
+                ]},
+                {label:"Монтажка",subItems:[
+                {label:"1.07"},
+                {label:"1.27"},
+                {label:"1.52"},
+
+                ]},
+                {label:"Баннер",subItems:[
+                {label:"Баннер",subItems:[
+                {label:"1.07"},
+                {label:"1.27"},
+                {label:"1.52"},
+                {label:"3.2"},
+                ]},
+                {label:"Баннер  black out",subItems:[
+                {label:"1.07"},
+                {label:"1.27"},
+                {label:"1.52"},
+                {label:"3.2"},
+                ]},
+                ]},
+
+                ]},
+
+
+
+
+
+
+
+                { label: "Конструкции",subItems:[
+                {label:"Х- баннер"},
+                {label:"Ролл ап"},
+                {label:"Виндеры"},
+                {label:"Рамки нельсон - черный , золотые, серебрянные"},
+                {label:"Алюминевые рамки"},
+                {label:"Цепи"},
+                {label:"Дистанционные держатели"},
+                {label:"Люверсы"}
+
+
+                ]},
+                { label: "Доп. расходы",subItems:[
+                {label:"Дайсон"},
+                {label:"Акфикс"},
+                {label:"Клей жидкий"},
+                {label:"Саморезы"},
+                {label:"Шиферные саморезы"},
+                {label:"Медведи"},
+                {label:"Анкера"},
+                {label:"Дюбеля"},
+                {label:"Гвозди"},
+                {label:"Уголки"},
+                {label:"Цанги"},
+                {label:"Шайбы"},
+                {label:"Термоусадка"},
+                {label:"Изолента"},
+                {label:"Дихлорэтан"},
+                {label:"Проволока"},
+                {label:"Леска"},
+                {label:"Стеклоочиститель"},
+                {label:"Бязь"},
+                {label:"Тряпки Дельфин"},
+                {label:"Микрофибра"},
+
+                ]},
+
+
+                ],
             "Типография": [
-                {
-                    label: "Тарелка",
-                    subItems: [
-                        {
-                            label: "Плоская",
-                            subItems: [{ label: "Серая" }, { label: "Голубая" }]
-                        },
-                        {
-                            label: "Глубокая",
-                            subItems: [{ label: "Белая" }, { label: "Желтая" }]
-                        }
-                    ]
-                }
+                { label : "Бумага"},
             ],
             "Полиграфия": [
-                {label: "Бумага"},
+                {label: "Бумага",subItems:[
+                {label:"Бумага глянец А4",subItems:[
+                {label:"115 ГР"},
+                {label:"130 ГР"},
+                {label:"160 ГР"},
+                {label:"200 ГР"},
+                {label:"250 ГР"},
+
+
+                ]},
+
+                {label:"Бумага матовая А4",subItems:[
+                {label:"200 ГР"},
+                {label:"250 ГР"},
+                {label:"300 ГР"},
+                ]},
+                {label:"Бумага глянец А3",subItems:[
+                {label:"160 ГР"},
+                {label:"200 ГР"},
+                {label:"250 ГР"},
+
+                ]},
+                {label:"Бумага матовая А3",subItems:[
+                {label:"200 ГР"},
+                {label:"250 ГР"},
+                {label:"300 ГР"},
+
+                ]},
+                {label:"Простая бумага",subItems:[
+                 {label:"А4"},
+                 {label:"А3"},
+
+
+                ]},
+                {label:"Фото бумага А4"},
+                {label:"Текстуристая бумага А4"},
+                {label:"Файлики"},
+                {label:"Ламинация",subItems:[
+                {label:"А3"},
+                {label:"А4"},
+
+
+                ]},
+
+
+
+                ]},
+
+
                 {
                     label: "Переплеты",
                     subItems:[
@@ -363,7 +657,6 @@ custom-dropdown {
                         {
                             label:"Переплет для рефератов",
                             subItems:[
-                                {label:"-------"},
                                 {
                                     label:"Синий",
                                     subItems:[{label:"Стандартный"}]
@@ -398,7 +691,7 @@ custom-dropdown {
                     const selectedData = categoriesMap[selectedCategory] || [];
 
                     // Find the associated dropdown list
-                    const parentContainer = this.closest('.category-container');
+                    const parentContainer = this.closest('.category-group');
                     const dropdownList = parentContainer.querySelector('.dropdown-options');
 
                     if (dropdownList) {
@@ -410,7 +703,7 @@ custom-dropdown {
                 const selectedCategory = selector.value;
                 if (selectedCategory) {
                     const selectedData = categoriesMap[selectedCategory] || [];
-                    const parentContainer = selector.closest('.category-container');
+                    const parentContainer = selector.closest('.category-group');
                     const dropdownList = parentContainer.querySelector('.dropdown-options');
 
                     if (dropdownList) {
@@ -520,7 +813,11 @@ custom-dropdown {
                 });
             }
         });
-
+function showColorPicker() {
+  // Show your color picker dialog
+  const colorPickerDialog = document.getElementById('colorPickerDialog');
+  colorPickerDialog.style.display = 'block';
+}
 </script>
 
 
