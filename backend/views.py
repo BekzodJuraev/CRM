@@ -87,8 +87,8 @@ class Dashboard(LoginRequiredMixin,TemplateView):
             if order.print:
                services.append("Печать")
 
-            x = ",".join(services)
-            return JsonResponse({'message': f'Для данного проекта технолог выбрал только этапы:{x}'}, status=401)
+            x = ", ".join(services)
+            return JsonResponse({'message': f'Для данного проекта технолог выбрал только этапы: {x}'}, status=401)
 
 
 
@@ -348,7 +348,7 @@ class Applications(LoginRequiredMixin,TemplateView):
    def get_context_data(self, *, object_list=None, **kwargs):
       context = super().get_context_data(**kwargs)
 
-      context['profile']=Profile.objects.filter(approve=False)
+      context['profile']=Profile.objects.filter(approve=False).order_by('-id')
 
       return context
 

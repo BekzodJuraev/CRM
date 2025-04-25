@@ -63,8 +63,6 @@ class Orders(models.Model):
     stage = models.CharField(max_length=20, choices=Stage_CHOICES)
     add_order=models.DateField()
     complete_order=models.DateField()
-    delivery_photo=models.ImageField(blank=True, upload_to='delivery/')
-    complete_photo=models.ImageField(blank=True,upload_to='complete/')
     rezka=models.BooleanField(default=False)
     svarka=models.BooleanField(default=False)
     fill=models.BooleanField(default=False)
@@ -81,6 +79,14 @@ class Orders(models.Model):
     def __str__(self):
         return self.client
 
+class Delivery_Photo(models.Model):
+    order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name='delivery_photo')
+    photo=models.ImageField(blank=True, upload_to='delivery/')
+
+
+class Compelete_Photo(models.Model):
+    order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name='complete_photo')
+    photo = models.ImageField(blank=True, upload_to='complete/')
 
 class Consumables(models.Model):
     add=models.CharField(max_length=50)

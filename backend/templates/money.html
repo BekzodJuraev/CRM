@@ -105,8 +105,8 @@
     <h1>Финансы</h1>
     <form action="" method="GET">
     <div class="dates">
-      <input type="date" name="first" value="{{request.GET.first}}">
-      <input type="date"  name="second" value="{{request.GET.second}}">
+      <input type="date" name="first" value="{{ request.GET.first|default:'2025-04-25' }}" >
+      <input type="date"  name="second" value="{{request.GET.second|default:'2025-04-25'}}">
     </div>
       <button class="add-button" > Искать </button>
       </form>
