@@ -1,7 +1,13 @@
 from django.contrib import admin
-from .models import Profile,Orders,Rezident,Finance,Consumables,Debt,Warehouse,WarehouseLimit
+from .models import Profile,Orders,Rezident,Finance,Consumables,Debt,Warehouse,WarehouseLimit,Delivery_Photo,Compelete_Photo
 # Register your models here.
 
+@admin.register(Delivery_Photo)
+class Delivery_Photo(admin.ModelAdmin):
+    pass
+@admin.register(Compelete_Photo)
+class Compelete_Photo(admin.ModelAdmin):
+    pass
 @admin.register(WarehouseLimit)
 class WarehouseLimit(admin.ModelAdmin):
     list_display = ['product']

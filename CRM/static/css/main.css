@@ -1,0 +1,95 @@
+.custom-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.selected {
+  padding: 8px;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.dropdown-options {
+  display: none;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  width: 100%;
+  border: 1px solid #ccc;
+  background: white;
+  z-index: 10;
+}
+
+.dropdown-options li {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.dropdown-options li:hover {
+  background: #f1f1f1;
+}
+custom-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.selected {
+  padding: 8px;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.dropdown-options {
+  display: none;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  width: 100%;
+  border: 1px solid #ccc;
+  background: white;
+  z-index: 10;
+}
+
+.dropdown-options > li {
+  position: relative;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.dropdown-options > li:hover {
+  background: #f1f1f1;
+}
+
+/* Submenu styles */
+.has-submenu:hover .submenu {
+  display: none;
+}
+
+.submenu {
+  display: none;
+  position: absolute;
+  left: 100%;
+  top: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 150px;
+  border: 1px solid #ccc;
+  background: white;
+}
+
+.submenu > li {
+  position: relative;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.submenu li:hover {
+  background: #f1f1f1;
+}

@@ -1,3 +1,4 @@
+{% load static %}
 {% if request.user.profile.approve %}
 <!DOCTYPE html>
 <html lang="ru">
@@ -47,6 +48,8 @@
             background: #f9f9f9;
         }
     </style>
+     <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <script src="{% static 'js/orders.js' %}"></script>
 </head>
 <body>
     <div class="container">
@@ -66,29 +69,30 @@
             <input type="number" class="form-control" placeholder="80" readonly name="order_predoplata" value="{{item.order_predoplata}}" id="order_predoplata" required>
             {% for i in item.consumables.all %}
             <label>Категория заказа и Расходники:</label>
-            <div id="categories-container">
+            <div class="category-container" id="categories-container">
                 <div class="category-group">
                     <label>Категория заказа:</label>
-                    <select class="form-select" name="catigories" required>
-
-    <option value="Наружная реклама и макеты" {% if i.catigories == "Наружная реклама и макеты" %}selected{% endif %}>Наружная реклама и макеты</option>
+                    <select class="form-select" name="catigories">
+             <option value="Наружная реклама и макеты" {% if i.catigories == "Наружная реклама и макеты" %}selected{% endif %}>Наружная реклама и макеты</option>
     <option value="Типография" {% if i.catigories == "Типография" %}selected{% endif %}>Типография</option>
     <option value="Полиграфия" {% if i.catigories == "Полиграфия" %}selected{% endif %}>Полиграфия</option>
-            </select>
-
+        </select>
                     <label>Расходник:</label>
-                    <div class="input-group">
-                       <select class="form-select" name="add" required>
-    <option value="АКРИЛ, 1 mm, Зеленый" {% if i.add == "АКРИЛ, 1 mm, Зеленый" %}selected{% endif %}>АКРИЛ, 1 mm, Зеленый</option>
-    <option value="АКРИЛ, 1 mm, Красный" {% if i.add == "АКРИЛ, 1 mm, Красный" %}selected{% endif %}>АКРИЛ, 1 mm, Красный</option>
-    <option value="АКРИЛ, 1 mm, Черный" {% if i.add == "АКРИЛ, 1 mm, Черный" %}selected{% endif %}>АКРИЛ, 1 mm, Черный</option>
-</select>
+                   <div class="input-group">
+                <div class="custom-dropdown">
+            <div class="selected" onclick="toggleDropdown(this)">{{i.add}}</div>
+            <ul class="dropdown-options" id="dropdown-list"></ul><br>
+            <input type="hidden" name="add" value="{{i.add}}" id="selectedValue">
+        </div>
 
-                        <input type="number" class="form-control" placeholder="Стоимость" name="price"  value="{{i.price}}" required>
+
+ <input type="number" class="form-control" placeholder="Стоимость" name="price"  value="{{i.price}}" required>
                         <input type="number" class="form-control" placeholder="Количество" name="quantity" min="1"  value="{{i.quantity}}" required>
-                        <button type="button" class="btn btn-remove" onclick="removeCategoryGroup(this)">-</button>
-                    </div>
+  <button type="button" class="btn btn-remove" onclick="removeCategoryGroup(this)">-</button>
+</div>
+
                 </div>
+
             </div>
                {% endfor %}
             <button type="button" class="btn-add" onclick="addCategoryGroup()" >+ Добавить категорию и расходник</button>
@@ -127,19 +131,27 @@
             <label>Срок выполнения:</label>
             <input type="date" class="form-control" name="complete_order" required value="{{item.complete_order|date:'Y-m-d'}}">
             {% if item.stage == "finished" or item.stage == "order_ready" %}
+
              <label>Загруженное доставщиком</label>
-             <div id="preview-container" class="preview-container" ">
-        <img id="preview-image" src="/{{item.delivery_photo}}" alt="Preview" style="max-width: 100%; max-height: 200px; display: block;">
+             <div id="preview-container" class="preview-container" style="display: flex; gap: 10px; flex-wrap: wrap;">
+             {% for photo in item.delivery_photo.all %}
+
+        <img id="preview-image" src="{{photo.photo.url}}" alt="Preview" style="max-width: 100%; max-height: 200px; display: block;">
+             {% endfor %}
             </div>
+
             <br>
             <label>Прикрепить фото:</label>
-            <input type="file" class="form-control" name="delivery_photo">
+            <input type="file" class="form-control" multiple name="delivery_photo">
             <br>
-            {% if item.complete_photo %}
-             <div id="preview-container" class="preview-container" ">
-        <img id="preview-image" src="/{{item.complete_photo}}" alt="Preview" style="max-width: 100%; max-height: 200px; display: block;">
-            </div>
+           {% if item.complete_photo.all.exists %}
+             <div id="preview-container" class="preview-container" style="display: flex; gap: 10px; flex-wrap: wrap;">
+            {% for photo in item.complete_photo.all %}
+        <img id="preview-image" src="{{photo.photo.url}}"  alt="Preview" style="max-width: 100%; max-height: 200px; display: block;">
+            {% endfor %}
+    </div>
     {% endif %}
+
             {% endif %}
             <button type="submit" class="btn btn-primary w-100 mt-3">Сохранить</button>
         </form>
@@ -157,30 +169,51 @@
     }
   });
         function addCategoryGroup() {
-            let container = document.getElementById("categories-container");
-            let newGroup = document.createElement("div");
-            newGroup.classList.add("category-group");
-            newGroup.innerHTML = `
-                <label>Категория заказа:</label>
-                <select class="form-select" name="catigories" required>
-              <option value="Наружная реклама и макеты">Наружная реклама и макеты</option>
-                        <option value="Типография">Типография</option>
-                        <option value=" Полиграфия">Полиграфия</option>
-                </select>
-                <label>Расходник:</label>
-                <div class="input-group">
-                    <select class="form-select" name="add" required>
-                             <option value="АКРИЛ, 1 mm, Зеленый"> АКРИЛ, 1 mm, Зеленый</option>
-                            <option value="АКРИЛ, 1 mm, Красный">  АКРИЛ, 1 mm, Красный</option>
-                            <option value="АКРИЛ, 1 mm, Черный">  АКРИЛ, 1 mm, Черный</option>
-                    </select>
-                    <input type="number" class="form-control" placeholder="Стоимость" name="price" required>
-                    <input type="number" class="form-control" placeholder="Количество" name="quantity" min="1"   required>
-                    <button type="button" class="btn btn-remove" onclick="removeCategoryGroup(this)">-</button>
-                </div>
-            `;
-            container.appendChild(newGroup);
-        }
+    let container = document.getElementById("categories-container");
+    let newGroup = document.createElement("div");
+    newGroup.classList.add("category-group");
+
+    // Create a unique ID for the new dropdown
+
+
+    newGroup.innerHTML = `
+        <label>Категория заказа:</label>
+        <select class="form-select" name="catigories" >
+            <option value="Наружная реклама и макеты">Наружная реклама и макеты</option>
+            <option value="Типография">Типография</option>
+            <option value="Полиграфия">Полиграфия</option>
+        </select>
+        <label>Расходник:</label>
+        <div class="input-group">
+            <div class="custom-dropdown">
+                <div class="selected" onclick="toggleDropdown(this)">-- Выберите --</div>
+                <ul class="dropdown-options" id="dropdown-list"></ul><br>
+                <input type="hidden" name="add" value="selectedValue" id="selectedValue">
+            </div>
+            <input type="number" class="form-control" placeholder="Стоимость" name="price" required>
+            <input type="number" class="form-control" placeholder="Количество" name="quantity" min="1" required>
+            <button type="button" class="btn btn-remove" onclick="removeCategoryGroup(this)">-</button>
+        </div>
+    `;
+
+    container.appendChild(newGroup);
+
+    // Initialize the dropdown for this newly added group
+    const select = newGroup.querySelector('.form-select');
+const dropdownList = newGroup.querySelector('.dropdown-options');
+const selectedDisplay = newGroup.querySelector('.selected');
+const hiddenInput = newGroup.querySelector('input[type="hidden"]');
+
+// Initial dropdown build
+const selectedCategory = select.value;
+buildDropdown(categoriesMap[selectedCategory] || [], dropdownList, selectedDisplay, hiddenInput);
+
+// ⛳️ Add change listener to update dropdown on category switch
+select.addEventListener("change", () => {
+    const newCategory = select.value;
+    buildDropdown(categoriesMap[newCategory] || [], dropdownList, selectedDisplay, hiddenInput);
+});
+}
 
         function removeCategoryGroup(button) {
             button.closest(".category-group").remove();

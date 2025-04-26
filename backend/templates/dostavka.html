@@ -148,16 +148,18 @@
     <input type="hidden" name="action" value="delivery">
 
     <!-- Preview container -->
-    <div id="preview-container-{{item.pk}}" class="preview-container" style="display:none; margin-bottom: 10px;">
-        <img id="preview-image-{{item.pk}}" src="" alt="Preview" style="max-width: 100%; max-height: 200px; display: block;">
-    </div>
+<!-- File upload with custom label -->
+<input type="file" name="photo" multiple id="photo-upload-{{item.pk}}" required onchange="handleFileChange(event, '{{item.pk}}')" style="display: none;"> <br>
+<label for="photo-upload-{{item.pk}}" class="custom-upload-label">Загрузить фото</label>
 
-    <!-- Submit button initially hidden -->
-    <button type="submit" id="submit-btn-{{item.pk}}" class="complete-btn" style="display: none;">Завершить заказ</button>
+<!-- Preview and Submit Button -->
+<div id="preview-container-{{item.pk}}" class="preview-container" style="display:none; margin-bottom: 10px;">
+    <!-- Preview images will appear here -->
+</div>
+<button type="submit" id="submit-btn-{{item.pk}}" class="complete-btn" style="display: none;">Завершить заказ</button>
 
     <!-- File upload -->
-    <input type="file" name="photo" id="photo-upload-{{item.pk}}" required onchange="handleFileChange(event, '{{item.pk}}')">
-    <label for="photo-upload-{{item.pk}}" class="custom-upload-label">Загрузить фото</label>
+
 </form>
 
 </div>
@@ -167,21 +169,37 @@
 function handleFileChange(event, pk) {
     const fileInput = event.target;
     const previewContainer = document.getElementById(`preview-container-${pk}`);
-    const previewImage = document.getElementById(`preview-image-${pk}`);
     const submitBtn = document.getElementById(`submit-btn-${pk}`);
 
-    if (fileInput.files && fileInput.files[0]) {
-        const reader = new FileReader();
+    if (fileInput.files.length > 0) {
+        previewContainer.style.display = 'flex';
+        submitBtn.style.display = 'block';
 
-        reader.onload = function(e) {
-            previewImage.src = e.target.result;
-            previewContainer.style.display = 'block';
-            submitBtn.style.display = 'block';
-        }
+        Array.from(fileInput.files).forEach(file => {
+            const reader = new FileReader();
 
-        reader.readAsDataURL(fileInput.files[0]);
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.alt = 'Preview';
+                img.style.maxWidth = '100px';
+                img.style.maxHeight = '100px';
+                img.style.margin = '5px';
+                img.style.objectFit = 'cover';
+
+                previewContainer.appendChild(img);
+            };
+
+            reader.readAsDataURL(file);
+        });
+
+        // Убираем required после выбора первого файла,
+        // чтобы не было ошибки при повторной загрузке
+        fileInput.required = false;
     }
 }
+
+
 </script>
 </body>
 </html>

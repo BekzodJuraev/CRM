@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django.views.generic import View,TemplateView,DetailView,UpdateView
-from .models import Profile,Rezident,Finance,Warehouse,WarehouseLimit,Consumables,Orders
+from .models import Profile,Rezident,Finance,Warehouse,WarehouseLimit,Consumables,Orders,Delivery_Photo,Compelete_Photo
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
@@ -62,11 +62,16 @@ class Dashboard(LoginRequiredMixin,TemplateView):
 
          return redirect(request.path)
       elif action == "delivery":
-         photo = request.FILES.get('photo')
-         order=Orders.objects.filter(pk=pk).first()
-         order.stage="order_ready"
-         order.delivery_photo=photo
-         order.save(update_fields=['stage','delivery_photo'])
+         photo = request.FILES.getlist('photo')
+         order=Orders.objects.filter(pk=pk).update(stage='order_ready')
+         delivery = [
+            Delivery_Photo(order_id=pk, photo=p)
+            for p in photo
+         ]
+         Delivery_Photo.objects.bulk_create(delivery)
+
+
+
 
          return redirect(request.path)
 
@@ -248,11 +253,17 @@ class OrderDetail(LoginRequiredMixin,DetailView):
       self.object.complete_order = request.POST.get('complete_order')
 
       # Handle uploaded file (delivery photo)
-      if 'delivery_photo' in request.FILES:
-         self.object.complete_photo = request.FILES.get('delivery_photo')
+
 
       # Save the updated order
       self.object.save()
+
+      photo=request.FILES.getlist('delivery_photo')
+      delivery = [
+         Compelete_Photo(order=self.object, photo=p)
+         for p in photo
+      ]
+      Compelete_Photo.objects.bulk_create(delivery)
 
       # Handle Consumables data
       add = request.POST.getlist('add')
