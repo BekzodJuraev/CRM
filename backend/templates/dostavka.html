@@ -142,8 +142,7 @@
         </div>
 
         <!-- Form for uploading photo and finishing order -->
-        <form method="POST" action="" enctype="multipart/form-data" class="actions">
-    {% csrf_token %}
+<form method="POST" action="{% url 'dashboard' %}" enctype="multipart/form-data" class="actions" data-pk="{{ item.pk }}" onsubmit="submitForm('{{ item.pk }}'); return false;">    {% csrf_token %}
     <input type="hidden" name="pk" value="{{item.pk}}">
     <input type="hidden" name="action" value="delivery">
 
@@ -166,38 +165,81 @@
     {% endfor %}
 
 <script>
+const selectedFiles = {}; // store files in memory
+
 function handleFileChange(event, pk) {
     const fileInput = event.target;
     const previewContainer = document.getElementById(`preview-container-${pk}`);
     const submitBtn = document.getElementById(`submit-btn-${pk}`);
 
-    if (fileInput.files.length > 0) {
-        previewContainer.style.display = 'flex';
-        submitBtn.style.display = 'block';
-
-        Array.from(fileInput.files).forEach(file => {
-            const reader = new FileReader();
-
-            reader.onload = function(e) {
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                img.alt = 'Preview';
-                img.style.maxWidth = '100px';
-                img.style.maxHeight = '100px';
-                img.style.margin = '5px';
-                img.style.objectFit = 'cover';
-
-                previewContainer.appendChild(img);
-            };
-
-            reader.readAsDataURL(file);
-        });
-
-        // Убираем required после выбора первого файла,
-        // чтобы не было ошибки при повторной загрузке
-        fileInput.required = false;
+    if (!selectedFiles[pk]) {
+        selectedFiles[pk] = [];
     }
+
+    const newFiles = Array.from(fileInput.files);
+
+    // Add new files to already selected ones
+    selectedFiles[pk] = selectedFiles[pk].concat(newFiles);
+
+    // Clear previews
+    previewContainer.innerHTML = '';
+
+    selectedFiles[pk].forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.alt = 'Preview';
+            img.style.maxWidth = '100px';
+            img.style.maxHeight = '100px';
+            img.style.margin = '5px';
+            img.style.objectFit = 'cover';
+            previewContainer.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+    });
+
+    previewContainer.style.display = 'flex';
+    submitBtn.style.display = 'block';
+
+    fileInput.required = false;
 }
+function submitForm(pk) {
+    const form = document.getElementById(`form-${pk}`);
+    const actionURL = form.getAttribute('action');
+
+    const formData = new FormData();
+
+    // Add normal form fields
+    formData.append('csrfmiddlewaretoken', form.querySelector('input[name="csrfmiddlewaretoken"]').value);
+    formData.append('pk', form.querySelector('input[name="pk"]').value);
+    formData.append('action', form.querySelector('input[name="action"]').value);
+
+    // Add all selected photos manually
+    if (selectedFiles[pk]) {
+        selectedFiles[pk].forEach(file => {
+            formData.append('photo', file);
+        });
+    }
+
+    fetch(actionURL, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log('Form submitted successfully.');
+            // Clear after submit
+            selectedFiles[pk] = [];
+        } else {
+            console.error('Form submission failed.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
 
 
 </script>
