@@ -67,9 +67,12 @@
 
             <label>Сумма предоплаты (80% от суммы заказа):</label>
             <input type="number" class="form-control" placeholder="80" readonly name="order_predoplata" value="{{item.order_predoplata}}" id="order_predoplata" required>
-            {% for i in item.consumables.all %}
             <label>Категория заказа и Расходники:</label>
+
+
             <div class="category-container" id="categories-container">
+
+            {% for i in item.consumables.all %}
                 <div class="category-group">
                     <label>Категория заказа:</label>
                     <select class="form-select" name="catigories">
@@ -92,9 +95,11 @@
 </div>
 
                 </div>
+                 {% endfor %}
 
             </div>
-               {% endfor %}
+
+
             <button type="button" class="btn-add" onclick="addCategoryGroup()" >+ Добавить категорию и расходник</button>
 
             <label>Описание / ТЗ:</label>

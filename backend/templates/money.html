@@ -120,8 +120,11 @@ background 0.3s;
     <h1>Финансы</h1>
     <form action="" method="GET">
     <div class="dates">
-      <input type="date" name="first" value="{{ request.GET.first|default:'2025-04-25' }}" >
-      <input type="date"  name="second" value="{{request.GET.second|default:'2025-04-25'}}">
+      <input type="date" name="first" value="{{ request.GET.first|default:first_day|date:'Y-m-d' }}" >
+      <input type="date"  name="second" value="{{request.GET.second|default:today_day|date:'Y-m-d'}}">
+
+
+
     </div>
       <button class="add-button" > Искать </button>
       </form>
@@ -150,6 +153,7 @@ background 0.3s;
       {% for item in money %}
         <tr>
           <td>{{item.name}}</td>
+
           <td>{{item.created_at|date:"d.m.Y"}}</td>
           <td>{{item.sum}}сум</td>
         </tr>

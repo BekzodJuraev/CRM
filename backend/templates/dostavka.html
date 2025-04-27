@@ -1,3 +1,4 @@
+{% load my_filters %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -130,19 +131,23 @@
             <div><span class="bold">Адрес:</span> {{item.adress}}</div>
             <div><span class="bold">Телефон:</span> {{item.phone}}</div>
             {% with item.consumables.all as consumables %}
-            <div><span class="bold">Категория:</span>  {% for rek in consumables %}
-      {{ rek.catigories }}{% if not forloop.last %}, {% endif %}
-    {% endfor %}
+            <div><span class="bold">Категория:</span>  {% for rek in consumables|distinct_categories %}
+    {{ rek.catigories }}{% if not forloop.last %}, {% endif %}
+{% endfor %}
             </div>
             <div><span class="bold">Расходники:</span>  {% for rek in consumables %}
-      {{ rek.add }} ({{ rek.price }} сум)
+      {{ rek.add }} ({{ rek.price }} сум);
     {% endfor %}</div>
             {% endwith %}
             <div><span class="bold">Описание / ТЗ:</span> {{item.description}}</div>
         </div>
+        <div id="preview-container-{{item.pk}}" class="preview-container" style="display:none; margin-bottom: 10px;">
+    <!-- Preview images will appear here -->
+</div>
 
         <!-- Form for uploading photo and finishing order -->
-<form method="POST" action="{% url 'dashboard' %}" enctype="multipart/form-data" class="actions" data-pk="{{ item.pk }}" onsubmit="submitForm('{{ item.pk }}'); return false;">    {% csrf_token %}
+<form method="POST" action="{% url 'dashboard' %}" enctype="multipart/form-data" class="actions" data-pk="{{ item.pk }}" >
+    {% csrf_token %}
     <input type="hidden" name="pk" value="{{item.pk}}">
     <input type="hidden" name="action" value="delivery">
 
@@ -152,9 +157,7 @@
 <label for="photo-upload-{{item.pk}}" class="custom-upload-label">Загрузить фото</label>
 
 <!-- Preview and Submit Button -->
-<div id="preview-container-{{item.pk}}" class="preview-container" style="display:none; margin-bottom: 10px;">
-    <!-- Preview images will appear here -->
-</div>
+
 <button type="submit" id="submit-btn-{{item.pk}}" class="complete-btn" style="display: none;">Завершить заказ</button>
 
     <!-- File upload -->
@@ -205,7 +208,7 @@ function handleFileChange(event, pk) {
     fileInput.required = false;
 }
 function submitForm(pk) {
-    const form = document.getElementById(`form-${pk}`);
+    const form = document.querySelector(`form[data-pk="${pk}"]`);
     const actionURL = form.getAttribute('action');
 
     const formData = new FormData();
@@ -216,29 +219,45 @@ function submitForm(pk) {
     formData.append('action', form.querySelector('input[name="action"]').value);
 
     // Add all selected photos manually
-    if (selectedFiles[pk]) {
+    if (selectedFiles[pk] && selectedFiles[pk].length > 0) {
         selectedFiles[pk].forEach(file => {
             formData.append('photo', file);
         });
+
+        // Use fetch to submit the form
+        fetch(actionURL, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                console.error('Form submission failed.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    } else {
+        console.error('No files selected');
     }
 
-    fetch(actionURL, {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        if (response.ok) {
-            console.log('Form submitted successfully.');
-            // Clear after submit
-            selectedFiles[pk] = [];
-        } else {
-            console.error('Form submission failed.');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
+    // Prevent the default form submission
+    return false;
 }
+
+// Ensure forms are properly intercepted
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('form.actions');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const pk = this.getAttribute('data-pk');
+            submitForm(pk);
+        });
+    });
+});
 
 
 

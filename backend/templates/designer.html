@@ -1,3 +1,4 @@
+{% load my_filters %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -117,14 +118,14 @@
 
         {% with item.consumables.all as consumables %}
   <p><b>Категория:</b>
-    {% for rek in consumables %}
+    {% for rek in consumables|distinct_categories  %}
       {{ rek.catigories }}{% if not forloop.last %}, {% endif %}
     {% endfor %}
   </p>
 
   <p><b>Расходники:</b>
     {% for rek in consumables %}
-      {{ rek.add }} ({{ rek.price }} сум)
+      {{ rek.add }} ({{ rek.price }} сум);
     {% endfor %}
   </p>
 {% endwith %}

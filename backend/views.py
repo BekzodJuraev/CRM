@@ -63,6 +63,7 @@ class Dashboard(LoginRequiredMixin,TemplateView):
          return redirect(request.path)
       elif action == "delivery":
          photo = request.FILES.getlist('photo')
+
          order=Orders.objects.filter(pk=pk).update(stage='order_ready')
          delivery = [
             Delivery_Photo(order_id=pk, photo=p)
@@ -126,17 +127,18 @@ class Dashboard(LoginRequiredMixin,TemplateView):
 
 
       for stage in stages:
-         queryset = Orders.objects.filter(stage=stage).annotate(today=Value(now().date()))
+         queryset = Orders.objects.filter(stage=stage).prefetch_related('consumables').annotate(today=Value(now().date()))
 
-         # Add search filter if present
+
+
          if search:
             queryset = queryset.filter(client__icontains=search)
 
-         # Add prefetch for 'design' stage
-         if stage == 'design':
-            queryset = queryset.prefetch_related('consumables')
+
 
          context[stage] = queryset
+
+
 
       context['rezka'] = [o for o in context['manufacturing'] if o.stage_pod == 'rezka']
       context['svarka'] = [o for o in context['manufacturing'] if o.stage_pod == 'svarka']
@@ -482,6 +484,10 @@ class Money(LoginRequiredMixin,TemplateView):
 
       total_sum=order.aggregate(total_sum=Sum('order_sum'))['total_sum'] or 0
       cost=query.aggregate(total_sum=Sum('sum'))['total_sum'] or 0
+      context['today_day']=today
+      context['first_day']=today.replace(day=1)
+
+
       context['marja']=total_sum - marja
       context['money'] = query
       context['count']=order.count()

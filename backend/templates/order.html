@@ -159,7 +159,7 @@ custom-dropdown {
             <input type="text" class="form-control" placeholder="Введите адрес" name="adress" required>
 
             <label>Сумма заказа:</label>
-            <input type="number" class="form-control" placeholder="100" name="order_sum" id="order_sum" required>
+            <input type="number" class="form-control" placeholder="100" name="order_sum" id="order_sum"  step="0.01" required>
 
             <label>Сумма предоплаты (80% от суммы заказа):</label>
             <input type="number" class="form-control" placeholder="80" readonly name="order_predoplata" id="order_predoplata" required>
@@ -234,6 +234,7 @@ custom-dropdown {
     </div>
 
     <script>
+
      document.getElementById('order_sum').addEventListener('input', function () {
     const orderSum = parseFloat(this.value);
     const predoplataInput = document.getElementById('order_predoplata');

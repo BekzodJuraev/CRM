@@ -1,4 +1,5 @@
 {% load static %}
+{% load my_filters %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -156,14 +157,14 @@
 
         {% with item.consumables.all as consumables %}
   <p><b>Категория:</b>
-    {% for rek in consumables %}
+    {% for rek in consumables|distinct_categories %}
       {{ rek.catigories }}{% if not forloop.last %}, {% endif %}
     {% endfor %}
   </p>
 
   <p><b>Расходники:</b>
     {% for rek in consumables %}
-      {{ rek.add }} ({{ rek.price }} сум)
+      {{ rek.add }} ({{ rek.price }} сум);
     {% endfor %}
   </p>
 {% endwith %}
@@ -171,7 +172,7 @@
       <p><b>Описание / ТЗ:</b> {{item.description}}</p>
     </div>
     <input type="hidden" name="pk" value="{{ item.pk }}">
-       <div id="categories-container">
+       <div id="categories-container-{{item.pk}}">
                 
             </div>
       <p>Отметьте галочками этапы, которые необходимо выполнить для данного заказа перед передачей в производство.</p>
@@ -180,7 +181,7 @@
   <input type="checkbox" name="fill" class="stage-checkbox"> Покраска<br>
   <input type="checkbox" name="print" class="stage-checkbox"> Печать<br>
 
-            <button type="button" class="btn-complete" onclick="addCategoryGroup()" >+ Добавить категорию и расходник</button>
+            <button type="button" class="btn-complete" onclick="addCategoryGroup({{item.pk}})" >+ Добавить категорию и расходник</button>
     <button class="btn-complete" value="technologist" name="action">Передать на производство</button>
   </div>
     </form>
@@ -189,10 +190,12 @@
 
 </div>
 <script>
-    function addCategoryGroup() {
-    let container = document.getElementById("categories-container");
+    function addCategoryGroup(pk) {
+
+    let container = document.getElementById("categories-container-" + pk);
     let newGroup = document.createElement("div");
     newGroup.classList.add("category-group");
+
 
     // Create a unique ID for the new dropdown
 
@@ -217,7 +220,9 @@
         </div>
     `;
 
+
     container.appendChild(newGroup);
+
 
     // Initialize the dropdown for this newly added group
     const select = newGroup.querySelector('.form-select');
@@ -235,6 +240,7 @@ select.addEventListener("change", () => {
     buildDropdown(categoriesMap[newCategory] || [], dropdownList, selectedDisplay, hiddenInput);
 });
 }
+
 
         function removeCategoryGroup(button) {
             button.closest(".category-group").remove();

@@ -57,7 +57,10 @@
         input::placeholder {
             color: rgba(255, 255, 255, 0.7);
         }
+        
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 </head>
 <body>
     <div class="container">
@@ -113,7 +116,12 @@
 <label>Придумайте логин:</label>
 <input type="text" name="login" required value="{{request.POST.login}}">
 <label>Придумайте пароль:</label>
-<input type="password" name="password" required>
+<div class="password-container">
+    <input type="password" name="password" id="password" required style="width:335px">
+    <button type="button" onclick="togglePassword()">
+        <i id="eye-icon" class="fa fa-eye"></i>  <!-- Using Font Awesome for the eye icon -->
+    </button>
+</div>
 
 <label>Загрузить фото:</label>
 <input type="file" name="photo" required>
@@ -138,5 +146,20 @@
     // Get today's date in YYYY-MM-DD format
     const today = new Date().toISOString().split('T')[0];
     document.getElementById("date_birth").setAttribute("max", today);
+    function togglePassword() {
+        var passwordField = document.getElementById("password");
+        var eyeIcon = document.getElementById("eye-icon");
+
+        // Toggle the type between password and text
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            eyeIcon.classList.remove("fa-eye");  // Hide eye icon
+            eyeIcon.classList.add("fa-eye-slash");  // Show slash icon
+        } else {
+            passwordField.type = "password";
+            eyeIcon.classList.remove("fa-eye-slash");  // Hide slash icon
+            eyeIcon.classList.add("fa-eye");  // Show eye icon
+        }
+    }
 </script>
 </html>
