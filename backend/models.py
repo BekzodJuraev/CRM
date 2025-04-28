@@ -28,7 +28,9 @@ class Profile(models.Model):
     approve=models.BooleanField(default=False)
 
 
-
+class Telegram_users(models.Model):
+    phone = PhoneNumberField(blank=True)
+    chat_id=models.IntegerField(default=0)
 
 class Orders(models.Model):
     Stage_CHOICES = [
@@ -39,7 +41,7 @@ class Orders(models.Model):
         ("assembly", "Сборка"),  # Assembly
         ("delivery", "Доставка"),  # Delivery
         ("order_ready", "Заказ готов"),  # Order Ready
-        ("finished", "Завершено"),  # Fully Completed / Finished
+        ("finished", "Завершён"),  # Fully Completed / Finished
     ]
 
     Social_CHOICES = [
@@ -69,6 +71,7 @@ class Orders(models.Model):
     print=models.BooleanField(default=False)
     stage_pod=models.CharField(max_length=20, choices=Stage_pod_CHOICES,default="rezka")
     payment_data=models.DateField(null=True)
+    complete_date=models.DateField(null=True)
 
 
 

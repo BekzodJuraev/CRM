@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django.views.generic import View,TemplateView,DetailView,UpdateView
-from .models import Profile,Rezident,Finance,Warehouse,WarehouseLimit,Consumables,Orders,Delivery_Photo,Compelete_Photo
+from .models import Profile,Rezident,Finance,Warehouse,WarehouseLimit,Consumables,Orders,Delivery_Photo,Compelete_Photo,Telegram_users
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
@@ -10,11 +10,108 @@ from django.db.models import Sum,Q,Count,F,Max,Prefetch,OuterRef, Subquery,Value
 from django.utils.timezone import now
 from django.http import JsonResponse
 from django.contrib.auth.views import LogoutView
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+import telegram
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton,WebAppInfo
+import json
+
+
+bot = telegram.Bot("8184436447:AAF3WD9vRZO5C3IiY3WBgZ9I2Oht45ZCt3c")
+
+@csrf_exempt
+@require_POST
+def telegram_webhook(request):
+    if request.method == 'POST':
+        try:
+            json_data = json.loads(request.body.decode('utf-8'))
+            if 'message' in json_data:
+                process_message(json_data)
+            elif 'callback_query' in json_data:
+                process_callback_query(json_data)
+        except:
+            pass
+
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse(status=405)
+
+reply_keyboard = [
+    [KeyboardButton("📞Отправить номер телефона",request_contact=True)],
+]
+markup_reply = ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True)
+def process_message(json_data):
+   chat_id = json_data['message']['chat']['id']
+   message_text = json_data['message'].get('text', "")
+
+
+   if message_text == "/start":
+      bot.send_message(chat_id,text="👋 Здравствуйте! Это бот для отслеживания статуса вашего заказа.📱 Пожалуйста, отправьте свой номер телефона, чтобы мы могли проверить ваш заказ в системе.",reply_markup=markup_reply)
+
+   elif 'contact' in json_data['message']:
+      phone_number = json_data['message']['contact']['phone_number']
+      order=Orders.objects.filter(phone=phone_number)
+      profile=Profile.objects.filter(phone=phone_number)
+      if order:
+         Telegram_users.objects.get_or_create(phone=phone_number,chat_id=chat_id)
+      elif profile:
+         Telegram_users.objects.get_or_create(phone=phone_number,chat_id=chat_id)
+      else:
+         bot.send_message(chat_id,text="❌ Ваш номер не зарегистрирован в системе.")
+
+
+
+def process_callback_query(json_data):
+   pass
+
+
 
 
 def logout_view(request):
    logout(request)
    return redirect('main')
+
+def admin_tech(pk):
+   postion=['manager','admin','chief']
+   profile = Profile.objects.filter(position__in=postion).values_list('phone', flat=True)
+   zakaz = Orders.objects.filter(pk=pk).first()
+   telegram_users = Telegram_users.objects.filter(phone__in=profile)
+   text = (f"🚚 Заказ готов к доставке!"
+           f"\n📌 Клиент {zakaz.client}"
+           f"\n📞 Контакт заказчика: {zakaz.phone}"
+           f"\n📍 Адрес:: {zakaz.adress}"
+           f"\n💵 Общая сумма заказа: {zakaz.order_sum}"
+           f"\n💰 Остаток к оплате: {zakaz.order_sum - zakaz.order_predoplata} сум📍 "
+           f"\n📅 Срок выполнения: {zakaz.complete_order}")
+
+   for item in telegram_users:
+      try:
+         bot.send_message(item.chat_id, text=text)
+      except:
+         pass
+
+
+
+
+
+def mess(pk):
+   zakaz = Orders.objects.filter(pk=pk).first()
+   telegram_user = Telegram_users.objects.filter(phone=zakaz.phone).first()
+   categories = ', '.join(str(consumable) for consumable in zakaz.consumables.all())
+
+   text = (f"🔔 Обновление статуса заказа!"
+           f"\n🏷️ {zakaz.client}"
+           f"\nСрок выполнения: {zakaz.complete_order}"
+           f"\n📂 Категория: {categories}"
+           f"\n📝 Описание / ТЗ: {zakaz.description}"
+           f"\nСумма заказа: {zakaz.order_sum} сум📍 "
+           f"\n📍Ваш заказ перенесён на этап \"{zakaz.get_stage_display()}\".")
+
+   try:
+      bot.send_message(chat_id=telegram_user.chat_id, text=text)
+   except:
+
+      pass
 
 
 class Dashboard(LoginRequiredMixin,TemplateView):
@@ -29,8 +126,12 @@ class Dashboard(LoginRequiredMixin,TemplateView):
       pk = request.POST.get('pk')
       stage=request.POST.get('stage')
 
+
+
       if action == "designer":
          Orders.objects.filter(pk=pk).update(stage="technologist")
+         mess(pk)
+
          return redirect(request.path)
       elif action == "technologist":
          add = request.POST.getlist('add')
@@ -60,6 +161,8 @@ class Dashboard(LoginRequiredMixin,TemplateView):
          ]
          Consumables.objects.bulk_create(consumables)
 
+         mess(pk)
+
          return redirect(request.path)
       elif action == "delivery":
          photo = request.FILES.getlist('photo')
@@ -72,7 +175,7 @@ class Dashboard(LoginRequiredMixin,TemplateView):
          Delivery_Photo.objects.bulk_create(delivery)
 
 
-
+         mess(pk)
 
          return redirect(request.path)
 
@@ -102,13 +205,33 @@ class Dashboard(LoginRequiredMixin,TemplateView):
             Orders.objects.filter(pk=pk).update(stage=stage,stage_pod=stage_pod)
          else:
             Orders.objects.filter(pk=pk).update(stage=stage)
+            mess(pk)
+         if stage == "delivery":
+            admin_tech(pk)
+
+
 
          return JsonResponse({'status': 'success'})
 
 
 
       elif action == "admin":
-         Orders.objects.filter(pk=pk).update(stage=stage)
+         if stage == "finished":
+            Orders.objects.filter(pk=pk).update(stage=stage, complete_date=now().date())
+
+         elif stage == 'delivery':
+            Orders.objects.filter(pk=pk).update(stage=stage)
+            admin_tech(pk)
+         else:
+            Orders.objects.filter(pk=pk).update(stage=stage)
+
+
+         mess(pk)
+
+
+
+
+
          return JsonResponse({'status': 'success'})
       return JsonResponse({'status': 'error', 'message': 'Invalid action'}, status=400)
 
@@ -150,7 +273,7 @@ class Dashboard(LoginRequiredMixin,TemplateView):
 
 
 
-      return context
+
 
 
 
@@ -282,6 +405,7 @@ class OrderDetail(LoginRequiredMixin,DetailView):
          for a, p, c, d in zip(add, price, catigories, quantity)
       ]
       Consumables.objects.bulk_create(consumables)
+      mess(self.object.pk)
 
       # Redirect after successful update
       return redirect('dashboard')
@@ -330,6 +454,7 @@ class Order(LoginRequiredMixin,TemplateView):
          for a, p, c , d  in zip(add, price, catigories, quantity)
       ]
       Consumables.objects.bulk_create(consumables)
+      mess(order.pk)
 
       return redirect('dashboard')
 
@@ -461,22 +586,23 @@ class Money(LoginRequiredMixin,TemplateView):
       context = super().get_context_data(**kwargs)
       first = self.request.GET.get('first')
       second=self.request.GET.get('second')
+
       today = now()
       query=Finance.objects.filter(
           created_at__year=today.year,
           created_at__month=today.month
       ).order_by('-id')
 
-      order = Orders.objects.filter(stage="finished", complete_order__year=today.year,
-                                    complete_order__month=today.month)
-      order1 = Orders.objects.filter(complete_order__year=today.year,
-                                    complete_order__month=today.month)
+      order = Orders.objects.filter(stage="finished", complete_date__year=today.year,
+                                    complete_date__month=today.month)
+      order1 = Orders.objects.filter(complete_date__year=today.year,
+                                    complete_date__month=today.month)
 
 
       if first and second:
          query = query.filter(created_at__range=(first, second))
-         order=order.filter(complete_order__range=(first,second))
-         order1=order1.filter(complete_order__range=(first,second))
+         order=order.filter(complete_date__range=(first,second))
+         order1=order1.filter(complete_date__range=(first,second))
 
       marja=Consumables.objects.filter(order__in=order).aggregate(total_sum=Sum(F('price')*F('quantity')))['total_sum'] or 0
       marja1 = Consumables.objects.filter(order__in=order1).aggregate(total_sum=Sum(F('price') * F('quantity')))[
@@ -526,7 +652,8 @@ class Debt(LoginRequiredMixin,TemplateView):
          payment_data = request.POST.get('payment_data')
          Orders.objects.filter(pk=pk).update(payment_data=payment_data)
       elif action == "payment":
-         Orders.objects.filter(pk=pk).update(stage='finished')
+         Orders.objects.filter(pk=pk).update(stage='finished',complete_date=now().date())
+         mess(pk)
 
 
 

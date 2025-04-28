@@ -257,10 +257,10 @@
 </div>
           {% endfor %}
     </div>
-    <div class="column" ondragover="allowDrop(event)"  data-stage="delivery" draggable="true" ondragstart="drag(event)" data-pod_stage="" ondrop="drop(event)">
+    <div class="column" ondragover="allowDrop(event)"  data-stage="delivery"  ondragstart="drag(event)" data-pod_stage="" ondrop="drop(event)">
         <h3>Доставка и установка</h3>
              {% for item in delivery %}
-    <div class="card" data-pk="{{item.pk}}" onclick="showPopup(this)">
+      <div class="card" data-pk="{{item.pk}}"  draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
         <div class="preview">
         <p><strong>Клиент:</strong> {{item.client}}</p>
         <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>

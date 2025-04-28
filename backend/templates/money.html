@@ -120,9 +120,17 @@ background 0.3s;
     <h1>Финансы</h1>
     <form action="" method="GET">
     <div class="dates">
-      <input type="date" name="first" value="{{ request.GET.first|default:first_day|date:'Y-m-d' }}" >
-      <input type="date"  name="second" value="{{request.GET.second|default:today_day|date:'Y-m-d'}}">
+        {% if request.GET.first %}
+        <input type="date" name="first" value="{{ request.GET.first}}" >
+        {% else %}
+        <input type="date" name="first" value="{{first_day|date:'Y-m-d' }}" >
+        {% endif %}
 
+       {% if request.GET.second %}
+      <input type="date"  name="second" value="{{request.GET.second}}">
+       {% else %}
+         <input type="date"  name="second" value="{{today_day|date:'Y-m-d'}}">
+        {% endif %}
 
 
     </div>
