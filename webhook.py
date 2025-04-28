@@ -2,8 +2,8 @@ from aiogram import Bot, Dispatcher, executor
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
 import logging
 
-ngrok_url = 'https://00f0-5-133-120-92.ngrok-free.app/telegram_webhook/'  # Replace with your NGROK URL
-#ngrok_url='https://9abc-5-133-120-92.ngrok-free.app/telegram_webhook/'
+ngrok_url = 'https://mayakcrm.uz/telegram_webhook/'  # Replace with your NGROK URL
+
 
 bot = Bot(token="8184436447:AAF3WD9vRZO5C3IiY3WBgZ9I2Oht45ZCt3c")
 dp = Dispatcher(bot)
