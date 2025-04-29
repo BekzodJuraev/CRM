@@ -164,7 +164,7 @@ const categoriesMap = {
                    {label: "33,3"},
                    {label: "41,6"},
                 ]},
-                {label:"Краска",onClick: showColorPicker},
+                {label:"Краска",onClick:togglePopup},
                 {label: "Провода"}
 
                 ]},
@@ -478,7 +478,7 @@ const categoriesMap = {
                    {label: "33,3"},
                    {label: "41,6"},
                 ]},
-                {label:"Краска",onClick: showColorPicker},
+                {label:"Краска",onClick: togglePopup},
                 {label: "Провода"}
 
                 ]},
@@ -822,6 +822,7 @@ const categoriesMap = {
             if (selectedElement) selectedElement.textContent = value;
             if (inputElement) inputElement.value = value;
             if (dropdownList) dropdownList.style.display = "none";
+
         }
 
         // Function to build a dropdown
@@ -870,9 +871,44 @@ const categoriesMap = {
             }
         });
 
-function showColorPicker() {
-  // Show your color picker dialog
-  const colorPickerDialog = document.getElementById('colorPickerDialog');
-  colorPickerDialog.style.display = 'block';
-}
 
+
+
+ function togglePopup() {
+    alert(1);
+    const popup = document.getElementById('colorPopup');
+    popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+  }
+
+  function updateColor() {
+    const color = document.getElementById('colorPicker').value;
+    const hex = color.toUpperCase();
+    const r = parseInt(hex.substr(1,2), 16);
+    const g = parseInt(hex.substr(3,2), 16);
+    const b = parseInt(hex.substr(5,2), 16);
+
+    const rNorm = r / 255;
+    const gNorm = g / 255;
+    const bNorm = b / 255;
+    const max = Math.max(rNorm, gNorm, bNorm);
+    const min = Math.min(rNorm, gNorm, bNorm);
+    const l = (max + min) / 2;
+    let h = 0, s = 0;
+
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case rNorm: h = (gNorm - bNorm) / d + (gNorm < bNorm ? 6 : 0); break;
+        case gNorm: h = (bNorm - rNorm) / d + 2; break;
+        case bNorm: h = (rNorm - gNorm) / d + 4; break;
+      }
+      h = h * 60;
+    }
+
+    document.getElementById('colorInfo').innerHTML = `
+      <div><strong>HEX:</strong> <span class="hex">${hex}</span></div>
+      <div><strong>RGB:</strong> ${r}, ${g}, ${b}</div>
+      <div><strong>HSL:</strong> ${Math.round(h)}°, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%</div>
+    `;
+  }

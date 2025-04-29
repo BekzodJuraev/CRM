@@ -93,3 +93,34 @@ custom-dropdown {
 .submenu li:hover {
   background: #f1f1f1;
 }
+
+ .popup {
+      display: none;
+      position: absolute;
+      top: 100px;
+      left: 100px;
+      width: 300px;
+      padding: 15px;
+      background: white;
+      border: 3px solid black;
+      box-shadow: 4px 4px 0 black;
+      z-index: 1000;
+    }
+
+    .color-box {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 10px;
+    }
+
+    .color-values {
+      font-size: 14px;
+    }
+
+    .hex {
+      font-family: monospace;
+      font-size: 16px;
+      background: #eaeaea;
+      padding: 5px;
+      display: inline-block;
+ }
