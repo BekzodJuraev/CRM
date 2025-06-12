@@ -19,10 +19,8 @@ class Profile(models.Model):
         ("technologist", "Технолог"),
         ("designer_cheif", "Главный дизайнер"),
         ("designer", "Дизайнер"),
-
         ("qa_cheif", "Главный сотрудник контроля качества"),
         ("qa_staff", "Сотрудник контроля качества"),
-
         ("sales_marketing", "Соц. маркетолог"),
         ("sales_call", "Сотрудник колл-центра"),
 
