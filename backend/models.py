@@ -7,11 +7,25 @@ class Profile(models.Model):
     POSITION_CHOICES = [
         ("manager", "Менеджер"),
         ("admin", "Администратор"),
+        ("accountant", "Бухгалтер"),
         ("supplier", "Снабженец"),
         ("chief", "Главный ЦЕХа"),
+        ("chief_staff", "Сотрудник ЦЕХа"),
+        ("delivery_cheif", "Главный доставщик"),
+        ("delivery", "Доставщик"),
+        ("installer_cheif", "Главный установщик"),
         ("installer", "Установщик"),
+        ("technologist_cheif", "Главный Технолог"),
         ("technologist", "Технолог"),
+        ("designer_cheif", "Главный дизайнер"),
         ("designer", "Дизайнер"),
+
+        ("qa_cheif", "Главный сотрудник контроля качества"),
+        ("qa_staff", "Сотрудник контроля качества"),
+
+        ("sales_marketing", "Соц. маркетолог"),
+        ("sales_call", "Сотрудник колл-центра"),
+
     ]
     username = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     name = models.CharField(max_length=200, null=True, blank=True, default=None)
