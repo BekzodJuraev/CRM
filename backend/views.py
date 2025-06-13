@@ -459,6 +459,22 @@ class Order(LoginRequiredMixin,TemplateView):
       return redirect('dashboard')
 
 
+class ProfileView(LoginRequiredMixin,TemplateView):
+   template_name = 'profile.html'
+   login_url = reverse_lazy('login')
+   def post(self, request, *args, **kwargs):
+      profile = request.user.profile
+      action=request.POST.get('action')
+      photo = request.FILES.get('photo')
+      if action == "delete":
+         profile.photo=None
+         profile.save(update_fields=['photo'])
+      else:
+         profile.photo=photo
+         profile.save(update_fields=['photo'])
+
+
+      return redirect(request.path)
 
 class Applications(LoginRequiredMixin,TemplateView):
    template_name = 'applications.html'

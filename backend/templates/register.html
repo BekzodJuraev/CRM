@@ -107,11 +107,38 @@
     <option value="" disabled selected>Выберите должность</option>
     <option value="manager">Менеджер</option>
     <option value="admin">Администратор</option>
+    <option value="accountant">Бухгалтер</option>
     <option value="supplier">Снабженец</option>
-    <option value="chief">Главный ЦЕХа</option>
-    <option value="installer">Установщик</option>
-    <option value="technologist">Технолог</option>
+      <optgroup label="Дизайнер">
+    <option value="designer_cheif">Главный дизайнер</option>
     <option value="designer">Дизайнер</option>
+  </optgroup>
+      <optgroup label="Технолог">
+    <option value="technologist_cheif">Главный Технолог</option>
+    <option value="technologist">Технолог</option>
+  </optgroup>
+      <optgroup label="Главный ЦЕХа">
+    <option value="chief">Главный ЦЕХа</option>
+    <option value="chief_staff">Сотрудник ЦЕХа</option>
+  </optgroup>
+      <optgroup label="Доставщик">
+    <option value="delivery_cheif">Главный доставщик</option>
+    <option value="delivery">Доставщик</option>
+  </optgroup>
+       <optgroup label="Установщик">
+    <option value="installer_cheif">Главный установщик</option>
+    <option value="installer">Установщик</option>
+  </optgroup>
+      <optgroup label="Сотрудник контроля качества">
+    <option value="qa_cheif">Главный сотрудник контроля качества</option>
+    <option value="qa_staff">Сотрудник контроля качества</option>
+  </optgroup>
+     <optgroup label="Отдел продаж">
+    <option value="sales_marketing">Соц. маркетолог</option>
+    <option value="sales_call">Сотрудник колл-центра</option>
+  </optgroup>
+
+
 </select>
 <label>Придумайте логин:</label>
 <input type="text" name="login" required value="{{request.POST.login}}">

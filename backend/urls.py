@@ -20,6 +20,7 @@ urlpatterns=[
     path('warehouse/limit',views.WarehouseLimitView.as_view(),name='warehouse_limit'),
     path('telegram_webhook/',views.telegram_webhook,name='telegram_webhook'),
     path('order/<int:pk>',views.OrderDetail.as_view(),name='order_detail'),
-    path('logout/',views.logout_view,name='logout')
+    path('logout/',views.logout_view,name='logout'),
+    path('profile',views.ProfileView.as_view(),name='profile')
 
 ]
