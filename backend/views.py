@@ -1,3 +1,6 @@
+import time
+from django.db import connection, reset_queries
+
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django.views.generic import View,TemplateView,DetailView,UpdateView
@@ -531,7 +534,6 @@ class Staff(LoginRequiredMixin,TemplateView):
       else:
          # Return all profiles if no search term is provided
          context['profile'] = Profile.objects.filter(approve=True).order_by('-id')
-
 
 
 

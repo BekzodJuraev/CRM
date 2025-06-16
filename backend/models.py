@@ -46,14 +46,24 @@ class Telegram_users(models.Model):
 
 class Orders(models.Model):
     Stage_CHOICES = [
-        ("accepted", "Принят"),  # Accepted / Received
-        ("design", "Проектирование"),  # Project Design / Planning
-        ("technologist", "Технолог"),  # Technologist Stage
-        ("manufacturing", "Производство"),  # Manufacturing
-        ("assembly", "Сборка"),  # Assembly
-        ("delivery", "Доставка"),  # Delivery
-        ("order_ready", "Заказ готов"),  # Order Ready
-        ("finished", "Завершён"),  # Fully Completed / Finished
+        ("marketing", "Соц. маркетинг"),
+        ("call_center", "Колл-центр"),
+        ("manager", "Менеджер"),
+        ("design", "Проектирование"),
+        ("technologist", "Технолог"),
+        ("manager_2", "Менеджер_2"),
+        ("accounting", "Бухгалтерия"),
+        ("warehouse", "Склад"),
+
+        ("production", "Производство"),
+        ("assembly_stage", "Сборка"),
+        ("accounting_2", "Бухгалтерия_2"),
+        ("delivery", "Доставка"),
+        ("installation", "Установка"),
+        ("quality_control", "Контроль качества"),
+
+        ("finished", "Завершён"),
+        ("archive", "Архив"),
     ]
 
     Social_CHOICES = [
