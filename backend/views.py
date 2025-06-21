@@ -247,8 +247,21 @@ class Dashboard(LoginRequiredMixin,TemplateView):
       search = self.request.GET.get('search')
 
       stages = [
-         'accepted', 'design', 'technologist', 'manufacturing',
-         'assembly', 'delivery', 'order_ready', 'finished'
+         "marketing",
+         "call_center",
+         "manager",
+         "design",
+         "technologist",
+         "manager_2",
+         "accounting",
+         "warehouse",
+         "manufacturing",
+         "assembly_stage",
+         "accounting_2",
+         "delivery",
+         "installation",
+         "quality_control",
+         "finished",
       ]
 
 

@@ -44,6 +44,42 @@ class Telegram_users(models.Model):
     phone = PhoneNumberField(blank=True)
     chat_id=models.IntegerField(default=0)
 
+
+class Clients:
+    Social_CHOICES = [
+        ("social", "Социальные сети"),
+        ("cold_calls", "Холодные звонки"),
+        ("word_of_mouth", "Сарафанное радио"),
+    ]
+
+    CLIENT_TYPE_CHOICES = [
+        ('INDIVIDUAL', 'Физическое лицо'),
+        ('LEGAL_ENTITY', 'Юридическое лицо'),
+    ]
+
+    social = models.CharField(max_length=20, choices=Social_CHOICES)
+
+
+    client_type = models.CharField(
+        max_length=20,
+        choices=CLIENT_TYPE_CHOICES,
+    )
+    phone = PhoneNumberField()
+
+    #indivudal
+    name = models.CharField(max_length=200, null=True, blank=True, default=None)
+    lastname = models.CharField(max_length=200, null=True, blank=True, default=None)
+    middle_name = models.CharField(max_length=200, null=True, blank=True, default=None)
+
+
+    #legal
+    adress = models.CharField(max_length=200, null=True, blank=True, default=None)
+    company_name=models.CharField(max_length=200, null=True, blank=True, default=None)
+    inn = models.CharField(max_length=12,null=True, blank=True, default=None)
+    account=models.IntegerField(blank=True,null=True,default=None)
+    mfo = models.IntegerField(blank=True, null=True, default=None)
+
+
 class Orders(models.Model):
     Stage_CHOICES = [
         ("marketing", "Соц. маркетинг"),
@@ -55,7 +91,7 @@ class Orders(models.Model):
         ("accounting", "Бухгалтерия"),
         ("warehouse", "Склад"),
 
-        ("production", "Производство"),
+        ("manufacturing", "Производство"),
         ("assembly_stage", "Сборка"),
         ("accounting_2", "Бухгалтерия_2"),
         ("delivery", "Доставка"),
@@ -65,25 +101,20 @@ class Orders(models.Model):
         ("finished", "Завершён"),
         ("archive", "Архив"),
     ]
-
-    Social_CHOICES = [
-        ("social", "Социальные сети"),
-        ("cold_calls", "Холодные звонки"),
-        ("word_of_mouth", "Сарафанное радио"),
-    ]
     Stage_pod_CHOICES = [
-        ("rezka","Резка"),
+        ("rezka", "Резка"),
         ("svarka", "Сварка"),
         ("fill", "Покраска"),
         ("print", "Печать"),
     ]
-    client=models.CharField(max_length=250)
-    adress=models.CharField(max_length=250)
+
+
+
     order_sum=models.DecimalField(max_digits=10, decimal_places=2,default=0)
     order_predoplata=models.DecimalField(max_digits=10, decimal_places=2,default=0)
     description=models.TextField()
     phone=models.CharField(max_length=50)
-    social=models.CharField(max_length=20, choices=Social_CHOICES)
+
     stage = models.CharField(max_length=20, choices=Stage_CHOICES)
     add_order=models.DateField()
     complete_order=models.DateField()

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Список клиентов — CRM</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #1c1f26;
+      color: #f5f5f5;
+    }
+
+    header {
+      background: #101214;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #333;
+    }
+
+    header h1 {
+      color: #ffd700;
+      font-weight: 600;
+      font-size: 24px;
+    }
+
+    .container {
+      padding: 40px;
+    }
+
+    .toggle-buttons {
+      display: flex;
+      margin-bottom: 20px;
+    }
+
+    .toggle-buttons button {
+      background-color: #2c2f36;
+      color: #f5f5f5;
+      border: 1px solid #444;
+      padding: 10px 20px;
+      margin-right: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .toggle-buttons button:hover,
+    .toggle-buttons button.active {
+      background-color: #ffd700;
+      color: #1c1f26;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .top-bar input[type="text"] {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background-color: #2c2f36;
+      color: #f5f5f5;
+      margin-right: 10px;
+    }
+
+    .top-bar button {
+      background-color: #ffd700;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      color: #1c1f26;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #2c2f36;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 15px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #383c44;
+      color: #ffd700;
+    }
+
+    tr:nth-child(even) {
+      background-color: #292c33;
+    }
+
+    tr:hover {
+      background-color: #3a3f4a;
+    }
+
+    @media (max-width: 768px) {
+      .top-bar {
+        flex-direction: column;
+      }
+      .top-bar input {
+        margin-bottom: 10px;
+        margin-right: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>CRM — Список клиентов</h1>
+    <div>👤 Beka Juraev</div>
+  </header>
+
+  <div class="container">
+    <div class="toggle-buttons">
+      <button class="active">Физическое лицо</button>
+      <button>Юридическое лицо</button>
+    </div>
+
+    <div class="top-bar">
+      <input type="text" placeholder="🔍 Поиск клиента...">
+      <button>+ Добавить клиента</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Фамилия</th>
+          <th>Имя</th>
+          <th>Отчество</th>
+          <th>📞 Телефон</th>
+          <th>🌐 Источник</th>
+          <th>📅 Дата регистрации</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Максим</td>
+          <td>Максим</td>
+          <td>Максим</td>
+          <td>+998915521315</td>
+          <td>Социальные сети</td>
+          <td>23.03.2024</td>
+        </tr>
+        <!-- Repeat rows or dynamically load them here -->
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
