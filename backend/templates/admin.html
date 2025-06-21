@@ -141,10 +141,10 @@
     </div>
 </div>
                     <div class="kanban mt-4">
-                         <div class="kanban-column"  data-stage="accepted" ondrop="drop(event)" ondragover="allowDrop(event)">
-                            <h5>Принят</h5>
+                        <div class="kanban-column"  data-stage="accepted" ondrop="drop(event)" ondragover="allowDrop(event)">
+                            <h5>Соц. маркетинг</h5>
 
-                            {% for item in accepted %}
+                            {% for item in marketing %}
 
                              {% if item.today >= item.complete_order %}
 
@@ -158,8 +158,40 @@
                              {% endif %}
                              {% endfor %}
                         </div>
+                        <div class="kanban-column"  data-stage="accepted" ondrop="drop(event)" ondragover="allowDrop(event)">
+                            <h5>Колл-центр</h5>
+
+                            {% for item in call_center %}
+
+                             {% if item.today >= item.complete_order %}
 
 
+
+                              <div class="kanban-item"  style="background-color: red;" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                            {% else %}
+                              <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+
+
+                             {% endif %}
+                             {% endfor %}
+                        </div>
+                         <div class="kanban-column"  data-stage="accepted" ondrop="drop(event)" ondragover="allowDrop(event)">
+                            <h5>Менеджер</h5>
+
+                            {% for item in manager %}
+
+                             {% if item.today >= item.complete_order %}
+
+
+
+                              <div class="kanban-item"  style="background-color: red;" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                            {% else %}
+                              <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+
+
+                             {% endif %}
+                             {% endfor %}
+                        </div>
                         <div class="kanban-column"  ondrop="drop(event)" data-stage="design" ondragover="allowDrop(event)">
                             <h5>Проектирование</h5>
                            {% for item in design %}
@@ -192,7 +224,58 @@
                              {% endif %}
                              {% endfor %}
                         </div>
-                       <div class="kanban-column"  ondrop="drop(event)" data-stage="manufacturing" ondragover="allowDrop(event)">
+                         <div class="kanban-column"  data-stage="accepted" ondrop="drop(event)" ondragover="allowDrop(event)">
+                            <h5>Менеджер</h5>
+
+                            {% for item in manager_2 %}
+
+                             {% if item.today >= item.complete_order %}
+
+
+
+                              <div class="kanban-item"  style="background-color: red;" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                            {% else %}
+                              <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+
+
+                             {% endif %}
+                             {% endfor %}
+                        </div>
+                        <div class="kanban-column"  data-stage="accepted" ondrop="drop(event)" ondragover="allowDrop(event)">
+                            <h5>Бухгалтерия</h5>
+
+                            {% for item in accounting %}
+
+                             {% if item.today >= item.complete_order %}
+
+
+
+                              <div class="kanban-item"  style="background-color: red;" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                            {% else %}
+                              <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+
+
+                             {% endif %}
+                             {% endfor %}
+                        </div>
+                        <div class="kanban-column"  data-stage="accepted" ondrop="drop(event)" ondragover="allowDrop(event)">
+                            <h5>Склад</h5>
+
+                            {% for item in warehouse %}
+
+                             {% if item.today >= item.complete_order %}
+
+
+
+                              <div class="kanban-item"  style="background-color: red;" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                            {% else %}
+                              <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+
+
+                             {% endif %}
+                             {% endfor %}
+                        </div>
+                        <div class="kanban-column"  ondrop="drop(event)" data-stage="manufacturing" ondragover="allowDrop(event)">
                             <h5>Производство</h5>
                             {% for item in manufacturing %}
 
@@ -224,6 +307,23 @@
                              {% endif %}
                              {% endfor %}
                         </div>
+                        <div class="kanban-column"  data-stage="accepted" ondrop="drop(event)" ondragover="allowDrop(event)">
+                            <h5>Бухгалтерия</h5>
+
+                            {% for item in accounting_2 %}
+
+                             {% if item.today >= item.complete_order %}
+
+
+
+                              <div class="kanban-item"  style="background-color: red;" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                            {% else %}
+                              <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+
+
+                             {% endif %}
+                             {% endfor %}
+                        </div>
                         <div class="kanban-column"  ondrop="drop(event)" data-stage="delivery" ondragover="allowDrop(event)">
                             <h5>Доставка</h5>
                            {% for item in delivery %}
@@ -240,9 +340,9 @@
                              {% endif %}
                              {% endfor %}
                         </div>
-                        <div class="kanban-column" id="" ondrop="drop(event)" data-stage="order_ready" ondragover="allowDrop(event)">
-                            <h5>Заказ готов</h5>
-                           {% for item in order_ready %}
+                        <div class="kanban-column"  ondrop="drop(event)" data-stage="delivery" ondragover="allowDrop(event)">
+                            <h5>Установка</h5>
+                           {% for item in installation %}
 
                              {% if item.today >= item.complete_order %}
 
@@ -256,6 +356,23 @@
                              {% endif %}
                              {% endfor %}
                         </div>
+                        <div class="kanban-column" id="" ondrop="drop(event)" data-stage="order_ready" ondragover="allowDrop(event)">
+                            <h5>Контроль качества</h5>
+                           {% for item in quality_control %}
+
+                             {% if item.today >= item.complete_order %}
+
+
+
+                              <div class="kanban-item"  style="background-color: red;" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                            {% else %}
+                              <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+
+
+                             {% endif %}
+                             {% endfor %}
+                        </div>
+
                         <div class="kanban-column"  ondrop="drop(event)" data-stage="finished" ondragover="allowDrop(event)">
                             <h5>Завершён</h5>
                             {% for item in finished %}
