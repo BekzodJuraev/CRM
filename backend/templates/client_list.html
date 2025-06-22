@@ -114,25 +114,28 @@
         margin-right: 0;
       }
     }
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
   <header>
     <h1>CRM — Список клиентов</h1>
-    <div>👤 Beka Juraev</div>
+    <div>👤 {{request.user.profile.name}}</div>
   </header>
 
   <div class="container">
-    <div class="toggle-buttons">
-      <button class="active">Физическое лицо</button>
-      <button>Юридическое лицо</button>
+     <div class="toggle-buttons">
+      <button id="btn-individual" class="active">Физическое лицо</button>
+      <button id="btn-legal">Юридическое лицо</button>
     </div>
 
     <div class="top-bar">
       <input type="text" placeholder="🔍 Поиск клиента...">
-      <button>+ Добавить клиента</button>
+      <button onclick="window.location.href='{% url 'client_add' %}'">+ Добавить клиента</button>
     </div>
-
+     <div id="individual-fields">
     <table>
       <thead>
         <tr>
@@ -144,18 +147,74 @@
           <th>📅 Дата регистрации</th>
         </tr>
       </thead>
+      {% for item in client_fiz %}
       <tbody>
         <tr>
-          <td>Максим</td>
-          <td>Максим</td>
-          <td>Максим</td>
-          <td>+998915521315</td>
-          <td>Социальные сети</td>
-          <td>23.03.2024</td>
+          <td>{{item.lastname}}</td>
+          <td>{{item.name}}</td>
+          <td>{{item.middle_name}}</td>
+          <td>{{item.phone}}</td>
+          <td>{{item.get_social_display}}</td>
+          <td>{{item.created_at|date:"d.m.Y"}}</td>
         </tr>
         <!-- Repeat rows or dynamically load them here -->
       </tbody>
-    </table>
+      {% endfor %}
+       </table>
+      </div>
+
+
+    <div id="legal-fields" class="hidden">
+      <table>
+      <thead>
+        <tr>
+          <th>Организация</th>
+          <th>Инн</th>
+          <th>Расчётный счёт:</th>
+          <th>МФО</th>
+          <th>Юридический адрес</th>
+          <th>Номер телефона</th>
+          <th>Источник</th>
+          <th>Дата регистрации</th>
+        </tr>
+      </thead>
+      {% for item in client_leg %}
+      <tbody>
+        <tr>
+          <td>{{item.company_name}}</td>
+          <td>{{item.inn}}</td>
+          <td>{{item.account}}</td>
+          <td>{{item.mfo}}</td>
+          <td>{{item.adress}}</td>
+           <td>{{item.phone}}</td>
+         <td>{{item.get_social_display}}</td>
+          <td>{{item.created_at|date:"d.m.Y"}}</td>
+        </tr>
+        <!-- Repeat rows or dynamically load them here -->
+      </tbody>
+      {% endfor %}
+       </table>
+    </div>
   </div>
+<script>
+    const btnIndividual = document.getElementById('btn-individual');
+    const btnLegal = document.getElementById('btn-legal');
+    const individualFields = document.getElementById('individual-fields');
+    const legalFields = document.getElementById('legal-fields');
+
+    btnIndividual.addEventListener('click', () => {
+      btnIndividual.classList.add('active');
+      btnLegal.classList.remove('active');
+      individualFields.classList.remove('hidden');
+      legalFields.classList.add('hidden');
+    });
+
+    btnLegal.addEventListener('click', () => {
+      btnLegal.classList.add('active');
+      btnIndividual.classList.remove('active');
+      legalFields.classList.remove('hidden');
+      individualFields.classList.add('hidden');
+    });
+  </script>
 </body>
 </html>

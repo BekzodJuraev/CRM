@@ -21,6 +21,8 @@ urlpatterns=[
     path('telegram_webhook/',views.telegram_webhook,name='telegram_webhook'),
     path('order/<int:pk>',views.OrderDetail.as_view(),name='order_detail'),
     path('logout/',views.logout_view,name='logout'),
-    path('profile',views.ProfileView.as_view(),name='profile')
+    path('profile',views.ProfileView.as_view(),name='profile'),
+    path('clients/',views.ClietView.as_view(),name='clients'),
+    path('clients/add',views.ClientCreateView.as_view(),name='client_add')
 
 ]

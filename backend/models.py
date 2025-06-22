@@ -45,7 +45,7 @@ class Telegram_users(models.Model):
     chat_id=models.IntegerField(default=0)
 
 
-class Clients:
+class Clients(models.Model):
     Social_CHOICES = [
         ("social", "Социальные сети"),
         ("cold_calls", "Холодные звонки"),
@@ -65,6 +65,7 @@ class Clients:
         choices=CLIENT_TYPE_CHOICES,
     )
     phone = PhoneNumberField()
+    created_at = models.DateField(auto_now_add=True,null=True)
 
     #indivudal
     name = models.CharField(max_length=200, null=True, blank=True, default=None)
@@ -78,6 +79,11 @@ class Clients:
     inn = models.CharField(max_length=12,null=True, blank=True, default=None)
     account=models.IntegerField(blank=True,null=True,default=None)
     mfo = models.IntegerField(blank=True, null=True, default=None)
+
+
+
+    def __str__(self):
+        return self.name or self.company_name
 
 
 class Orders(models.Model):

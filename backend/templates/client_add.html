@@ -89,7 +89,7 @@
 <body>
   <header>
     <h1>CRM — Добавить клиента</h1>
-    <div>👤 Beka Juraev</div>
+    <div>👤 {{request.user.profile.name}}</div>
   </header>
 
   <div class="container">
@@ -98,56 +98,75 @@
       <button id="btn-legal">Юридическое лицо</button>
     </div>
 
-    <form id="client-form">
+    <form id="client-form" METHOD="POST">
+      {% csrf_token %}
       <div id="individual-fields">
         <label>Фамилия:</label>
-        <input type="text" placeholder="Введите фамилию">
+        <input type="text" placeholder="Введите фамилию" name="lastname" required>
 
         <label>Имя:</label>
-        <input type="text" placeholder="Введите имя">
+        <input type="text" placeholder="Введите имя" name="name" required>
 
         <label>Отчество:</label>
-        <input type="text" placeholder="Введите отчество">
+        <input type="text" placeholder="Введите отчество" name="middle_name" required>
 
         <label>Номер телефона:</label>
-        <input type="tel" placeholder="+998...">
+         <input type="tel"
+       name="phone"
+       placeholder="+998901234567"
+       pattern="^\+998\d{9}$"
+       title="+998901234567"
+       required>
 
         <label>Источник:</label>
-        <select>
-          <option>Социальные сети</option>
-          <option>Холодные звонки</option>
-          <option>Сарафанное радио</option>
-        </select>
-      </div>
+       <select  name="social" required>
+                <option value="social">Социальные сети</option>
+                <option value="cold_calls">Холодные звонки</option>
+                <option value="word_of_mouth">Сарафанное радио</option>
+            </select>
 
+        <input hidden name="action" value="INDIVIDUAL">
+         <button type="submit">Сохранить</button>
+      </div>
+    </form>
+      <form method="POST">
+        {% csrf_token %}
       <div id="legal-fields" class="hidden">
         <label>Наименование организации:</label>
-        <input type="text" placeholder="ООО 'Пример'">
+        <input type="text" placeholder="ООО 'Пример'" name="company_name" required>
 
         <label>ИНН:</label>
-        <input type="text" placeholder="ИНН">
+        <input type="text" placeholder="ИНН" name="inn" required>
 
         <label>Расчётный счёт (Р/С):</label>
-        <input type="text" placeholder="Р/С">
+        <input type="number" placeholder="Р/С" name="account" required>
 
         <label>МФО:</label>
-        <input type="text" placeholder="МФО">
+        <input type="number" placeholder="МФО" name="mfo" required>
 
         <label>Юридический адрес:</label>
-        <input type="text" placeholder="Адрес">
+        <input type="text" placeholder="Адрес" name="adress" required>
 
         <label>Номер телефона:</label>
-        <input type="tel" placeholder="+998...">
+        <input type="tel"
+       name="phone"
+       placeholder="+998901234567"
+       pattern="^\+998\d{9}$"
+       title="+998901234567"
+       required>
 
         <label>Источник:</label>
-        <select>
-          <option>Социальные сети</option>
-          <option>Холодные звонки</option>
-          <option>Сарафанное радио</option>
-        </select>
+        <select  name="social" required>
+                <option value="social">Социальные сети</option>
+                <option value="cold_calls">Холодные звонки</option>
+                <option value="word_of_mouth">Сарафанное радио</option>
+            </select>
+
+
+        <button type="submit">Сохранить</button>
       </div>
 
-      <button type="submit">Сохранить</button>
+
     </form>
   </div>
 

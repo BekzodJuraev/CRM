@@ -4,7 +4,7 @@ from django.db import connection, reset_queries
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django.views.generic import View,TemplateView,DetailView,UpdateView
-from .models import Profile,Rezident,Finance,Warehouse,WarehouseLimit,Consumables,Orders,Delivery_Photo,Compelete_Photo,Telegram_users
+from .models import Profile,Rezident,Finance,Warehouse,WarehouseLimit,Consumables,Orders,Delivery_Photo,Compelete_Photo,Telegram_users,Clients
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
@@ -605,8 +605,42 @@ class Rezident_Create(LoginRequiredMixin,TemplateView):
 
 
 
+class ClietView(LoginRequiredMixin,TemplateView):
+   template_name = 'client_list.html'
+   login_url = reverse_lazy('login')
+
+   def get_context_data(self, *, object_list=None, **kwargs):
+      context = super().get_context_data(**kwargs)
+      context['client_fiz']=Clients.objects.filter(client_type='INDIVIDUAL')
+      context['client_leg'] = Clients.objects.filter(client_type='LEGAL_ENTITY')
+
+      return context
 
 
+class ClientCreateView(LoginRequiredMixin,TemplateView):
+   template_name = 'client_add.html'
+   login_url = reverse_lazy('login')
+
+
+   def post(self, request, *args, **kwargs):
+      action=request.POST.get('action')
+      phone=request.POST.get('phone')
+      social=request.POST.get('social')
+      if action == 'INDIVIDUAL':
+         name=request.POST.get('name')
+         lastname = request.POST.get('name')
+         middle_name = request.POST.get('name')
+         Clients.objects.create(name=name,lastname=lastname,middle_name=middle_name,social=social,phone=phone,client_type=action)
+      else:
+         adress = request.POST.get('adress')
+         company_name = request.POST.get('company_name')
+         inn = request.POST.get('inn')
+         account = request.POST.get('account')
+         mfo = request.POST.get('mfo')
+         Clients.objects.create(adress=adress, company_name=company_name, inn=inn, social=social, phone=phone,
+                                client_type='LEGAL_ENTITY',account=account,mfo=mfo)
+
+      return redirect('clients')
 
 
 class Money(LoginRequiredMixin,TemplateView):

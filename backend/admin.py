@@ -1,6 +1,10 @@
 from django.contrib import admin
-from .models import Profile,Orders,Rezident,Finance,Consumables,Debt,Warehouse,WarehouseLimit,Delivery_Photo,Compelete_Photo,Telegram_users
+from .models import Profile,Orders,Rezident,Finance,Consumables,Debt,Warehouse,WarehouseLimit,Delivery_Photo,Compelete_Photo,Telegram_users,Clients
 # Register your models here.
+
+@admin.register(Clients)
+class ClientsAdmin(admin.ModelAdmin):
+    pass
 @admin.register(Telegram_users)
 class Telegram(admin.ModelAdmin):
     pass
