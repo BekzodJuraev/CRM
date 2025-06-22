@@ -115,7 +115,7 @@ class Orders(models.Model):
     ]
 
 
-
+    client=models.ForeignKey(Clients, on_delete=models.CASCADE, related_name='clients_order',null=True)
     order_sum=models.DecimalField(max_digits=10, decimal_places=2,default=0)
     order_predoplata=models.DecimalField(max_digits=10, decimal_places=2,default=0)
     description=models.TextField()
@@ -139,7 +139,7 @@ class Orders(models.Model):
 
 
     def __str__(self):
-        return self.client
+        return self.client.name or self.client.company_name
 
 class Delivery_Photo(models.Model):
     order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name='delivery_photo')
