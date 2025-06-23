@@ -1,5 +1,6 @@
 import time
 from django.db import connection, reset_queries
+from django.http import JsonResponse
 
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
@@ -21,6 +22,44 @@ import json
 
 
 bot = telegram.Bot("8184436447:AAF3WD9vRZO5C3IiY3WBgZ9I2Oht45ZCt3c")
+
+
+def search_client(request):
+   query = request.GET.get('q')
+   client_id = request.GET.get('id')
+
+   if client_id:
+      try:
+         c = Clients.objects.get(id=client_id)
+         return JsonResponse({
+            'id': c.id,
+            'name': c.name,
+            'lastname': c.lastname,
+            'middle_name': c.middle_name,
+            'phone':str(c.phone),
+            'source': c.get_social_display(),
+            'registered_at': c.created_at.strftime('%d.%m.%Y') if c.created_at else ''
+         })
+      except Clients.DoesNotExist:
+         return JsonResponse({'error': 'Клиент не найден'}, status=404)
+
+   if query:
+      clients = Clients.objects.filter(
+         Q(name__icontains=query) |
+         Q(lastname__icontains=query) |
+         Q(middle_name__icontains=query)
+      )[:10]
+
+      results = [
+         {
+            'id': c.id,
+            'name': f"{c.lastname or ''} {c.name or ''} {c.middle_name or ''}".strip()
+         }
+         for c in clients
+      ]
+      return JsonResponse(results, safe=False)
+
+   return JsonResponse([], safe=False)
 
 @csrf_exempt
 @require_POST
@@ -628,8 +667,8 @@ class ClientCreateView(LoginRequiredMixin,TemplateView):
       social=request.POST.get('social')
       if action == 'INDIVIDUAL':
          name=request.POST.get('name')
-         lastname = request.POST.get('name')
-         middle_name = request.POST.get('name')
+         lastname = request.POST.get('lastname')
+         middle_name = request.POST.get('middle_name')
          Clients.objects.create(name=name,lastname=lastname,middle_name=middle_name,social=social,phone=phone,client_type=action)
       else:
          adress = request.POST.get('adress')

@@ -23,6 +23,7 @@ urlpatterns=[
     path('logout/',views.logout_view,name='logout'),
     path('profile',views.ProfileView.as_view(),name='profile'),
     path('clients/',views.ClietView.as_view(),name='clients'),
-    path('clients/add',views.ClientCreateView.as_view(),name='client_add')
+    path('clients/add',views.ClientCreateView.as_view(),name='client_add'),
+    path('search-client/', views.search_client, name='search-client'),
 
 ]

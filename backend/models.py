@@ -113,12 +113,19 @@ class Orders(models.Model):
         ("fill", "Покраска"),
         ("print", "Печать"),
     ]
+    vstrecha_choice = [
+        ("viezd", "Выезд"),
+        ("priezd", "Приезд"),
 
+    ]
 
     client=models.ForeignKey(Clients, on_delete=models.CASCADE, related_name='clients_order',null=True)
+    vstrecha=models.CharField(max_length=20, choices=vstrecha_choice,null=True)
     order_sum=models.DecimalField(max_digits=10, decimal_places=2,default=0)
     order_predoplata=models.DecimalField(max_digits=10, decimal_places=2,default=0)
     description=models.TextField()
+    catigories = models.CharField(max_length=50)
+    razmer=models.CharField(max_length=50)
     phone=models.CharField(max_length=50)
 
     stage = models.CharField(max_length=20, choices=Stage_CHOICES)
