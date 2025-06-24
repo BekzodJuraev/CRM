@@ -27,39 +27,78 @@ bot = telegram.Bot("8184436447:AAF3WD9vRZO5C3IiY3WBgZ9I2Oht45ZCt3c")
 def search_client(request):
    query = request.GET.get('q')
    client_id = request.GET.get('id')
+   client_type = request.GET.get('type')
+   if client_type == 'legal':
 
-   if client_id:
-      try:
-         c = Clients.objects.get(id=client_id)
-         return JsonResponse({
-            'id': c.id,
-            'name': c.name,
-            'lastname': c.lastname,
-            'middle_name': c.middle_name,
-            'phone':str(c.phone),
-            'source': c.get_social_display(),
-            'registered_at': c.created_at.strftime('%d.%m.%Y') if c.created_at else ''
-         })
-      except Clients.DoesNotExist:
-         return JsonResponse({'error': 'Клиент не найден'}, status=404)
 
-   if query:
-      clients = Clients.objects.filter(
-         Q(name__icontains=query) |
-         Q(lastname__icontains=query) |
-         Q(middle_name__icontains=query)
-      )[:10]
+      if client_id:
 
-      results = [
-         {
-            'id': c.id,
-            'name': f"{c.lastname or ''} {c.name or ''} {c.middle_name or ''}".strip()
-         }
-         for c in clients
-      ]
-      return JsonResponse(results, safe=False)
+         try:
+            c = Clients.objects.get(id=client_id)
 
-   return JsonResponse([], safe=False)
+            return JsonResponse({
+               'id': c.id,
+               'company_name': c.company_name,
+               'inn': c.inn,
+               'account':c.account,
+               'mfo': c.mfo,
+               'adress':c.adress,
+               'phone': str(c.phone),
+               'source': c.get_social_display(),
+               'registered_at': c.created_at.strftime('%d.%m.%Y') if c.created_at else ''
+            })
+         except Clients.DoesNotExist:
+            return JsonResponse({'error': 'Клиент не найден'}, status=404)
+
+      if query:
+         clients = Clients.objects.filter(company_name__icontains=query)[:10]
+
+         results = [
+            {
+               'id': c.id,
+               'name': c.company_name
+            }
+            for c in clients
+         ]
+         return JsonResponse(results, safe=False)
+
+      return JsonResponse([], safe=False)
+
+   else:
+      if client_id:
+         try:
+            c = Clients.objects.get(id=client_id)
+            return JsonResponse({
+               'id': c.id,
+               'name': c.name,
+               'lastname': c.lastname,
+               'middle_name': c.middle_name,
+               'phone': str(c.phone),
+               'source': c.get_social_display(),
+               'registered_at': c.created_at.strftime('%d.%m.%Y') if c.created_at else ''
+            })
+         except Clients.DoesNotExist:
+            return JsonResponse({'error': 'Клиент не найден'}, status=404)
+
+      if query:
+         clients = Clients.objects.filter(
+            Q(name__icontains=query) |
+            Q(lastname__icontains=query) |
+            Q(middle_name__icontains=query)
+         )[:10]
+
+         results = [
+            {
+               'id': c.id,
+               'name': f"{c.lastname or ''} {c.name or ''} {c.middle_name or ''}".strip()
+            }
+            for c in clients
+         ]
+         return JsonResponse(results, safe=False)
+
+      return JsonResponse([], safe=False)
+
+
 
 @csrf_exempt
 @require_POST

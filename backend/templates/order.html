@@ -200,6 +200,7 @@ custom-dropdown {
             <label>Клиент:</label>
             <input type="text" class="form-control" id="client-input" name="client" autocomplete="off" required>
             <input type="hidden" id="client-id" name="client_id">
+            <input type="hidden" id="client-type" name="client_type" value="individual">
             <div id="client-suggestions" style="border: 1px solid #ccc; display: none; position: absolute; background: white;"></div>
 
 <!-- Блок с информацией о клиенте -->
@@ -210,6 +211,17 @@ custom-dropdown {
               <p><strong>Номер телефона:</strong> <span id="phone"></span></p>
               <p><strong>Источник:</strong> <span id="source"></span></p>
               <p><strong>Дата регистрации:</strong> <span id="registered_at"></span></p>
+            </div>
+
+            <div id="company-info" style="margin-top: 20px; display: none;">
+              <p><strong>Наименование организации:</strong> <span id="company_name"></span></p>
+              <p><strong>ИНН:</strong> <span id="inn"></span></p>
+              <p><strong>Расчётный счёт (Р/С):</strong> <span id="account"></span></p>
+              <p><strong>МФО:</strong> <span id="mfo"></span></p>
+                <p><strong>Юридический адрес:</strong> <span id="adress"></span></p>
+              <p><strong>Номер телефона:</strong> <span id="phone2"></span></p>
+              <p><strong>Источник:</strong> <span id="source2"></span></p>
+              <p><strong>Дата регистрации:</strong> <span id="registered_at2"></span></p>
             </div>
 
               <label>Тип встречи:</label>
@@ -360,6 +372,7 @@ select.addEventListener("change", () => {
     const legalFields = document.getElementById('legal-fields');
 
     btnIndividual.addEventListener('click', () => {
+    document.getElementById("client-type").value = "individual";
       btnIndividual.classList.add('active');
       btnLegal.classList.remove('active');
       individualFields.classList.remove('hidden');
@@ -367,6 +380,7 @@ select.addEventListener("change", () => {
     });
 
     btnLegal.addEventListener('click', () => {
+    document.getElementById("client-type").value = "legal";
       btnLegal.classList.add('active');
       btnIndividual.classList.remove('active');
       legalFields.classList.remove('hidden');
@@ -382,15 +396,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const suggestions = document.getElementById('client-suggestions');
   const clientInfoBlock = document.getElementById('client-info');
 
+  const companyInfoBlock = document.getElementById('company-info');
+
+
+
   input.addEventListener('input', () => {
     const query = input.value;
+    const type = document.getElementById('client-type').value;
     if (query.length < 2) {
       suggestions.innerHTML = '';
       suggestions.style.display = 'none';
       return;
     }
 
-    fetch(`/search-client/?q=${encodeURIComponent(query)}`)
+    fetch(`/search-client/?q=${encodeURIComponent(query)}&type=${type}`)
       .then(res => res.json())
       .then(data => {
         suggestions.innerHTML = '';
@@ -404,16 +423,30 @@ document.addEventListener('DOMContentLoaded', () => {
             // Заполняем ID
             document.getElementById('client-id').value = client.id;
             // Показываем информацию о клиенте
-            fetch(`/search-client/?id=${client.id}`)
+            fetch(`/search-client/?id=${client.id}&type=${type}`)
               .then(r => r.json())
               .then(info => {
+                if (type == 'legal'){
+                clientInfoBlock.style.display = 'none';
+                document.getElementById('company_name').textContent = info.company_name;
+                document.getElementById('inn').textContent = info.inn;
+                document.getElementById('account').textContent = info.account;
+                document.getElementById('mfo').textContent = info.mfo;
+                document.getElementById('adress').textContent = info.adress;
+                document.getElementById('phone2').textContent = info.phone;
+                document.getElementById('source2').textContent = info.source;
+                document.getElementById('registered_at2').textContent = info.registered_at;
+                companyInfoBlock.style.display = 'block';}
+                else{
+                companyInfoBlock.style.display = 'none';
                 document.getElementById('lastname').textContent = info.lastname;
                 document.getElementById('firstname').textContent = info.name;
                 document.getElementById('middlename').textContent = info.middle_name;
                 document.getElementById('phone').textContent = info.phone;
                 document.getElementById('source').textContent = info.source;
                 document.getElementById('registered_at').textContent = info.registered_at;
-                clientInfoBlock.style.display = 'block';
+                clientInfoBlock.style.display = 'block';}
+
               });
 
             // Скрываем подсказки
