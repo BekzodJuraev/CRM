@@ -10,8 +10,33 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'js/orders.js' %}"></script>
+    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+
 
     <style>
+    #geoModal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+}
+
+#geoModalContent {
+  position: relative;
+  width: 80%;
+  height: 70%;
+  margin: 5% auto;
+  background: #fff;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+}
         body {
             background-color: #f8f9fa;
         }
@@ -189,6 +214,12 @@ custom-dropdown {
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
 </head>
 <body>
+<div id="geoModal">
+  <div id="geoModalContent">
+    <p><strong>Выберите местоположение:</strong></p>
+    <div id="map"></div>
+  </div>
+</div>
     <div class="container">
         <h2 class="text-center">Добавить новый заказ</h2>
           <div class="toggle-buttons">
@@ -259,20 +290,44 @@ custom-dropdown {
             <textarea class="form-control" rows="3" name="description" required></textarea>
             <label>Размер:</label>
             <input type="text" class="form-control" placeholder="40 cm"  name="razmer"  required>
+            <h6>Дизайн</h6>
+            <input type="checkbox" id="size-large" name="size" value="large"><label>Дизайн выполняем мы:</label>
+            <br>
+               <label>Описание дизайна::</label>  <label class="file-input-wrapper">
+    <span class="file-label">📎 Прикрепить файл</span>
+    <input type="file" name="tz_file" class="file-input" onchange="updateFileName(this)">
+  </label>
+     <textarea class="form-control" rows="3" name="description" ></textarea>
+
+        <h3>Местоположение установки:</h3>
+           <button id="pick_map" onclick="openGeoModal()">Загрузить геолокацию</button>
+<input type="hidden" name="latitude" id="latitude">
+<input type="hidden" name="longitude" id="longitude">
+<div id="geo-status"></div>
+<!-- Map where the user picks the location -->
+
+
+<!-- Status & result -->
+
+<div id="mini-map" style="width: 100%; max-width: 400px; height: 200px; margin-top: 10px; display: none;"></div>
 
 
 
 
             <label>Выбор этапа:</label>
             <select class="form-select" name="stage" required>
-                <option value="accepted">Принят</option>
+                <option value="call_center">Колл-центр</option>
+                <option value="manager">Менеджер</option>
                 <option value="design">Проектирование</option>
                 <option value="technologist">Технолог</option>
-                <option value="manufacturing">Производство</option>
-                 <option value="assembly">Сборка</option>
+                 <option value="manager_2">Менеджер(добавить)</option>
+                <option value="accounting">Бухгалтерия</option>
+                <option value="warehouse">Склад</option>
+                <option value="accounting_2">Бухгалтерия(добавить)</option>
                 <option value="delivery">Доставка</option>
-                <option value="order_ready">Заказ готов</option>
-                <option value="finished">Завершено</option>
+                <option value="installation">Установка</option>
+                <option value="quality_control">Контроль качества</option>
+
 
             </select>
 
@@ -287,18 +342,7 @@ custom-dropdown {
     </div>
 
 
-    <div class="popup" id="colorPopup">
-  <h3>Выберите акцентный цвет</h3>
-  <div class="color-box">
-    <label>Цвет:</label>
-    <input type="color" id="colorPicker" value="#40A7E3" onchange="updateColor()">
-  </div>
-  <div class="color-values" id="colorInfo">
-    <div><strong>HEX:</strong> <span class="hex">#40A7E3</span></div>
-    <div><strong>RGB:</strong> 64, 167, 227</div>
-    <div><strong>HSL:</strong> 202°, 75%, 57%</div>
-  </div>
-</div>
+
 
     <script>
 
@@ -470,7 +514,79 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 </script>
+<script>
 
+let map, placemark, miniMapInstance;
+
+function openGeoModal() {
+  document.getElementById("geoModal").style.display = "block";
+
+  // Delay map init to ensure the div is visible
+  setTimeout(initMap, 300);
+}
+
+function initMap() {
+  if (map) return; // prevent re-init
+
+  map = new ymaps.Map("map", {
+    center: [41.311081, 69.240562],
+    zoom: 12
+  });
+
+  map.events.add('click', function (e) {
+    const coords = e.get('coords');
+
+    if (!placemark) {
+      placemark = new ymaps.Placemark(coords, {}, { draggable: true });
+      map.geoObjects.add(placemark);
+    } else {
+      placemark.geometry.setCoordinates(coords);
+    }
+
+    // Save coordinates
+    document.getElementById('latitude').value = coords[0];
+    document.getElementById('longitude').value = coords[1];
+
+    document.getElementById('geo-status').innerText = '📍 Геолокация выбрана';
+    document.getElementById("geoModal").style.display = "none";
+
+    // Show mini map preview
+    showMiniMap(coords[0], coords[1]);
+  });
+}
+
+function showMiniMap(lat, lon) {
+  const miniMapContainer = document.getElementById("mini-map");
+  const pick =document.getElementById("pick_map");
+  pick.style.display="none";
+  // Make container visible
+  miniMapContainer.style.display = "block";
+
+  // Destroy existing map if exists
+  if (miniMapInstance) {
+    miniMapInstance.destroy();
+  }
+
+  // Create new map instance
+  miniMapInstance = new ymaps.Map("mini-map", {
+    center: [lat, lon],
+    zoom: 15,
+    controls: []
+  });
+
+  const miniPlacemark = new ymaps.Placemark([lat, lon]);
+  miniMapInstance.geoObjects.add(miniPlacemark);
+}
+
+// Optional: close modal on outside click
+window.onclick = function(event) {
+  const modal = document.getElementById("geoModal");
+
+  if (event.target === modal) {
+    modal.style.display = "none";
+  }
+}
+</script>
 </body>
 </html>
 {% else %}

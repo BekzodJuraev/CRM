@@ -120,6 +120,7 @@ class Orders(models.Model):
     ]
 
     client=models.ForeignKey(Clients, on_delete=models.CASCADE, related_name='clients_order',null=True)
+    order_name=models.CharField(max_length=100,null=True)
     vstrecha=models.CharField(max_length=20, choices=vstrecha_choice,null=True)
     order_sum=models.DecimalField(max_digits=10, decimal_places=2,default=0)
     order_predoplata=models.DecimalField(max_digits=10, decimal_places=2,default=0)
@@ -127,6 +128,9 @@ class Orders(models.Model):
     catigories = models.CharField(max_length=50)
     razmer=models.CharField(max_length=50)
     phone=models.CharField(max_length=50)
+    latitude = models.FloatField(blank=True, null=True, default=0)
+    longitude = models.FloatField(blank=True, null=True, default=0)
+
 
     stage = models.CharField(max_length=20, choices=Stage_CHOICES)
     add_order=models.DateField()
