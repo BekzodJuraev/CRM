@@ -125,12 +125,15 @@ class Orders(models.Model):
     order_sum=models.DecimalField(max_digits=10, decimal_places=2,default=0)
     order_predoplata=models.DecimalField(max_digits=10, decimal_places=2,default=0)
     description=models.TextField()
+    description_design = models.TextField()
+    check_design=models.BooleanField(default=False)
     catigories = models.CharField(max_length=50)
     razmer=models.CharField(max_length=50)
-    phone=models.CharField(max_length=50)
+
     latitude = models.FloatField(blank=True, null=True, default=0)
     longitude = models.FloatField(blank=True, null=True, default=0)
-
+    tz=models.FileField(blank=True, upload_to='pictures/')
+    design=models.FileField(blank=True, upload_to='pictures/')
 
     stage = models.CharField(max_length=20, choices=Stage_CHOICES)
     add_order=models.DateField()

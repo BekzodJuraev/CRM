@@ -1,0 +1,35 @@
+{
+   "name": "example_name",
+   "price": 1099,
+   "id_user": 1,
+   "comment": "example_comment",
+   "adress": "example_address",
+   "phone": "1234567890",
+   "related_diaries": 
+[{"add_item":15,"count":3}
+,{"add_item":16,"count":3}
+]
+
+}
+
+
+
+
+
+
+
+class BotSerializer(serializers.ModelSerializer):
+    related_diaries = OrderItemSerializer(many=True, required=False, allow_empty=True)
+
+    class Meta:
+        model = Bot
+        fields = ['id_user', 'name', 'price', 'comment', 'adress', 'phone', 'related_diaries']
+
+    def create(self, validated_data):
+        related_diaries_data = validated_data.pop('related_diaries', [])
+        bot = Bot.objects.create(**validated_data)
+        for diary_data in related_diaries_data:
+            add_item = diary_data.pop('add_item')
+            count = diary_data.pop('count')
+            OrderItem.objects.create(order=bot, add_item=add_item, count=count, **diary_data)
+        return bot

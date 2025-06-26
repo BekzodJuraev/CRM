@@ -512,20 +512,29 @@ class Order(LoginRequiredMixin,TemplateView):
 
 
    def post(self,request):
-      add=request.POST.getlist('add')
-      price=request.POST.getlist('price')
-      catigories = request.POST.getlist('catigories')
-      quantity=request.POST.getlist('quantity')
+      # add=request.POST.getlist('add')
+      # price=request.POST.getlist('price')
+      # catigories = request.POST.getlist('catigories')
+      # quantity=request.POST.getlist('quantity')
 
 
 
-      client = request.POST.get('client')
-      adress= request.POST.get('adress')
+      client = request.POST.get('client_id')
+      vstrecha=request.POST.get('vstrecha')
+      order_name=request.POST.get('order_name')
       order_sum = request.POST.get('order_sum')
+      catigories=request.POST.get('catigories')
       order_predoplata = request.POST.get('order_predoplata')
+      tz=request.FILES.get('tz')
+      check_design=request.POST.get('check_design') == 'on'
+      design = request.FILES.get('design')
+      latitude=request.POST.get('latitude')
+      longitude=request.POST.get('longitude')
+      razmer=request.POST.get('razmer')
       description = request.POST.get('description')
-      phone = request.POST.get('phone')
-      social = request.POST.get('social')
+      description_design=request.POST.get('description_design')
+
+
       stage = request.POST.get('stage')
       add_order = request.POST.get('add_order')
       complete_order = request.POST.get('complete_order')
@@ -533,22 +542,28 @@ class Order(LoginRequiredMixin,TemplateView):
 
 
       order=Orders.objects.create\
-         (client=client,
-          adress=adress,
+         (client_id=client,
+          order_name=order_name,
+          vstrecha=vstrecha,
           order_sum=order_sum,
           order_predoplata=order_predoplata,
           description=description,
-          phone=phone,
-          social=social,
+          catigories=catigories,
+          tz=tz,
+          check_design=check_design,
+          design=design,
+          latitude=latitude,
+          longitude=longitude,
+          razmer=razmer,
+          description_design=description_design,
           stage=stage,
           add_order=add_order,
-          complete_order=complete_order)
-      consumables = [
-         Consumables(order=order, add=a, price=p, catigories=c , quantity=d)
-         for a, p, c , d  in zip(add, price, catigories, quantity)
-      ]
-      Consumables.objects.bulk_create(consumables)
-      mess(order.pk)
+          complete_order=complete_order
+
+          )
+
+
+     # mess(order.pk)
 
       return redirect('dashboard')
 

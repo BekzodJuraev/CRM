@@ -209,6 +209,35 @@ custom-dropdown {
     .file-label {
       display: inline-block;
     }
+      .file-preview {
+      margin-top: 10px;
+      position: relative;
+      display: inline-block;
+      max-width: 150px;
+    }
+
+    .file-preview img,
+    .file-preview .file-icon {
+      max-width: 100%;
+      max-height: 150px;
+      border: 1px solid #ccc;
+      padding: 5px;
+      border-radius: 5px;
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      font-weight: bold;
+    }
 
     </style>
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
@@ -226,7 +255,7 @@ custom-dropdown {
       <button id="btn-individual" class="active">Физическое лицо</button>
       <button id="btn-legal">Юридическое лицо</button>
     </div>
-        <form action="" method="POST">
+        <form action="" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <label>Клиент:</label>
             <input type="text" class="form-control" id="client-input" name="client" autocomplete="off" required>
@@ -254,6 +283,8 @@ custom-dropdown {
               <p><strong>Источник:</strong> <span id="source2"></span></p>
               <p><strong>Дата регистрации:</strong> <span id="registered_at2"></span></p>
             </div>
+            <label>Наименование проекта:</label>
+            <input type="text" class="form-control" name="order_name">
 
               <label>Тип встречи:</label>
             <select class="form-select" name="vstrecha" required>
@@ -283,22 +314,32 @@ custom-dropdown {
 
 
 
-            <label>Описание / ТЗ:</label>  <label class="file-input-wrapper">
-    <span class="file-label">📎 Прикрепить файл</span>
-    <input type="file" name="tz_file" class="file-input" onchange="updateFileName(this)">
-  </label>
-            <textarea class="form-control" rows="3" name="description" required></textarea>
+         <label>Описание / ТЗ:</label>
+<label class="file-input-wrapper">
+  <span class="file-label">📎 Прикрепить файл</span>
+  <input type="file" name="tz"  class="file-input" onchange="handleFile(this,'preview_tz')">
+</label>
+
+
+
+
+
+
+            <textarea class="form-control" rows="3" name="description"></textarea>
+
+
+            <div id="preview_tz"></div>
             <label>Размер:</label>
             <input type="text" class="form-control" placeholder="40 cm"  name="razmer"  required>
             <h6>Дизайн</h6>
-            <input type="checkbox" id="size-large" name="size" value="large"><label>Дизайн выполняем мы:</label>
+            <input type="checkbox" id="size-large" name="check_design" ><label>Дизайн выполняем мы:</label>
             <br>
-               <label>Описание дизайна::</label>  <label class="file-input-wrapper">
-    <span class="file-label">📎 Прикрепить файл</span>
-    <input type="file" name="tz_file" class="file-input" onchange="updateFileName(this)">
-  </label>
-     <textarea class="form-control" rows="3" name="description" ></textarea>
-
+               <label>Описание дизайна:</label>  <label class="file-input-wrapper">
+  <span class="file-label">📎 Прикрепить файл</span>
+  <input type="file" name="design"  class="file-input" onchange="handleFile(this,'preview_design')">
+</label>
+     <textarea class="form-control" rows="3" name="description_design" ></textarea>
+             <div id="preview_design"></div>
         <h3>Местоположение установки:</h3>
            <button id="pick_map" onclick="openGeoModal()">Загрузить геолокацию</button>
 <input type="hidden" name="latitude" id="latitude">
@@ -320,10 +361,10 @@ custom-dropdown {
                 <option value="manager">Менеджер</option>
                 <option value="design">Проектирование</option>
                 <option value="technologist">Технолог</option>
-                 <option value="manager_2">Менеджер(добавить)</option>
+                 <option value="manager_2">Менеджер(Утверждение окончательной цены)</option>
                 <option value="accounting">Бухгалтерия</option>
                 <option value="warehouse">Склад</option>
-                <option value="accounting_2">Бухгалтерия(добавить)</option>
+                <option value="accounting_2">Бухгалтерия(Подтверждение 100% оплаты)</option>
                 <option value="delivery">Доставка</option>
                 <option value="installation">Установка</option>
                 <option value="quality_control">Контроль качества</option>
@@ -586,6 +627,51 @@ window.onclick = function(event) {
     modal.style.display = "none";
   }
 }
+</script>
+<script>
+  function handleFile(input,previewId) {
+    const file = input.files[0];
+    const container = document.getElementById(previewId);
+    container.innerHTML = ''; // clear previous
+
+    if (!file) return;
+
+    const preview = document.createElement('div');
+    preview.className = 'file-preview';
+
+    const removeBtn = document.createElement('button');
+    removeBtn.innerText = '×';
+    removeBtn.className = 'remove-btn';
+    removeBtn.onclick = () => {
+      input.value = ''; // reset file input
+      container.innerHTML = '';
+    };
+
+    preview.appendChild(removeBtn);
+
+    const isImage = file.type.startsWith('image/');
+
+    if (isImage) {
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(file);
+      img.alt = 'Предпросмотр изображения';
+      img.style.cursor = 'pointer';
+      img.onclick = () => window.open(img.src, '_blank');
+      preview.appendChild(img);
+    } else {
+      const fileIcon = document.createElement('div');
+      fileIcon.className = 'file-icon';
+      fileIcon.innerHTML = `📄 ${file.name}`;
+      fileIcon.style.cursor = 'pointer';
+      fileIcon.onclick = () => {
+        const url = URL.createObjectURL(file);
+        window.open(url, '_blank');
+      };
+      preview.appendChild(fileIcon);
+    }
+
+    container.appendChild(preview);
+  }
 </script>
 </body>
 </html>
