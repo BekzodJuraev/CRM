@@ -25,5 +25,7 @@ urlpatterns=[
     path('clients/',views.ClietView.as_view(),name='clients'),
     path('clients/add',views.ClientCreateView.as_view(),name='client_add'),
     path('search-client/', views.search_client, name='search-client'),
+    path('staff/more',views.Staff_more.as_view(),name='staff_more'),
+    path('staff/archive',views.StaffArchive.as_view(),name='staff_archive'),
 
 ]

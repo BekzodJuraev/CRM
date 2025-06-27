@@ -1,0 +1,128 @@
+<!-- Project Stats UI -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Участие в проектах</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f4f4f9;
+      margin: 0;
+      padding: 40px;
+      color: #333;
+    }
+
+    .container {
+      background: white;
+      max-width: 900px;
+      margin: auto;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      padding: 30px;
+    }
+
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    .title::before {
+      content: "📁";
+      margin-right: 10px;
+    }
+
+    .date-range {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .date-range input {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+
+    .summary {
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 30px;
+      background: #fafafa;
+    }
+
+    .summary p {
+      margin: 8px 0;
+      font-size: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 14px 20px;
+      text-align: left;
+    }
+
+    th {
+      background: #1e88e5;
+      color: white;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+
+    tr:hover {
+      background: #e3f2fd;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="title">Участие в проектах</div>
+    <div class="date-range">
+      <input type="date" value="2024-02-01">
+      <input type="date" value="2024-02-21">
+    </div>
+    <div class="summary">
+      <p>Всего выполнено проектов: <strong>5</strong></p>
+      <p>Проекты в процессе: <strong>2</strong></p>
+      <p>Штрафы: <strong>0 UZS</strong></p>
+      <p>Официальная заработная плата: <strong>5 000 000 UZS</strong></p>
+      <p>Неофициальная заработная плата: <strong>3 000 000 UZS</strong></p>
+      <p>Начисленная сумма за проекты: <strong>4 000 000 UZS</strong></p>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Наименование проекта</th>
+          <th>Период</th>
+          <th>Выплаченная сумма</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>ТЦ “Север”</td><td>01.10.2023–03.11.2023</td><td>5 000 000 UZS</td></tr>
+        <tr><td>ТЦ “Север”</td><td>01.07.2023–03.10.2023</td><td>5 000 000 UZS</td></tr>
+        <tr><td>ТЦ “Север”</td><td>01.10.2023–03.10.2023</td><td>5 000 000 UZS</td></tr>
+        <tr><td>ТЦ “Север”</td><td>01.10.2023–03.10.2023</td><td>5 000 000 UZS</td></tr>
+        <tr><td>ТЦ “Север”</td><td>01.10.2023–03.10.2023</td><td>5 000 000 UZS</td></tr>
+        <tr><td>ТЦ “Север”</td><td>01.10.2023–03.10.2023</td><td>5 000 000 UZS</td></tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

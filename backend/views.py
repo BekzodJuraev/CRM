@@ -449,7 +449,9 @@ class Register(TemplateView):
 
       return redirect('login')
 
-
+class Staff_more(LoginRequiredMixin,TemplateView):
+   login_url = reverse_lazy('login')
+   template_name = 'staff_more.html'
 class OrderDetail(LoginRequiredMixin,DetailView):
    model = Orders
    login_url = reverse_lazy('login')
@@ -620,6 +622,16 @@ class Staff(LoginRequiredMixin,TemplateView):
    template_name = 'staff.html'
    login_url = reverse_lazy('login')
 
+   def post(self,request):
+      pk=self.request.POST.get('pk')
+      profile = Profile.objects.select_related('username').get(pk=pk)
+      profile.archive = False
+      profile.username.is_active = False
+      profile.username.save(update_fields=['is_active'])
+      profile.save(update_fields=['archive'])
+
+      return redirect(request.path)
+
 
 
 
@@ -631,7 +643,8 @@ class Staff(LoginRequiredMixin,TemplateView):
       if search:
          # Apply a case-insensitive search across multiple fields
          context['profile'] = Profile.objects.filter(
-            approve=True
+            approve=True,
+            archive=True
          ).filter(
             Q(name__icontains=search) |
             Q(lastname__icontains=search) |
@@ -639,12 +652,51 @@ class Staff(LoginRequiredMixin,TemplateView):
          ).order_by('-id')
       else:
          # Return all profiles if no search term is provided
-         context['profile'] = Profile.objects.filter(approve=True).order_by('-id')
+         context['profile'] = Profile.objects.filter(approve=True,archive=True).order_by('-id')
 
 
 
       return context
 
+class StaffArchive(LoginRequiredMixin,TemplateView):
+   template_name = 'staff_archive.html'
+   login_url = reverse_lazy('login')
+
+   def post(self,request):
+      pk=self.request.POST.get('pk')
+      profile = Profile.objects.select_related('username').get(pk=pk)
+      profile.archive = True
+      profile.username.is_active = True
+      profile.username.save(update_fields=['is_active'])
+      profile.save(update_fields=['archive'])
+
+      return redirect(request.path)
+
+
+
+
+
+   def get_context_data(self, *, object_list=None, **kwargs):
+      context = super().get_context_data(**kwargs)
+      search=self.request.GET.get('search')
+
+      if search:
+         # Apply a case-insensitive search across multiple fields
+         context['profile'] = Profile.objects.filter(
+            approve=True,
+            archive=False
+         ).filter(
+            Q(name__icontains=search) |
+            Q(lastname__icontains=search) |
+            Q(middle_name__icontains=search)  # Add more fields as necessary
+         ).order_by('-id')
+      else:
+         # Return all profiles if no search term is provided
+         context['profile'] = Profile.objects.filter(approve=True,archive=False).order_by('-id')
+
+
+
+      return context
 
 class RezidentView(LoginRequiredMixin,TemplateView):
    template_name = 'rezedent.html'

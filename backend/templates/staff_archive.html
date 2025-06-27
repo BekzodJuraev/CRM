@@ -191,19 +191,15 @@
     <div>👤 {{request.user.profile.name}}</div>
   </header>
 
-
-
-    <div class="top-bar">
+        <div class="top-bar">
+          <button onclick="window.location.href='{% url 'staff' %}'">Назад</button>
      <form action="" method="GET">
       <input type="text" name="search" placeholder="🔍 Поиск клиента...">
        </form>
-        <button onclick="window.location.href='{% url 'staff_archive' %}'">Архив сотрудников</button>
+
 
 
     </div>
-
-
-
      <div id="individual-fields">
     <table>
       <thead>
@@ -238,7 +234,7 @@
           <td>{{item.get_position_display}}</td>
             <td><div>
                 <button onclick="window.location.href='{% url 'staff_more' %}'">Подробнее</button>
-                <button onclick="openPopup({{item.pk}})">Удалить</button>
+                <button onclick="openPopup({{item.pk}})">Восстановить</button>
             </div></td>
         </tr>
         <!-- Repeat rows or dynamically load them here -->
@@ -249,7 +245,7 @@
 
       <div class="overlay" id="overlay">
   <div class="popup">
-    <h2>Вы уверены, что хотите удалить данного сотрудника?</h2>
+    <h2>Вы уверены, что хотите восстановить доступ данному сотруднику?</h2>
     <div class="popup-buttons">
       <form method="post" >
         {% csrf_token %}
@@ -258,7 +254,7 @@
         </form>
       <button class="no-btn" onclick="closePopup()">Нет</button>
     </div>
-    <p class="note">После подтверждения данный сотрудник теряет доступ к аккаунту</p>
+    <p class="note">После подтверждения данный сотрудник сможет войти в аккаунт со старым логином и паролем</p>
   </div>
 </div>
 

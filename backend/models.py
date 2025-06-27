@@ -38,6 +38,9 @@ class Profile(models.Model):
     hobby=models.CharField(max_length=60,blank=True)
     photo = models.ImageField(blank=True, upload_to='pictures/',null=True)
     approve=models.BooleanField(default=False)
+    archive=models.BooleanField(default=True)
+
+
 
 
 class Telegram_users(models.Model):
