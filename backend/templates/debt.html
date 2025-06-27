@@ -88,10 +88,10 @@
     <tbody>
     {% for item in order %}
       <tr data-id="{{item.pk}}">
-        <td>{{item.client}}</td>
+        <td>{{item.client.name}}</td>
         <td>{{item.dolg}}сум</td>
         <td>{{item.complete_order|date:"d.m.Y"}}</td>
-        <td>{{item.phone}}</td>
+        <td>{{item.client.phone}}</td>
 
 
         <td><input type="date" value="{{ item.payment_data|date:'Y-m-d' }}" onchange="updateDate({{ item.pk }}, this.value)"></td>

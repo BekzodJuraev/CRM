@@ -744,6 +744,7 @@ class Money(LoginRequiredMixin,TemplateView):
       context = super().get_context_data(**kwargs)
       first = self.request.GET.get('first')
       second=self.request.GET.get('second')
+      rasxod=self.request.GET.get('rasxod')
 
       today = now()
       query=Finance.objects.filter(
@@ -758,7 +759,12 @@ class Money(LoginRequiredMixin,TemplateView):
 
 
       if first and second:
-         query = query.filter(created_at__range=(first, second))
+         if rasxod:
+            query = query.filter(created_at__range=(first, second), name=rasxod)
+         else:
+            query = query.filter(created_at__range=(first, second))
+
+
          order=order.filter(complete_date__range=(first,second))
          order1=order1.filter(complete_date__range=(first,second))
 
@@ -826,8 +832,8 @@ class Debt(LoginRequiredMixin,TemplateView):
       query=Orders.objects.filter(stage='order_ready')
       if search:
          query=query.filter(client__icontains=search)
-      context['total_sum']=query.aggregate(total_sum=Sum(F('order_sum') - F('order_predoplata')))['total_sum'] or 0
-      context['order']=query.values('client','complete_order','phone','payment_data','pk').annotate(dolg=F('order_sum') - F('order_predoplata'))
+      #context['total_sum']=query.aggregate(total_sum=Sum(F('order_sum') - F('order_predoplata')))['total_sum'] or 0
+     # context['order']=query.values('client','complete_order','phone','payment_data','pk').annotate(dolg=F('order_sum') - F('order_predoplata'))
       #print(query.values('phone').annotate(sum=Sum('order_sum')))
 
       return context

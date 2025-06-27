@@ -98,6 +98,53 @@
       background-color: #f3f4f6;
       font-weight: 600;
     }
+       #filter-icon {
+      font-size: 24px;
+      cursor: pointer;
+      padding: 6px;
+      border: 2px solid black;
+      display: inline-block;
+      text-align: center;
+    }
+
+    /* Centered popup */
+    #popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border: 2px solid black;
+      padding: 20px;
+      z-index: 999;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    #popup input {
+      padding: 8px;
+      font-size: 16px;
+      width: 250px;
+    }
+
+    #popup button {
+      padding: 8px 12px;
+      font-size: 16px;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+
+    /* Background dim */
+    #overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 998;
+    }
+
   </style>
 </head>
 <body>
@@ -117,8 +164,34 @@ background 0.3s;
   width:100px;
   padding:
 12px;" onclick="window.location.href='{% url 'dashboard' %}'">Меню</button>
+      <br>
+      <button  style="background-color: #fbbf24;
+  border:
+none;
+  border-radius:
+10px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition:
+background 0.3s;
+  display: block;
+  padding:
+12px;" onclick="window.location.href='{% url 'debt' %}'">💳 Таблица задолженностей</button>
+      <br>
+      <div id="filter-icon">☰</div>
     <h1>Финансы</h1>
+<div id="overlay"></div>
+
+<!-- Popup -->
+<div id="popup">
+  <input type="text" id="popup-input" placeholder="Введите наименование">
+  <button onclick="addValue()">Добавить</button>
+</div>
     <form action="" method="GET">
+        <input type="text" name="rasxod" id="rasxod-hidden" placeholder="Введите наименование" hidden>
+
+
     <div class="dates">
         {% if request.GET.first %}
         <input type="date" name="first" value="{{ request.GET.first}}" >
@@ -170,5 +243,46 @@ background 0.3s;
       </tbody>
     </table>
   </div>
+<script>
+  const icon = document.getElementById("filter-icon");
+  const popup = document.getElementById("popup");
+  const overlay = document.getElementById("overlay");
+  const input = document.getElementById("popup-input");
+  const hiddenField = document.getElementById("rasxod-hidden");
+
+  // Show popup
+  icon.onclick = () => {
+    popup.style.display = "block";
+    overlay.style.display = "block";
+    input.value = ""; // clear
+    input.focus();
+  };
+
+  // Hide popup
+  function closePopup() {
+    popup.style.display = "none";
+    overlay.style.display = "none";
+  }
+
+  // Add value from input to hidden field
+  function addValue() {
+    const value = input.value.trim();
+    if (value) {
+      hiddenField.value = value;
+       // Optional: make it visible if needed
+      closePopup();
+    }
+  }
+
+  // Allow Enter key in popup
+  input.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+      addValue();
+    }
+  });
+
+  // Hide popup on clicking outside
+  overlay.onclick = closePopup;
+</script>
 </body>
 </html>
