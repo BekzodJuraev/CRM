@@ -42,6 +42,18 @@ class Profile(models.Model):
 
 
 
+class Social_clients(models.Model):
+    profile = models.ForeignKey(
+        'Profile', on_delete=models.CASCADE, related_name='social_client', verbose_name="Профиль"
+    )
+    client_name=models.CharField(max_length=100)
+    phone=PhoneNumberField(null=True, blank=True, default=None)
+    comment=models.CharField(max_length=255,null=True, blank=True, default=None)
+    order=models.OneToOneField("Orders", on_delete=models.CASCADE, related_name='marketing',null=True)
+
+
+    def __str__(self):
+        return self.profile.name
 
 class Telegram_users(models.Model):
     phone = PhoneNumberField(blank=True)
@@ -61,6 +73,7 @@ class Clients(models.Model):
     ]
 
     social = models.CharField(max_length=20, choices=Social_CHOICES)
+
 
 
     client_type = models.CharField(
@@ -138,9 +151,9 @@ class Orders(models.Model):
     tz=models.FileField(blank=True, upload_to='pictures/')
     design=models.FileField(blank=True, upload_to='pictures/')
 
-    stage = models.CharField(max_length=20, choices=Stage_CHOICES)
-    add_order=models.DateField()
-    complete_order=models.DateField()
+    stage = models.CharField(max_length=20, choices=Stage_CHOICES,default='marketing')
+    add_order=models.DateField(null=True)
+    complete_order=models.DateField(null=True)
     rezka=models.BooleanField(default=False)
     svarka=models.BooleanField(default=False)
     fill=models.BooleanField(default=False)
@@ -155,8 +168,9 @@ class Orders(models.Model):
 
 
 
-    def __str__(self):
-        return self.client.name or self.client.company_name
+
+
+
 
 class Delivery_Photo(models.Model):
     order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name='delivery_photo')

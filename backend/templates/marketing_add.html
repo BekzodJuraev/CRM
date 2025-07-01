@@ -1,0 +1,129 @@
+{% if request.user.profile.approve %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Добавить клиента — CRM</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #1c1f26;
+      color: #f5f5f5;
+    }
+
+    header {
+      background: #101214;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #333;
+    }
+
+    header h1 {
+      color: #ffd700;
+      font-weight: 600;
+      font-size: 24px;
+    }
+
+    .container {
+      padding: 40px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .toggle-buttons {
+      display: flex;
+      margin-bottom: 20px;
+    }
+
+    .toggle-buttons button {
+      background-color: #2c2f36;
+      color: #f5f5f5;
+      border: 1px solid #444;
+      padding: 10px 20px;
+      margin-right: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .toggle-buttons button.active {
+      background-color: #ffd700;
+      color: #1c1f26;
+    }
+
+    form label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 5px;
+    }
+
+    form input, form select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background-color: #2c2f36;
+      color: #f5f5f5;
+    }
+
+    form button {
+      margin-top: 20px;
+      background-color: #ffd700;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      color: #1c1f26;
+      cursor: pointer;
+      font-weight: bold;
+      width: 100%;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>CRM — Добавить клиента</h1>
+    <div>👤 {{request.user.profile.name}}</div>
+  </header>
+
+  <div class="container">
+
+
+    <form id="client-form" METHOD="POST">
+      {% csrf_token %}
+      <div id="individual-fields">
+        <label>Клиент:</label>
+        <input type="text"  name="client" required>
+
+
+
+
+
+        <label>Номер телефона:</label>
+         <input type="tel"
+       name="phone"
+       placeholder="+998901234567"
+       pattern="^\+998\d{9}$"
+       title="+998901234567"
+       required>
+          <label>Комментарий:</label>
+        <input type="text"  name="comment" >
+         <button type="submit">Сохранить</button>
+      </div>
+    </form>
+
+  </div>
+
+
+</body>
+</html>
+{% else %}
+{% include 'waiting.html' %}
+{% endif %}

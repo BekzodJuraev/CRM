@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Архив проектов</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .tab {
+      padding: 10px 20px;
+      background: #e0e0e0;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .tab.active {
+      background: #007aff;
+      color: white;
+      font-weight: bold;
+    }
+    #search {
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      flex-grow: 1;
+      max-width: 300px;
+    }
+    .client-card {
+      background: white;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+    .client-card .btn {
+      background: #007aff;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      position: absolute;
+      right: 20px;
+      top: 20px;
+    }
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .pagination button {
+      padding: 8px 16px;
+      font-size: 20px;
+      border-radius: 10px;
+      border: none;
+      background: #007aff;
+      color: white;
+      cursor: pointer;
+    }
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal.hidden {
+      display: none;
+    }
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 14px;
+      width: 500px;
+      position: relative;
+    }
+    .close {
+      position: absolute;
+      right: 15px;
+      top: 10px;
+      font-size: 24px;
+      cursor: pointer;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="tabs">
+        <button class="tab active" data-tab="completed">Завершённые</button>
+        <button class="tab" data-tab="failed">Сорванные</button>
+      </div>
+      <input type="text" id="search" placeholder="Поиск клиентов..." />
+    </header>
+
+    <div id="client-list" class="client-list"></div>
+
+    <div class="pagination">
+      <button id="prevPage">❮</button>
+      <button id="nextPage">❯</button>
+    </div>
+  </div>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <div id="modalDetails"></div>
+    </div>
+  </div>
+
+  <script>
+    const clients = [
+      {
+        name: "Клиент 1",
+        date: "24.03.2020",
+        phone: "+998915523115",
+        type: "Визит",
+        description: "Изготовление баннера 4x6 м с логотипом и текстом на русском и узбекском языках. Установка на металлическом каркасе.",
+        reason: "Не устраивает цена",
+        status: "failed"
+      },
+      {
+        name: "Клиент 2",
+        date: "24.03.2020",
+        phone: "+998901234567",
+        type: "Онлайн",
+        description: "Рекламный пост в Telegram-канале.",
+        reason: "",
+        status: "completed"
+      },
+      {
+        name: "Клиент 3",
+        date: "24.03.2020",
+        phone: "+998909876543",
+        type: "Онлайн",
+        description: "Создание макета и печать листовок.",
+        reason: "Клиент передумал",
+        status: "completed"
+      },
+      {
+        name: "Клиент 4",
+        date: "24.03.2020",
+        phone: "+998901119988",
+        type: "Визит",
+        description: "Размещение рекламы на билбордах.",
+        reason: "",
+        status: "completed"
+      },
+      // Добавьте больше клиентов при необходимости
+    ];
+
+    let activeTab = "completed";
+    let currentPage = 0;
+    const itemsPerPage = 2;
+
+    const clientList = document.getElementById("client-list");
+    const modal = document.getElementById("modal");
+    const modalDetails = document.getElementById("modalDetails");
+    const closeModal = document.getElementById("closeModal");
+    const searchInput = document.getElementById("search");
+
+    function renderClients() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const filtered = clients.filter(
+        (c) => c.status === activeTab && c.name.toLowerCase().includes(searchTerm)
+      );
+
+      const paginated = filtered.slice(
+        currentPage * itemsPerPage,
+        (currentPage + 1) * itemsPerPage
+      );
+
+      clientList.innerHTML = "";
+      if (paginated.length === 0) {
+        clientList.innerHTML = "<p>Нет данных для отображения.</p>";
+        return;
+      }
+
+      paginated.forEach((client, index) => {
+        const card = document.createElement("div");
+        card.className = "client-card";
+        card.innerHTML = `
+          <strong>${client.name}</strong><br>
+          Сохран call-центром: ${client.date}
+          <button class="btn" onclick="openModal(${clients.indexOf(client)})">Подробнее</button>
+        `;
+        clientList.appendChild(card);
+      });
+    }
+
+    function openModal(index) {
+      const client = clients[index];
+      modalDetails.innerHTML = `
+        <h3>Клиент: ${client.name}</h3>
+        <p><strong>Номер:</strong> ${client.phone}</p>
+        <p><strong>Тип встречи:</strong> ${client.type}</p>
+        <p><strong>Описание:</strong> ${client.description}</p>
+        ${
+          client.reason
+            ? `<p style="color:red"><strong>Причина срыва:</strong> ${client.reason}</p>`
+            : ""
+        }
+      `;
+      modal.classList.remove("hidden");
+    }
+
+    closeModal.onclick = () => {
+      modal.classList.add("hidden");
+    };
+
+    document.querySelectorAll(".tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+        activeTab = tab.dataset.tab;
+        currentPage = 0;
+        renderClients();
+      });
+    });
+
+    searchInput.addEventListener("input", () => {
+      currentPage = 0;
+      renderClients();
+    });
+
+    document.getElementById("prevPage").onclick = () => {
+      if (currentPage > 0) {
+        currentPage--;
+        renderClients();
+      }
+    };
+
+    document.getElementById("nextPage").onclick = () => {
+      const total = clients.filter(c => c.status === activeTab && c.name.toLowerCase().includes(searchInput.value.toLowerCase())).length;
+      if ((currentPage + 1) * itemsPerPage < total) {
+        currentPage++;
+        renderClients();
+      }
+    };
+
+    renderClients();
+  </script>
+</body>
+</html>

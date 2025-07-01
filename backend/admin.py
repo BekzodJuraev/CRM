@@ -1,7 +1,9 @@
 from django.contrib import admin
-from .models import Profile,Orders,Rezident,Finance,Consumables,Debt,Warehouse,WarehouseLimit,Delivery_Photo,Compelete_Photo,Telegram_users,Clients
+from .models import Profile,Orders,Rezident,Finance,Consumables,Debt,Warehouse,WarehouseLimit,Delivery_Photo,Compelete_Photo,Telegram_users,Clients,Social_clients
 # Register your models here.
-
+@admin.register(Social_clients)
+class Social_clients(admin.ModelAdmin):
+    pass
 @admin.register(Clients)
 class ClientsAdmin(admin.ModelAdmin):
     pass

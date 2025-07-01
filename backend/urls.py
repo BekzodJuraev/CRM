@@ -27,5 +27,9 @@ urlpatterns=[
     path('search-client/', views.search_client, name='search-client'),
     path('staff/more',views.Staff_more.as_view(),name='staff_more'),
     path('staff/archive',views.StaffArchive.as_view(),name='staff_archive'),
+    path('marketing/',views.MarketingClietView.as_view(),name='marketing'),
+    path('marketing/add',views.MarketingClientCreateView.as_view(),name='marketing_add'),
+    path('marketing/<int:pk>',views.DetailMarketing.as_view(),name='marketing_detail'),
+    path('archive/',views.ArchiveOrder.as_view(),name='archive')
 
 ]

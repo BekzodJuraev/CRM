@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django.views.generic import View,TemplateView,DetailView,UpdateView
-from .models import Profile,Rezident,Finance,Warehouse,WarehouseLimit,Consumables,Orders,Delivery_Photo,Compelete_Photo,Telegram_users,Clients
+from .models import Profile,Rezident,Finance,Warehouse,WarehouseLimit,Consumables,Orders,Delivery_Photo,Compelete_Photo,Telegram_users,Clients,Social_clients
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
@@ -787,7 +787,69 @@ class ClientCreateView(LoginRequiredMixin,TemplateView):
 
       return redirect('clients')
 
+class MarketingClietView(LoginRequiredMixin,TemplateView):
+   template_name = 'marketing.html'
+   login_url = reverse_lazy('login')
 
+
+   def post(self, request, *args, **kwargs):
+      pk = request.POST.get('pk')
+      Orders.objects.filter(marketing__id=pk).update(stage='call_center')
+      return redirect(request.path)
+
+
+
+class ArchiveOrder(LoginRequiredMixin,TemplateView):
+   template_name = 'archive.html'
+   login_url = reverse_lazy('login')
+   def get_context_data(self, *, object_list=None, **kwargs):
+      context = super().get_context_data(**kwargs)
+      search = self.request.GET.get('search')
+      profile=self.request.user.profile
+
+      if search:
+         context['profile'] = Social_clients.objects.filter(profile=profile,client_name__icontains=search).select_related('order')
+      else:
+         context['profile'] = Social_clients.objects.filter(profile=profile).select_related('order')
+
+      return context
+
+class DetailMarketing(LoginRequiredMixin,DetailView):
+   model = Social_clients
+   login_url = reverse_lazy('login')
+   template_name = 'marketing_detail.html'
+   context_object_name = 'item'
+
+   def post(self, request, *args, **kwargs):
+      phone = request.POST.get('phone')
+      client_name = request.POST.get('client')
+      comment = request.POST.get('comment')
+      self.object = self.get_object()
+      self.object.phone=phone
+      self.object.client_name=client_name
+      self.object.comment=comment
+      self.object.save()
+
+      return redirect('marketing')
+
+class MarketingClientCreateView(LoginRequiredMixin,TemplateView):
+   template_name = 'marketing_add.html'
+   login_url = reverse_lazy('login')
+
+
+   def post(self, request, *args, **kwargs):
+
+      phone=request.POST.get('phone')
+      client_name = request.POST.get('client')
+      comment = request.POST.get('comment')
+      profile=request.user.profile
+      order=Orders.objects.create()
+      Social_clients.objects.create(profile=profile,client_name=client_name,phone=phone,comment=comment,order=order)
+
+
+
+
+      return redirect('marketing')
 class Money(LoginRequiredMixin,TemplateView):
    template_name = 'money.html'
    login_url = reverse_lazy('login')
