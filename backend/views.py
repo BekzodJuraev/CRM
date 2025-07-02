@@ -817,6 +817,15 @@ class ArchiveOrder(LoginRequiredMixin,TemplateView):
    login_url = reverse_lazy('login')
 
 
+
+   def get_context_data(self, *, object_list=None, **kwargs):
+      context = super().get_context_data(**kwargs)
+      context['failed']=Orders.objects.filter(stage='failed').order_by('-created_at')
+      context['finished'] = Orders.objects.filter(stage='finished')
+      return context
+
+
+
 class DetailMarketing(LoginRequiredMixin,DetailView):
    model = Social_clients
    login_url = reverse_lazy('login')
@@ -828,9 +837,11 @@ class DetailMarketing(LoginRequiredMixin,DetailView):
       phone = request.POST.get('phone')
       client_name = request.POST.get('client')
       comment = request.POST.get('comment')
+      reason=request.POST.get('reason')
       self.object = self.get_object()
       if pk:
-         Orders.objects.filter(marketing__id=pk).update(stage='failed')
+
+         Orders.objects.filter(marketing__id=pk).update(stage='failed',fail=reason)
       else:
 
          self.object.phone = phone

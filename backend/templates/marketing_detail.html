@@ -86,6 +86,16 @@
       display: none;
     }
 
+   .btn {
+      padding: 12px 25px;
+      background: crimson;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
     .overlay {
       display: none;
       position: fixed;
@@ -136,20 +146,7 @@
       background: #ccc;
     }
 
-    .note {
-      font-size: 14px;
-      color: #666;
-      margin-top: 15px;
-    }
-    .btn {
-      padding: 12px 25px;
-      background: crimson;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      cursor: pointer;
-    }
+
   </style>
 </head>
 <body>
@@ -189,30 +186,35 @@
    <div class="overlay" id="overlay">
   <div class="popup">
         <h2>Укажите причину срыва сделки:</h2>
-    <input type="text" id="fail" name="fail"  >
+    <input type="text" id="fail" name="fail">
     <div class="popup-buttons">
       <form method="post" >
         {% csrf_token %}
+        <input type="text" name="reason"  id="reason" hidden>
         <input type="number" name="pk" value="{{item.pk}}" hidden>
       <button class="yes-btn" onclick="confirmDelete()">Да</button>
+
         </form>
-      <button class="no-btn" onclick="closePopup()">Нет</button>
+       <button class="no-btn" onclick="closePopup()">Нет</button>
+
     </div>
 
   </div>
 </div>
+
 <script>
   function openPopup() {
     document.getElementById('overlay').style.display = 'flex';
-    document.getElementById('fail').value=pk
+
   }
 
   function closePopup() {
+
     document.getElementById('overlay').style.display = 'none';
   }
 
   function confirmDelete() {
-
+    document.getElementById('reason').value = document.getElementById('fail').value;
     closePopup();
   }
 </script>
