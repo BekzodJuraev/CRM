@@ -85,6 +85,71 @@
     .hidden {
       display: none;
     }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .popup {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      max-width: 400px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+      position: relative;
+    }
+
+    .popup h2 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: black;
+    }
+
+    .popup-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .popup-buttons button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .yes-btn {
+      background: #4caf50;
+      color: white;
+    }
+
+    .no-btn {
+      background: #ccc;
+    }
+
+    .note {
+      font-size: 14px;
+      color: #666;
+      margin-top: 15px;
+    }
+    .btn {
+      padding: 12px 25px;
+      background: crimson;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -115,14 +180,42 @@
        required>
           <label>Комментарий:</label>
         <input type="text"  name="comment"  value="{{item.comment}}" >
-        <button type="submit">Сорвать</button>
          <button type="submit">Сохранить</button>
       </div>
     </form>
+     <button type="submit" onclick="openPopup()">Сорвать</button>
 
   </div>
+   <div class="overlay" id="overlay">
+  <div class="popup">
+        <h2>Укажите причину срыва сделки:</h2>
+    <input type="text" id="fail" name="fail"  >
+    <div class="popup-buttons">
+      <form method="post" >
+        {% csrf_token %}
+        <input type="number" name="pk" value="{{item.pk}}" hidden>
+      <button class="yes-btn" onclick="confirmDelete()">Да</button>
+        </form>
+      <button class="no-btn" onclick="closePopup()">Нет</button>
+    </div>
 
+  </div>
+</div>
+<script>
+  function openPopup() {
+    document.getElementById('overlay').style.display = 'flex';
+    document.getElementById('fail').value=pk
+  }
 
+  function closePopup() {
+    document.getElementById('overlay').style.display = 'none';
+  }
+
+  function confirmDelete() {
+
+    closePopup();
+  }
+</script>
 </body>
 </html>
 {% else %}

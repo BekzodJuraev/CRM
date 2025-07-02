@@ -798,10 +798,6 @@ class MarketingClietView(LoginRequiredMixin,TemplateView):
       return redirect(request.path)
 
 
-
-class ArchiveOrder(LoginRequiredMixin,TemplateView):
-   template_name = 'archive.html'
-   login_url = reverse_lazy('login')
    def get_context_data(self, *, object_list=None, **kwargs):
       context = super().get_context_data(**kwargs)
       search = self.request.GET.get('search')
@@ -814,6 +810,13 @@ class ArchiveOrder(LoginRequiredMixin,TemplateView):
 
       return context
 
+
+
+class ArchiveOrder(LoginRequiredMixin,TemplateView):
+   template_name = 'archive.html'
+   login_url = reverse_lazy('login')
+
+
 class DetailMarketing(LoginRequiredMixin,DetailView):
    model = Social_clients
    login_url = reverse_lazy('login')
@@ -821,14 +824,21 @@ class DetailMarketing(LoginRequiredMixin,DetailView):
    context_object_name = 'item'
 
    def post(self, request, *args, **kwargs):
+      pk=request.POST.get('pk')
       phone = request.POST.get('phone')
       client_name = request.POST.get('client')
       comment = request.POST.get('comment')
       self.object = self.get_object()
-      self.object.phone=phone
-      self.object.client_name=client_name
-      self.object.comment=comment
-      self.object.save()
+      if pk:
+         Orders.objects.filter(marketing__id=pk).update(stage='failed')
+      else:
+
+         self.object.phone = phone
+         self.object.client_name = client_name
+         self.object.comment = comment
+         self.object.save()
+
+
 
       return redirect('marketing')
 

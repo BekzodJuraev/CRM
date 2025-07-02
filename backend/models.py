@@ -122,6 +122,7 @@ class Orders(models.Model):
 
         ("finished", "Завершён"),
         ("archive", "Архив"),
+        ("failed", "fail")
     ]
     Stage_pod_CHOICES = [
         ("rezka", "Резка"),
@@ -161,6 +162,7 @@ class Orders(models.Model):
     stage_pod=models.CharField(max_length=20, choices=Stage_pod_CHOICES,default="rezka")
     payment_data=models.DateField(null=True)
     complete_date=models.DateField(null=True)
+    fail=models.CharField(max_length=255,null=True)
 
 
 
