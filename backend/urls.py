@@ -30,6 +30,8 @@ urlpatterns=[
     path('marketing/',views.MarketingClietView.as_view(),name='marketing'),
     path('marketing/add',views.MarketingClientCreateView.as_view(),name='marketing_add'),
     path('marketing/<int:pk>',views.DetailMarketing.as_view(),name='marketing_detail'),
-    path('archive/',views.ArchiveOrder.as_view(),name='archive')
+    path('archive/',views.ArchiveOrder.as_view(),name='archive'),
+    path('call_center/',views.Call_center.as_view(),name='call_center'),
+    path('call_center/add',views.Call_center_add.as_view(),name='call_center_add'),
 
 ]

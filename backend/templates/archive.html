@@ -141,48 +141,39 @@
 
   <script>
     const clients = [
+    {% for item in failed %}
       {
-        name: "Клиент 1",
-        date: "24.03.2020",
-        phone: "+998915523115",
-        type: "Визит",
-        description: "Изготовление баннера 4x6 м с логотипом и текстом на русском и узбекском языках. Установка на металлическом каркасе.",
-        reason: "Не устраивает цена",
+        name: "{{item.order_name}}",
+        date: "{{item.fail_date|date:"d.m.Y"}}",
+        phone: "{{item.client.phone}}",
+        type: "{{item.get_vstrecha_display}}",
+        description: "{{item.description}}",
+        reason: "{{item.fail}}",
+        reason_fail:"{{item.by_who_fail}}",
         status: "failed"
       },
+      {% endfor %}
+
+      {% for item in finished %}
       {
-        name: "Клиент 2",
-        date: "24.03.2020",
-        phone: "+998901234567",
-        type: "Онлайн",
-        description: "Рекламный пост в Telegram-канале.",
-        reason: "",
+        name: "{{item.order_name}}",
+        date: "{{item.complete_date|date:"d.m.Y"}}",
+        client_type:"{{item.client.get_client_type_display}}",
+        id:"{{item.pk}}",
+        phone: "{{item.client.phone}}",
+        type: "{{item.get_vstrecha_display}}",
+        description: "{{item.description}}",
+        reason: "{{item.fail}}",
+        reason_fail:"{{item.by_who_fail}}",
         status: "completed"
       },
-      {
-        name: "Клиент 3",
-        date: "24.03.2020",
-        phone: "+998909876543",
-        type: "Онлайн",
-        description: "Создание макета и печать листовок.",
-        reason: "Клиент передумал",
-        status: "completed"
-      },
-      {
-        name: "Клиент 4",
-        date: "24.03.2020",
-        phone: "+998901119988",
-        type: "Визит",
-        description: "Размещение рекламы на билбордах.",
-        reason: "",
-        status: "completed"
-      },
-      // Добавьте больше клиентов при необходимости
+      {% endfor %}
+
     ];
 
     let activeTab = "completed";
     let currentPage = 0;
-    const itemsPerPage = 2;
+    const itemsPerPage = 10;
 
     const clientList = document.getElementById("client-list");
     const modal = document.getElementById("modal");
@@ -212,7 +203,10 @@
         card.className = "client-card";
         card.innerHTML = `
           <strong>${client.name}</strong><br>
-          Сохран call-центром: ${client.date}
+
+          ${client.status === "failed"
+          ? `Сорван ${client.reason_fail}: ${client.date}`
+          : `Завершён: ${client.date}`}
           <button class="btn" onclick="openModal(${clients.indexOf(client)})">Подробнее</button>
         `;
         clientList.appendChild(card);
@@ -220,20 +214,30 @@
     }
 
     function openModal(index) {
-      const client = clients[index];
-      modalDetails.innerHTML = `
-        <h3>Клиент: ${client.name}</h3>
-        <p><strong>Номер:</strong> ${client.phone}</p>
-        <p><strong>Тип встречи:</strong> ${client.type}</p>
-        <p><strong>Описание:</strong> ${client.description}</p>
-        ${
-          client.reason
-            ? `<p style="color:red"><strong>Причина срыва:</strong> ${client.reason}</p>`
-            : ""
-        }
-      `;
-      modal.classList.remove("hidden");
-    }
+  const client = clients[index];
+
+  let modalContent = `
+    <h3>Клиент: ${client.name}</h3>
+    <p><strong>Номер:</strong> ${client.phone}</p>
+    <p><strong>Тип встречи:</strong> ${client.type}</p>
+    <p><strong>Описание:</strong> ${client.description}</p>
+  `;
+
+  if (client.status === "failed") {
+    modalContent += `
+      <p style="color:red"><strong>Причина срыва:</strong> ${client.reason}</p>
+      <p><strong>Сорван:</strong> ${client.reason_fail}</p>
+    `;
+  } else if (client.status === "completed") {
+    modalContent += `
+      <p><strong>Тип клиента:</strong> ${client.client_type}</p>
+      <p><strong>Дата завершения:</strong> ${client.date}</p>
+    `;
+  }
+
+  modalDetails.innerHTML = modalContent;
+  modal.classList.remove("hidden");
+}
 
     closeModal.onclick = () => {
       modal.classList.add("hidden");

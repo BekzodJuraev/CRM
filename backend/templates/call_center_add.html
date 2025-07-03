@@ -1,0 +1,672 @@
+{% load static %}
+{% if request.user.profile.approve %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добавить новый заказ</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/orders.js' %}"></script>
+    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+
+
+    <style>
+    #geoModal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+}
+
+#geoModalContent {
+  position: relative;
+  width: 80%;
+  height: 70%;
+  margin: 5% auto;
+  background: #fff;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+}
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .btn-add, .btn-remove {
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+        .btn-add {
+            background: #007bff;
+            color: white;
+        }
+        .btn-add:hover {
+            background: #0056b3;
+        }
+        .btn-remove {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-remove:hover {
+            background: #a71d2a;
+        }
+        .category-group {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+        }
+.custom-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.selected {
+  padding: 8px;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.dropdown-options {
+  display: none;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  width: 100%;
+  border: 1px solid #ccc;
+  background: white;
+  z-index: 10;
+}
+
+.dropdown-options li {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.dropdown-options li:hover {
+  background: #f1f1f1;
+}
+custom-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.selected {
+  padding: 8px;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.dropdown-options {
+  display: none;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  width: 100%;
+  border: 1px solid #ccc;
+  background: white;
+  z-index: 10;
+}
+
+.dropdown-options > li {
+  position: relative;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.dropdown-options > li:hover {
+  background: #f1f1f1;
+}
+
+/* Submenu styles */
+.has-submenu:hover .submenu {
+  display: none;
+}
+
+.submenu {
+  display: none;
+  position: absolute;
+  left: 100%;
+  top: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 150px;
+  border: 1px solid #ccc;
+  background: white;
+}
+
+.submenu > li {
+  position: relative;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.submenu li:hover {
+  background: #f1f1f1;
+}
+.toggle-buttons button {
+      background-color: #2c2f36;
+      color: #f5f5f5;
+      border: 1px solid #444;
+      padding: 10px 20px;
+      margin-right: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+.toggle-buttons button:hover,
+    .toggle-buttons button.active {
+      background-color: #ffd700;
+      color: #1c1f26;
+    }
+     .toggle-buttons {
+      display: flex;
+      margin-bottom: 20px;
+    }
+
+     .file-input-wrapper {
+      display: inline-block;
+      border: 2px solid black;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-family: sans-serif;
+    }
+
+    .file-input-wrapper:hover {
+      background-color: #f0f0f0;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .file-label {
+      display: inline-block;
+    }
+      .file-preview {
+      margin-top: 10px;
+      position: relative;
+      display: inline-block;
+      max-width: 150px;
+    }
+
+    .file-preview img,
+    .file-preview .file-icon {
+      max-width: 100%;
+      max-height: 150px;
+      border: 1px solid #ccc;
+      padding: 5px;
+      border-radius: 5px;
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    </style>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<body>
+<div id="geoModal">
+  <div id="geoModalContent">
+    <p><strong>Выберите местоположение:</strong></p>
+    <div id="map"></div>
+  </div>
+</div>
+    <div class="container">
+        <h2 class="text-center">Добавить новый заказ</h2>
+          <div class="toggle-buttons">
+      <button id="btn-individual" class="active">Физическое лицо</button>
+      <button id="btn-legal">Юридическое лицо</button>
+    </div>
+        <form action="" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label>Клиент:</label>
+            <input type="text" class="form-control" id="client-input" name="client" autocomplete="off" required>
+            <input type="hidden" id="client-id" name="client_id">
+            <input type="hidden" id="client-type" name="client_type" value="individual">
+            <div id="client-suggestions" style="border: 1px solid #ccc; display: none; position: absolute; background: white;"></div>
+
+<!-- Блок с информацией о клиенте -->
+            <div id="client-info" style="margin-top: 20px; display: none;">
+              <p><strong>Фамилия:</strong> <span id="lastname"></span></p>
+              <p><strong>Имя:</strong> <span id="firstname"></span></p>
+              <p><strong>Отчество:</strong> <span id="middlename"></span></p>
+              <p><strong>Номер телефона:</strong> <span id="phone"></span></p>
+              <p><strong>Источник:</strong> <span id="source"></span></p>
+              <p><strong>Дата регистрации:</strong> <span id="registered_at"></span></p>
+            </div>
+
+            <div id="company-info" style="margin-top: 20px; display: none;">
+              <p><strong>Наименование организации:</strong> <span id="company_name"></span></p>
+              <p><strong>ИНН:</strong> <span id="inn"></span></p>
+              <p><strong>Расчётный счёт (Р/С):</strong> <span id="account"></span></p>
+              <p><strong>МФО:</strong> <span id="mfo"></span></p>
+                <p><strong>Юридический адрес:</strong> <span id="adress"></span></p>
+              <p><strong>Номер телефона:</strong> <span id="phone2"></span></p>
+              <p><strong>Источник:</strong> <span id="source2"></span></p>
+              <p><strong>Дата регистрации:</strong> <span id="registered_at2"></span></p>
+            </div>
+            <label>Наименование проекта:</label>
+            <input type="text" class="form-control" name="order_name">
+
+               <label>Статус заявки:</label>
+            <select class="form-select" name="zayavka" required>
+                <option value="hot">Горячая</option>
+                <option value="cool">Холодная</option>
+
+            </select>
+              <label>Тип встречи:</label>
+            <select class="form-select" name="vstrecha" required>
+                <option value="viezd">Выезд</option>
+                <option value="priezd">Приезд</option>
+
+            </select>
+
+            
+
+
+            <label>Сумма заказа:</label>
+            <input type="number" class="form-control" placeholder="100" name="order_sum" id="order_sum"  step="0.01" required>
+
+            <label>Сумма предоплаты (80% от суммы заказа):</label>
+            <input type="number" class="form-control" placeholder="80" readonly name="order_predoplata" id="order_predoplata" required>
+
+            <label>Категория заказа:</label>
+            <select class="form-select" name="catigories" required>
+                <option value="Наружная реклама и макеты">Наружная реклама и макеты</option>
+                <option value="Типография">Типография</option>
+                <option value="Полиграфия">Полиграфия</option>
+            </select>
+
+
+
+
+
+
+
+         <label>Описание / ТЗ:</label>
+<label class="file-input-wrapper">
+  <span class="file-label">📎 Прикрепить файл</span>
+  <input type="file" name="tz"  class="file-input" onchange="handleFile(this,'preview_tz')">
+</label>
+
+
+
+
+
+
+            <textarea class="form-control" rows="3" name="description"></textarea>
+
+
+            <div id="preview_tz"></div>
+            <label>Размер:</label>
+            <input type="text" class="form-control" placeholder="40 cm"  name="razmer"  required>
+            <h6>Дизайн</h6>
+            <input type="checkbox" id="size-large" name="check_design" ><label>Дизайн выполняем мы:</label>
+            <br>
+               <label>Описание дизайна:</label>  <label class="file-input-wrapper">
+  <span class="file-label">📎 Прикрепить файл</span>
+  <input type="file" name="design"  class="file-input" onchange="handleFile(this,'preview_design')">
+</label>
+     <textarea class="form-control" rows="3" name="description_design" ></textarea>
+             <div id="preview_design"></div>
+        <h3>Местоположение установки:</h3>
+           <button id="pick_map" onclick="openGeoModal()">Загрузить геолокацию</button>
+<input type="hidden" name="latitude" id="latitude">
+<input type="hidden" name="longitude" id="longitude">
+<div id="geo-status"></div>
+<!-- Map where the user picks the location -->
+
+
+<!-- Status & result -->
+
+<div id="mini-map" style="width: 100%; max-width: 400px; height: 200px; margin-top: 10px; display: none;"></div>
+
+
+
+
+
+
+            <label>Дата добавления заказа:</label>
+            <input type="date" class="form-control" name="add_order" required>
+
+            <label>Срок выполнения:</label>
+            <input type="date" class="form-control" name="complete_order"  required>
+
+            <button type="submit" class="btn btn-primary w-100 mt-3">Сохранить</button>
+        </form>
+    </div>
+
+
+
+
+    <script>
+
+     document.getElementById('order_sum').addEventListener('input', function () {
+    const orderSum = parseFloat(this.value);
+    const predoplataInput = document.getElementById('order_predoplata');
+
+    if (!isNaN(orderSum)) {
+      predoplataInput.value = (orderSum * 0.8).toFixed(2);
+    } else {
+      predoplataInput.value = '';
+    }
+  });
+        function addCategoryGroup() {
+    let container = document.getElementById("categories-container");
+    let newGroup = document.createElement("div");
+    newGroup.classList.add("category-group");
+
+    // Create a unique ID for the new dropdown
+
+
+    newGroup.innerHTML = `
+        <label>Категория заказа:</label>
+        <select class="form-select" name="catigories" >
+            <option value="Наружная реклама и макеты">Наружная реклама и макеты</option>
+            <option value="Типография">Типография</option>
+            <option value="Полиграфия">Полиграфия</option>
+        </select>
+        <label>Расходник:</label>
+        <div class="input-group">
+            <div class="custom-dropdown">
+                <div class="selected" onclick="toggleDropdown(this)">-- Выберите --</div>
+                <ul class="dropdown-options" id="dropdown-list"></ul><br>
+                <input type="hidden" name="add" value="selectedValue" id="selectedValue">
+            </div>
+            <input type="number" class="form-control" placeholder="Стоимость" name="price" required>
+            <input type="number" class="form-control" placeholder="Количество" name="quantity" min="1" required>
+            <button type="button" class="btn btn-remove" onclick="removeCategoryGroup(this)">-</button>
+        </div>
+    `;
+
+    container.appendChild(newGroup);
+
+    // Initialize the dropdown for this newly added group
+    const select = newGroup.querySelector('.form-select');
+const dropdownList = newGroup.querySelector('.dropdown-options');
+const selectedDisplay = newGroup.querySelector('.selected');
+const hiddenInput = newGroup.querySelector('input[type="hidden"]');
+
+// Initial dropdown build
+const selectedCategory = select.value;
+buildDropdown(categoriesMap[selectedCategory] || [], dropdownList, selectedDisplay, hiddenInput);
+
+// ⛳️ Add change listener to update dropdown on category switch
+select.addEventListener("change", () => {
+    const newCategory = select.value;
+    buildDropdown(categoriesMap[newCategory] || [], dropdownList, selectedDisplay, hiddenInput);
+});
+}
+
+        function removeCategoryGroup(button) {
+            button.closest(".category-group").remove();
+        }
+
+</script>
+
+<script>
+    const btnIndividual = document.getElementById('btn-individual');
+    const btnLegal = document.getElementById('btn-legal');
+    const individualFields = document.getElementById('individual-fields');
+    const legalFields = document.getElementById('legal-fields');
+
+    btnIndividual.addEventListener('click', () => {
+    document.getElementById("client-type").value = "individual";
+      btnIndividual.classList.add('active');
+      btnLegal.classList.remove('active');
+      individualFields.classList.remove('hidden');
+      legalFields.classList.add('hidden');
+    });
+
+    btnLegal.addEventListener('click', () => {
+    document.getElementById("client-type").value = "legal";
+      btnLegal.classList.add('active');
+      btnIndividual.classList.remove('active');
+      legalFields.classList.remove('hidden');
+      individualFields.classList.add('hidden');
+    });
+
+  </script>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('client-input');
+  const suggestions = document.getElementById('client-suggestions');
+  const clientInfoBlock = document.getElementById('client-info');
+
+  const companyInfoBlock = document.getElementById('company-info');
+
+
+
+  input.addEventListener('input', () => {
+    const query = input.value;
+    const type = document.getElementById('client-type').value;
+    if (query.length < 2) {
+      suggestions.innerHTML = '';
+      suggestions.style.display = 'none';
+      return;
+    }
+
+    fetch(`/search-client/?q=${encodeURIComponent(query)}&type=${type}`)
+      .then(res => res.json())
+      .then(data => {
+        suggestions.innerHTML = '';
+        data.forEach(client => {
+          const div = document.createElement('div');
+          div.textContent = client.name;
+          div.style.padding = '5px';
+          div.style.cursor = 'pointer';
+
+          div.onclick = () => {
+            // Заполняем ID
+            document.getElementById('client-id').value = client.id;
+            // Показываем информацию о клиенте
+            fetch(`/search-client/?id=${client.id}&type=${type}`)
+              .then(r => r.json())
+              .then(info => {
+                if (type == 'legal'){
+                clientInfoBlock.style.display = 'none';
+                document.getElementById('company_name').textContent = info.company_name;
+                document.getElementById('inn').textContent = info.inn;
+                document.getElementById('account').textContent = info.account;
+                document.getElementById('mfo').textContent = info.mfo;
+                document.getElementById('adress').textContent = info.adress;
+                document.getElementById('phone2').textContent = info.phone;
+                document.getElementById('source2').textContent = info.source;
+                document.getElementById('registered_at2').textContent = info.registered_at;
+                companyInfoBlock.style.display = 'block';}
+                else{
+                companyInfoBlock.style.display = 'none';
+                document.getElementById('lastname').textContent = info.lastname;
+                document.getElementById('firstname').textContent = info.name;
+                document.getElementById('middlename').textContent = info.middle_name;
+                document.getElementById('phone').textContent = info.phone;
+                document.getElementById('source').textContent = info.source;
+                document.getElementById('registered_at').textContent = info.registered_at;
+                clientInfoBlock.style.display = 'block';}
+
+              });
+
+            // Скрываем подсказки
+            suggestions.style.display = 'none';
+            input.value = client.name;
+          };
+
+          suggestions.appendChild(div);
+        });
+
+        suggestions.style.display = data.length ? 'block' : 'none';
+      });
+  });
+
+  // Клик вне подсказок — скрыть
+  document.addEventListener('click', e => {
+    if (!suggestions.contains(e.target) && e.target !== input) {
+      suggestions.style.display = 'none';
+    }
+  });
+});
+
+</script>
+<script>
+
+let map, placemark, miniMapInstance;
+
+function openGeoModal() {
+  document.getElementById("geoModal").style.display = "block";
+
+  // Delay map init to ensure the div is visible
+  setTimeout(initMap, 300);
+}
+
+function initMap() {
+  if (map) return; // prevent re-init
+
+  map = new ymaps.Map("map", {
+    center: [41.311081, 69.240562],
+    zoom: 12
+  });
+
+  map.events.add('click', function (e) {
+    const coords = e.get('coords');
+
+    if (!placemark) {
+      placemark = new ymaps.Placemark(coords, {}, { draggable: true });
+      map.geoObjects.add(placemark);
+    } else {
+      placemark.geometry.setCoordinates(coords);
+    }
+
+    // Save coordinates
+    document.getElementById('latitude').value = coords[0];
+    document.getElementById('longitude').value = coords[1];
+
+    document.getElementById('geo-status').innerText = '📍 Геолокация выбрана';
+    document.getElementById("geoModal").style.display = "none";
+
+    // Show mini map preview
+    showMiniMap(coords[0], coords[1]);
+  });
+}
+
+function showMiniMap(lat, lon) {
+  const miniMapContainer = document.getElementById("mini-map");
+  const pick =document.getElementById("pick_map");
+  pick.style.display="none";
+  // Make container visible
+  miniMapContainer.style.display = "block";
+
+  // Destroy existing map if exists
+  if (miniMapInstance) {
+    miniMapInstance.destroy();
+  }
+
+  // Create new map instance
+  miniMapInstance = new ymaps.Map("mini-map", {
+    center: [lat, lon],
+    zoom: 15,
+    controls: []
+  });
+
+  const miniPlacemark = new ymaps.Placemark([lat, lon]);
+  miniMapInstance.geoObjects.add(miniPlacemark);
+}
+
+// Optional: close modal on outside click
+window.onclick = function(event) {
+  const modal = document.getElementById("geoModal");
+
+  if (event.target === modal) {
+    modal.style.display = "none";
+  }
+}
+</script>
+<script>
+  function handleFile(input,previewId) {
+    const file = input.files[0];
+    const container = document.getElementById(previewId);
+    container.innerHTML = ''; // clear previous
+
+    if (!file) return;
+
+    const preview = document.createElement('div');
+    preview.className = 'file-preview';
+
+    const removeBtn = document.createElement('button');
+    removeBtn.innerText = '×';
+    removeBtn.className = 'remove-btn';
+    removeBtn.onclick = () => {
+      input.value = ''; // reset file input
+      container.innerHTML = '';
+    };
+
+    preview.appendChild(removeBtn);
+
+    const isImage = file.type.startsWith('image/');
+
+    if (isImage) {
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(file);
+      img.alt = 'Предпросмотр изображения';
+      img.style.cursor = 'pointer';
+      img.onclick = () => window.open(img.src, '_blank');
+      preview.appendChild(img);
+    } else {
+      const fileIcon = document.createElement('div');
+      fileIcon.className = 'file-icon';
+      fileIcon.innerHTML = `📄 ${file.name}`;
+      fileIcon.style.cursor = 'pointer';
+      fileIcon.onclick = () => {
+        const url = URL.createObjectURL(file);
+        window.open(url, '_blank');
+      };
+      preview.appendChild(fileIcon);
+    }
+
+    container.appendChild(preview);
+  }
+</script>
+</body>
+</html>
+{% else %}
+{% include 'waiting.html' %}
+{% endif %}

@@ -97,6 +97,9 @@ class Clients(models.Model):
     mfo = models.IntegerField(blank=True, null=True, default=None)
 
 
+    active=models.BooleanField(default=False)
+
+
 
     def __str__(self):
         return self.name or self.company_name
@@ -135,10 +138,18 @@ class Orders(models.Model):
         ("priezd", "Приезд"),
 
     ]
+    zayavki_choice = [
+        ("hot", "Горячая"),
+        ("cool", "Холодная"),
 
+    ]
     client=models.ForeignKey(Clients, on_delete=models.CASCADE, related_name='clients_order',null=True)
+    call_center = models.ForeignKey(
+        'Profile', on_delete=models.CASCADE, related_name='call_center_profile', verbose_name="Профиль",null=True
+    )
     order_name=models.CharField(max_length=100,null=True)
     vstrecha=models.CharField(max_length=20, choices=vstrecha_choice,null=True)
+    zayavki = models.CharField(max_length=20, choices=zayavki_choice, null=True)
     order_sum=models.DecimalField(max_digits=10, decimal_places=2,default=0)
     order_predoplata=models.DecimalField(max_digits=10, decimal_places=2,default=0)
     description=models.TextField()
@@ -162,6 +173,8 @@ class Orders(models.Model):
     stage_pod=models.CharField(max_length=20, choices=Stage_pod_CHOICES,default="rezka")
     payment_data=models.DateField(null=True)
     complete_date=models.DateField(null=True)
+    fail_date = models.DateField(null=True)
+    by_who_fail=models.CharField(max_length=50,null=True,blank=True)
     fail=models.CharField(max_length=255,null=True)
 
 

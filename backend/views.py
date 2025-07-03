@@ -804,9 +804,9 @@ class MarketingClietView(LoginRequiredMixin,TemplateView):
       profile=self.request.user.profile
 
       if search:
-         context['profile'] = Social_clients.objects.filter(profile=profile,client_name__icontains=search).select_related('order')
+         context['profile'] = Social_clients.objects.filter(profile=profile,client_name__icontains=search).select_related('order').exclude(order__stage='failed')
       else:
-         context['profile'] = Social_clients.objects.filter(profile=profile).select_related('order')
+         context['profile'] = Social_clients.objects.filter(profile=profile).select_related('order').exclude(order__stage='failed')
 
       return context
 
@@ -820,9 +820,40 @@ class ArchiveOrder(LoginRequiredMixin,TemplateView):
 
    def get_context_data(self, *, object_list=None, **kwargs):
       context = super().get_context_data(**kwargs)
-      context['failed']=Orders.objects.filter(stage='failed').order_by('-created_at')
-      context['finished'] = Orders.objects.filter(stage='finished')
+      context['failed']=Orders.objects.filter(stage='failed').order_by('-fail_date')
+      context['finished'] = Orders.objects.filter(stage='archive').order_by('-complete_date')
       return context
+
+class Call_center(LoginRequiredMixin,TemplateView):
+   template_name = 'call_center.html'
+   login_url = reverse_lazy('login')
+
+   def get_context_data(self, *, object_list=None, **kwargs):
+      context = super().get_context_data(**kwargs)
+      context['order']=Orders.objects.filter(stage='call_center')
+      search = self.request.GET.get('search')
+
+      if search:
+         context['order'] = Orders.objects.filter(
+    Q(stage='call_center') &
+    (
+        Q(client__name__icontains=search) |
+        Q(client__company_name__icontains=search) |
+        Q(marketing__name__icontains=search)
+    )
+).select_related('client','marketing')
+
+      else:
+         context['order'] = Orders.objects.filter(stage='call_center').select_related('client','marketing')
+      return context
+class Call_center_add(LoginRequiredMixin,TemplateView):
+   template_name = 'call_center_add.html'
+   login_url = reverse_lazy('login')
+
+
+
+
+
 
 
 
@@ -841,7 +872,7 @@ class DetailMarketing(LoginRequiredMixin,DetailView):
       self.object = self.get_object()
       if pk:
 
-         Orders.objects.filter(marketing__id=pk).update(stage='failed',fail=reason)
+         Orders.objects.filter(marketing__id=pk).update(stage='failed',fail=reason,fail_date=now().date(),by_who_fail='соц.маркетологом')
       else:
 
          self.object.phone = phone
