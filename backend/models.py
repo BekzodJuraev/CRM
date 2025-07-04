@@ -101,8 +101,7 @@ class Clients(models.Model):
 
 
 
-    def __str__(self):
-        return self.name or self.company_name
+
 
 
 class Orders(models.Model):

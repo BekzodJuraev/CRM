@@ -245,7 +245,7 @@
            <td>{{item.get_zayavki_display}}</td>
 
             <td><div>
-                <button onclick="window.location.href='{% url 'marketing_detail' item.pk %}'">Подробнее</button>
+                <button onclick="window.location.href='{% url 'call_cente_detail' item.pk %}'">Подробнее</button>
               {% if item.stage == 'call_center'%}
                 <button onclick="openPopup({{item.pk}})">Передать менеджеру</button>
               {% endif %}

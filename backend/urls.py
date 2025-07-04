@@ -33,5 +33,6 @@ urlpatterns=[
     path('archive/',views.ArchiveOrder.as_view(),name='archive'),
     path('call_center/',views.Call_center.as_view(),name='call_center'),
     path('call_center/add',views.Call_center_add.as_view(),name='call_center_add'),
+    path('call_center/<int:pk>',views.DetailCall.as_view(),name='call_cente_detail'),
 
 ]

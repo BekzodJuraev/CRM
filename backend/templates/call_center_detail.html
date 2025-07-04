@@ -251,10 +251,17 @@ custom-dropdown {
 </div>
     <div class="container">
         <h2 class="text-center">Добавить новый заказ</h2>
-          <div class="toggle-buttons">
-      <button id="btn-individual" class="active">Физическое лицо</button>
-      <button id="btn-legal">Юридическое лицо</button>
+        {% if item.client.client_type == "LEGAL_ENTITY" %}
+        <div class="toggle-buttons">
+      <button id="btn-individual" >Физическое лицо</button>
+      <button id="btn-legal" class="active">Юридическое лицо</button>
     </div>
+        {% else %}
+            <div class="toggle-buttons">
+      <button id="btn-individual" class="active" >Физическое лицо</button>
+      <button id="btn-legal" >Юридическое лицо</button>
+    </div>
+        {% endif %}
         <form action="" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
 
@@ -267,13 +274,13 @@ custom-dropdown {
 
             <div id="person" style="margin-top: 20px; display: block;">
                    <label>Фамилия:</label>
-        <input type="text" placeholder="Введите фамилию" class="form-control" name="lastname" >
+        <input type="text" placeholder="Введите фамилию" class="form-control" name="lastname"  value="{{item.client.lastname}}">
 
         <label>Имя:</label>
-        <input type="text" placeholder="Введите имя" class="form-control" name="name" >
+        <input type="text" placeholder="Введите имя" class="form-control" name="name" value="{% if item.client.name %}{{item.client.name}}{% else %}{{item.marketing.client_name}}{% endif %}">
 
         <label>Отчество:</label>
-        <input type="text" placeholder="Введите отчество" class="form-control" name="middle_name" >
+        <input type="text" placeholder="Введите отчество" class="form-control" name="middle_name" value="{{item.client.middle_name}}">
 
         <label>Номер телефона:</label>
          <input type="tel"
@@ -282,43 +289,47 @@ custom-dropdown {
        pattern="^\+998\d{9}$"
        title="+998901234567"
        class="form-control"
-       >
+                value="{% if item.client.phone %}{{item.client.phone}}{% else %} {{ item.marketing.phone }}{% endif %}">
                   <label>Наименование проекта:</label>
-            <input type="text" class="form-control" placeholder="Проект 1" name="order_name">
+            <input type="text" class="form-control" placeholder="Проект 1" name="order_name" value="{{item.order_name }}">
                     <label>Источник:</label>
-                  <select  name="social" class="form-select" >
-                <option value="social">Социальные сети</option>
-                <option value="cold_calls">Холодные звонки</option>
-                <option value="word_of_mouth">Сарафанное радио</option>
-            </select>
+              <select name="social" class="form-select" required>
+    <option value="social" {% if item.client.social == "social" %}selected{% endif %}>Социальные сети</option>
+    <option value="cold_calls" {% if item.client.social == "cold_calls" %}selected{% endif %}>Холодные звонки</option>
+    <option value="word_of_mouth" {% if item.client.social == "word_of_mouth" %}selected{% endif %}>Сарафанное радио</option>
+</select>
                  <label>Статус заявки:</label>
-            <select class="form-select" name="zayavka"  required>
-                <option value="hot">Горячая</option>
-                <option value="cool">Холодная</option>
-
-            </select>
+          <select class="form-select" name="zayavka" required>
+    <option value="hot" {% if item.zayavki == "hot" %}selected{% endif %}>Горячая</option>
+    <option value="cool" {% if item.zayavki == "cool" %}selected{% endif %}>Холодная</option>
+</select>
               <label>Тип встречи:</label>
-            <select class="form-select" name="vstrecha" required >
-                <option value="viezd">Выезд</option>
-                <option value="priezd">Приезд</option>
-
-            </select>
+      <select class="form-select" name="vstrecha" required>
+    <option value="viezd" {% if item.vstrecha == "viezd" %}selected{% endif %}>Выезд</option>
+    <option value="priezd" {% if item.vstrecha == "priezd" %}selected{% endif %}>Приезд</option>
+</select>
 
 
 
 
             <label>Сумма заказа:</label>
-            <input type="number" class="form-control" placeholder="100" name="order_sum" id="order_sum"  step="0.01" >
+            <input type="number" class="form-control" placeholder="100" name="order_sum" id="order_sum"  step="0.01"  value="{{item.order_sum}}" >
 
             <label>Сумма предоплаты (80% от суммы заказа):</label>
-            <input type="number" class="form-control" placeholder="80" readonly name="order_predoplata" id="order_predoplata" >
+            <input type="number" class="form-control" placeholder="80" readonly name="order_predoplata"   value="{{item.order_predoplata}}"  id="order_predoplata" >
 
             <label>Категория заказа:</label>
-            <select class="form-select" name="catigories" >
-                <option value="Наружная реклама и макеты">Наружная реклама и макеты</option>
-                <option value="Типография">Типография</option>
-                <option value="Полиграфия">Полиграфия</option>
-            </select>
+   <select class="form-select" name="catigories">
+    <option value="Наружная реклама и макеты" {% if item.catigories == "Наружная реклама и макеты" %}selected{% endif %}>
+        Наружная реклама и макеты
+    </option>
+    <option value="Типография" {% if item.catigories == "Типография" %}selected{% endif %}>
+        Типография
+    </option>
+    <option value="Полиграфия" {% if item.catigories == "Полиграфия" %}selected{% endif %}>
+        Полиграфия
+    </option>
+</select>
 
 
 
@@ -338,11 +349,14 @@ custom-dropdown {
 
 
             <textarea class="form-control" rows="3" name="description"></textarea>
-
+                {% if item.design %}
+                <div id="preview_tz"><div class="file-preview"><button class="remove-btn">×</button><img src="{{item.design.url}}" alt="Предпросмотр изображения" style="cursor: pointer;"></div></div>
+                <div class="file-icon" style="cursor: pointer;">📄 FPSMonitor.txt</div>
+                {% endif %}
 
             <div id="preview_tz"></div>
             <label>Размер:</label>
-            <input type="text" class="form-control" placeholder="40 cm"  name="razmer"  >
+            <input type="text" class="form-control" placeholder="40 cm"  name="razmer" >
             <h6>Дизайн</h6>
             <input type="checkbox" id="size-large" name="check_design" ><label>Дизайн выполняем мы:</label>
             <br>
@@ -350,12 +364,12 @@ custom-dropdown {
   <span class="file-label">📎 Прикрепить файл</span>
   <input type="file" name="design"  class="file-input" onchange="handleFile(this,'preview_design')">
 </label>
-     <textarea class="form-control" rows="3" name="description_design" ></textarea>
+     <textarea class="form-control" rows="3" name="description_design"  value="{{item.description_design}}"></textarea>
              <div id="preview_design"></div>
         <h3>Местоположение установки:</h3>
            <button id="pick_map"  type="button" onclick="openGeoModal()">Загрузить геолокацию</button>
-<input type="hidden" name="latitude" id="latitude">
-<input type="hidden" name="longitude" id="longitude">
+<input type="hidden" name="latitude" id="latitude" value="{{item.latitude}}">
+<input type="hidden" name="longitude" id="longitude" value="{{item.longitude}}">
 <div id="geo-status"></div>
 <!-- Map where the user picks the location -->
 
@@ -370,10 +384,10 @@ custom-dropdown {
 
 
             <label>Дата добавления заказа:</label>
-            <input type="date"  class="form-control" name="add_order" >
+            <input type="date"  class="form-control" name="add_order" value="{{ item.add_order|date:'Y-m-d' }}" >
 
             <label>Срок выполнения:</label>
-            <input type="date" class="form-control" name="complete_order"  >
+            <input type="date" class="form-control" name="complete_order"  value="{{item.complete_order|date:'Y-m-d'}}" >
 
             <button type="submit" class="btn btn-primary w-100 mt-3">Сохранить</button>
             </div>

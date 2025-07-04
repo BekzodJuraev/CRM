@@ -530,8 +530,8 @@ class Order(LoginRequiredMixin,TemplateView):
       tz=request.FILES.get('tz')
       check_design=request.POST.get('check_design') == 'on'
       design = request.FILES.get('design')
-      latitude=request.POST.get('latitude')
-      longitude=request.POST.get('longitude')
+      latitude = request.POST.get('latitude') or 0
+      longitude = request.POST.get('longitude') or 0
       razmer=request.POST.get('razmer')
       description = request.POST.get('description')
       description_design=request.POST.get('description_design')
@@ -804,9 +804,9 @@ class MarketingClietView(LoginRequiredMixin,TemplateView):
       profile=self.request.user.profile
 
       if search:
-         context['profile'] = Social_clients.objects.filter(profile=profile,client_name__icontains=search).select_related('order').exclude(order__stage='failed')
+         context['profile'] = Social_clients.objects.filter(profile=profile,order__stage='marketing',client_name__icontains=search).select_related('order').exclude(order__stage='failed')
       else:
-         context['profile'] = Social_clients.objects.filter(profile=profile).select_related('order').exclude(order__stage='failed')
+         context['profile'] = Social_clients.objects.filter(profile=profile,order__stage='marketing').select_related('order').exclude(order__stage='failed')
 
       return context
 
@@ -828,6 +828,13 @@ class Call_center(LoginRequiredMixin,TemplateView):
    template_name = 'call_center.html'
    login_url = reverse_lazy('login')
 
+
+
+   def post(self, request, *args, **kwargs):
+      pk = request.POST.get('pk')
+      Orders.objects.filter(id=pk).update(stage='manager')
+      return redirect(request.path)
+
    def get_context_data(self, *, object_list=None, **kwargs):
       context = super().get_context_data(**kwargs)
       context['order']=Orders.objects.filter(stage='call_center')
@@ -836,10 +843,9 @@ class Call_center(LoginRequiredMixin,TemplateView):
       if search:
          context['order'] = Orders.objects.filter(
     Q(stage='call_center') &
-    (
-        Q(client__name__icontains=search) |
+      ( Q(client__name__icontains=search) |
         Q(client__company_name__icontains=search) |
-        Q(marketing__name__icontains=search)
+        Q(marketing__client_name__icontains=search)
     )
 ).select_related('client','marketing')
 
@@ -851,9 +857,84 @@ class Call_center_add(LoginRequiredMixin,TemplateView):
    login_url = reverse_lazy('login')
 
 
+   def post(self,request,*args, **kwargs):
+
+
+      action = request.POST.get('action')
+      vstrecha=request.POST.get('vstrecha')
+      zayavki = request.POST.get('zayavka')
+      order_name=request.POST.get('order_name')
+      order_sum = request.POST.get('order_sum') or 0
+      catigories=request.POST.get('catigories')
+      order_predoplata = request.POST.get('order_predoplata') or 0
+      tz=request.FILES.get('tz')
+      check_design=request.POST.get('check_design') == 'on'
+      design = request.FILES.get('design')
+      latitude=request.POST.get('latitude' ) or 0
+      longitude=request.POST.get('longitude') or 0
+      razmer=request.POST.get('razmer')
+      description = request.POST.get('description')
+      description_design=request.POST.get('description_design')
+
+      add_order = request.POST.get('add_order') or None
+      complete_order = request.POST.get('complete_order') or None
+      phone=request.POST.get('phone')
+      social = request.POST.get('social')
 
 
 
+      if action == 'INDIVIDUAL':
+         name = request.POST.get('name')
+         lastname = request.POST.get('lastname')
+         middle_name = request.POST.get('middle_name')
+         client=Clients.objects.create(name=name, lastname=lastname, middle_name=middle_name, social=social, phone=phone,
+                                client_type=action)
+      else:
+         adress = request.POST.get('adress')
+         company_name = request.POST.get('company_name')
+         inn = request.POST.get('inn') or None
+         account = request.POST.get('account') or None
+         mfo = request.POST.get('mfo') or None
+         client=Clients.objects.create(adress=adress, company_name=company_name, inn=inn, social=social, phone=phone,
+                                client_type='LEGAL_ENTITY', account=account, mfo=mfo)
+
+
+
+
+      order = Orders.objects.create \
+         (client=client,
+          call_center=request.user.profile,
+          order_name=order_name,
+          zayavki=zayavki,
+          vstrecha=vstrecha,
+          order_sum=order_sum,
+          order_predoplata=order_predoplata,
+          description=description,
+          catigories=catigories,
+          tz=tz,
+          check_design=check_design,
+          design=design,
+          latitude=latitude,
+          longitude=longitude,
+          razmer=razmer,
+          description_design=description_design,
+          stage='call_center',
+          add_order=add_order,
+          complete_order=complete_order
+
+          )
+
+
+      return redirect('call_center')
+
+
+
+
+class DetailCall(LoginRequiredMixin,DetailView):
+   model = Orders
+   login_url = reverse_lazy('login')
+   template_name = 'call_center_detail.html'
+   context_object_name = 'item'
 
 
 
