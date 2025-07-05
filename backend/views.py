@@ -936,6 +936,92 @@ class DetailCall(LoginRequiredMixin,DetailView):
    template_name = 'call_center_detail.html'
    context_object_name = 'item'
 
+   def post(self, request, *args, **kwargs):
+      action = request.POST.get('action')
+
+      obj = self.get_object()
+      if action == 'delete':
+         obj.delete()
+      else:
+         vstrecha = request.POST.get('vstrecha')
+         zayavki = request.POST.get('zayavka')
+         order_name = request.POST.get('order_name')
+         order_sum = request.POST.get('order_sum') or 0
+         catigories = request.POST.get('catigories')
+         order_predoplata = request.POST.get('order_predoplata') or 0
+         tz = request.FILES.get('tz')
+         check_design = request.POST.get('check_design') == 'on'
+         design = request.FILES.get('design')
+         latitude = request.POST.get('latitude') or 0
+         longitude = request.POST.get('longitude') or 0
+         razmer = request.POST.get('razmer')
+         description = request.POST.get('description')
+         description_design = request.POST.get('description_design')
+
+         add_order = request.POST.get('add_order') or None
+         complete_order = request.POST.get('complete_order') or None
+         phone = request.POST.get('phone')
+         social = request.POST.get('social')
+
+         if action == 'INDIVIDUAL':
+            name = request.POST.get('name')
+            lastname = request.POST.get('lastname')
+            middle_name = request.POST.get('middle_name')
+            obj.client.adress = None
+            obj.client.inn = None
+            obj.client.account = None
+            obj.client.phone = phone
+            obj.client.company_name = None
+            obj.client.name=name
+            obj.client.lastname = lastname
+            obj.client.middle_name = middle_name
+            obj.client.phone = phone
+            obj.client.client_type="INDIVIDUAL"
+            obj.client.save()
+
+         else:
+            adress = request.POST.get('adress')
+            company_name = request.POST.get('company_name')
+            inn = request.POST.get('inn') or None
+            account = request.POST.get('account') or None
+            mfo = request.POST.get('mfo') or None
+
+            obj.client.name = None
+            obj.client.lastname = None
+            obj.client.middle_name = None
+            obj.client.company_name = company_name
+            obj.client.adress = adress
+            obj.client.inn = inn
+            obj.client.account = account
+            obj.client.phone = phone
+            obj.client.client_type = "LEGAL_ENTITY"
+            obj.client.save()
+
+         obj.order_name = order_name
+         obj.zayavki = zayavki
+         obj.vstrecha = vstrecha
+         obj.order_sum = order_sum
+         obj.order_predoplata = order_predoplata
+         obj.description = description
+         obj.catigories = catigories
+         obj.tz = tz
+         obj.check_design = check_design
+         obj.design = design
+         obj.latitude = latitude
+         obj.longitude = longitude
+         obj.razmer = razmer
+         obj.description_design = description_design
+         obj.add_order = add_order
+         obj.complete_order = complete_order
+
+         obj.save()
+
+
+
+
+
+      return redirect('call_center')
+
 
 
 class DetailMarketing(LoginRequiredMixin,DetailView):

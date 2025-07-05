@@ -260,7 +260,7 @@ custom-dropdown {
 
 
 
-            <input type="hidden"  name="action" value="INDIVIDUAL">
+            <input type="hidden"  name="action" value="INDIVIDUAL" id="action">
 
 
 
@@ -274,118 +274,16 @@ custom-dropdown {
 
         <label>Отчество:</label>
         <input type="text" placeholder="Введите отчество" class="form-control" name="middle_name" >
-
-        <label>Номер телефона:</label>
-         <input type="tel"
-       name="phone"
-       placeholder="+998901234567"
-       pattern="^\+998\d{9}$"
-       title="+998901234567"
-       class="form-control"
-       >
-                  <label>Наименование проекта:</label>
-            <input type="text" class="form-control" placeholder="Проект 1" name="order_name">
-                    <label>Источник:</label>
-                  <select  name="social" class="form-select" >
-                <option value="social">Социальные сети</option>
-                <option value="cold_calls">Холодные звонки</option>
-                <option value="word_of_mouth">Сарафанное радио</option>
-            </select>
-                 <label>Статус заявки:</label>
-            <select class="form-select" name="zayavka"  required>
-                <option value="hot">Горячая</option>
-                <option value="cool">Холодная</option>
-
-            </select>
-              <label>Тип встречи:</label>
-            <select class="form-select" name="vstrecha" required >
-                <option value="viezd">Выезд</option>
-                <option value="priezd">Приезд</option>
-
-            </select>
-
-
-
-
-            <label>Сумма заказа:</label>
-            <input type="number" class="form-control" placeholder="100" name="order_sum" id="order_sum"  step="0.01" >
-
-            <label>Сумма предоплаты (80% от суммы заказа):</label>
-            <input type="number" class="form-control" placeholder="80" readonly name="order_predoplata" id="order_predoplata" >
-
-            <label>Категория заказа:</label>
-            <select class="form-select" name="catigories" >
-                <option value="Наружная реклама и макеты">Наружная реклама и макеты</option>
-                <option value="Типография">Типография</option>
-                <option value="Полиграфия">Полиграфия</option>
-            </select>
-
-
-
-
-
-
-
-         <label>Описание / ТЗ:</label>
-<label class="file-input-wrapper">
-  <span class="file-label">📎 Прикрепить файл</span>
-  <input type="file" name="tz"  class="file-input" onchange="handleFile(this,'preview_tz')">
-</label>
-
-
-
-
-
-
-            <textarea class="form-control" rows="3" name="description"></textarea>
-
-
-            <div id="preview_tz"></div>
-            <label>Размер:</label>
-            <input type="text" class="form-control" placeholder="40 cm"  name="razmer"  >
-            <h6>Дизайн</h6>
-            <input type="checkbox" id="size-large" name="check_design" ><label>Дизайн выполняем мы:</label>
-            <br>
-               <label>Описание дизайна:</label>  <label class="file-input-wrapper">
-  <span class="file-label">📎 Прикрепить файл</span>
-  <input type="file" name="design"  class="file-input" onchange="handleFile(this,'preview_design')">
-</label>
-     <textarea class="form-control" rows="3" name="description_design" ></textarea>
-             <div id="preview_design"></div>
-        <h3>Местоположение установки:</h3>
-           <button id="pick_map"  type="button" onclick="openGeoModal()">Загрузить геолокацию</button>
-<input type="hidden" name="latitude" id="latitude">
-<input type="hidden" name="longitude" id="longitude">
-<div id="geo-status"></div>
-<!-- Map where the user picks the location -->
-
-
-<!-- Status & result -->
-
-<div id="mini-map" style="width: 100%; max-width: 400px; height: 200px; margin-top: 10px; display: none;"></div>
-
-
-
-
-
-
-            <label>Дата добавления заказа:</label>
-            <input type="date"  class="form-control" name="add_order" >
-
-            <label>Срок выполнения:</label>
-            <input type="date" class="form-control" name="complete_order"  >
-
-            <button type="submit" class="btn btn-primary w-100 mt-3">Сохранить</button>
             </div>
-            </form>
 
 
-        <form action="" method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <input type="hidden"  name="action" value="legal">
+
+
             <div id="legal" style="margin-top: 20px; display: none;">
-              <label>Наименование организации:</label>
+                       <label>Наименование организации:</label>
         <input type="text" class="form-control" placeholder="ООО 'Пример'" name="company_name" >
+
+
 
         <label>ИНН:</label>
         <input type="text"  class="form-control" placeholder="ИНН" name="inn" >
@@ -399,14 +297,19 @@ custom-dropdown {
         <label>Юридический адрес:</label>
         <input type="text" class="form-control" placeholder="Адрес" name="adress" >
 
-        <label>Номер телефона:</label>
+
+
+
+
+    </div>
+            <label>Номер телефона:</label>
         <input type="tel"
        name="phone"
        placeholder="+998901234567"
        pattern="^\+998\d{9}$"
        title="+998901234567"
         class="form-control" >
-          <label>Наименование проекта:</label>
+             <label>Наименование проекта:</label>
             <input type="text" class="form-control" placeholder="Проект 1" name="order_name">
         <label>Источник:</label>
         <select  class="form-select" name="social" required>
@@ -477,7 +380,7 @@ custom-dropdown {
      <textarea class="form-control" rows="3" name="description_design" ></textarea>
              <div id="preview_design"></div>
         <h3>Местоположение установки:</h3>
-           <button id="pick_map" onclick="openGeoModal()">Загрузить геолокацию</button>
+           <button id="pick_map" type="button" onclick="openGeoModal()">Загрузить геолокацию</button>
 <input type="hidden" name="latitude" id="latitude">
 <input type="hidden" name="longitude" id="longitude">
 <div id="geo-status"></div>
@@ -500,10 +403,8 @@ custom-dropdown {
             <input type="date" class="form-control" name="complete_order"  >
 
             <button type="submit" class="btn btn-primary w-100 mt-3">Сохранить</button>
+            </form>
 
-
-    </div>
-             </form>
 
 
 
@@ -516,7 +417,7 @@ custom-dropdown {
     if (!isNaN(orderSum)) {
       predoplataInput.value = (orderSum * 0.8).toFixed(2);
     } else {
-      predoplataInput.value = 0;
+       predoplataInput.value = '';
     }
   });
         function addCategoryGroup() {
@@ -579,11 +480,13 @@ select.addEventListener("change", () => {
     const companyInfoBlock = document.getElementById('legal');
 
 
+
     btnIndividual.addEventListener('click', () => {
       btnIndividual.classList.add('active');
       btnLegal.classList.remove('active');
       companyInfoBlock.style.display = 'none';
       clientInfoBlock.style.display = 'block';
+      document.getElementById('action').value="INDIVIDUAL";
 
 
     });
@@ -594,6 +497,7 @@ select.addEventListener("change", () => {
       btnIndividual.classList.remove('active');
       clientInfoBlock.style.display = 'none';
       companyInfoBlock.style.display = 'block';
+      document.getElementById('action').value="LEGAL";
 
 
     });

@@ -251,23 +251,19 @@ custom-dropdown {
 </div>
     <div class="container">
         <h2 class="text-center">Добавить новый заказ</h2>
-        {% if item.client.client_type == "LEGAL_ENTITY" %}
-        <div class="toggle-buttons">
-      <button id="btn-individual" >Физическое лицо</button>
-      <button id="btn-legal" class="active">Юридическое лицо</button>
-    </div>
-        {% else %}
-            <div class="toggle-buttons">
+
+             <div class="toggle-buttons">
       <button id="btn-individual" class="active" >Физическое лицо</button>
       <button id="btn-legal" >Юридическое лицо</button>
     </div>
-        {% endif %}
+
         <form action="" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
 
 
 
-            <input type="hidden"  name="action" value="INDIVIDUAL">
+            <input type="hidden" id="action" name="action" value="INDIVIDUAL">
+
 
 
 
@@ -282,7 +278,33 @@ custom-dropdown {
         <label>Отчество:</label>
         <input type="text" placeholder="Введите отчество" class="form-control" name="middle_name" value="{{item.client.middle_name}}">
 
-        <label>Номер телефона:</label>
+
+            </div>
+             <div id="legal" style="margin-top: 20px; display: none;">
+              <label>Наименование организации:</label>
+        <input type="text" class="form-control" placeholder="ООО 'Пример'" name="company_name" value="{{item.client.company_name}}" >
+
+        <label>ИНН:</label>
+        <input type="text"  class="form-control" placeholder="ИНН" name="inn" value="{{item.client.inn}}" >
+
+        <label>Расчётный счёт (Р/С):</label>
+        <input type="number" class="form-control" placeholder="Р/С" name="account" value="{{item.client.account}}" >
+
+        <label>МФО:</label>
+        <input type="number" class="form-control"  placeholder="МФО" name="mfo"  value="{{item.client.mfo}}">
+
+        <label>Юридический адрес:</label>
+        <input type="text" class="form-control" placeholder="Адрес" name="adress"  value="{{item.client.adress}}" >
+
+
+
+
+
+    </div>
+
+
+
+             <label>Номер телефона:</label>
          <input type="tel"
        name="phone"
        placeholder="+998901234567"
@@ -340,7 +362,7 @@ custom-dropdown {
          <label>Описание / ТЗ:</label>
 <label class="file-input-wrapper">
   <span class="file-label">📎 Прикрепить файл</span>
-  <input type="file" name="tz"  class="file-input" onchange="handleFile(this,'preview_tz')">
+  <input type="file" name="tz"  class="file-input" onchange="handleFile(this,'preview_tz')" value="{{item.tz}}">
 </label>
 
 
@@ -348,28 +370,27 @@ custom-dropdown {
 
 
 
-            <textarea class="form-control" rows="3" name="description"></textarea>
-                {% if item.design %}
-                <div id="preview_tz"><div class="file-preview"><button class="remove-btn">×</button><img src="{{item.design.url}}" alt="Предпросмотр изображения" style="cursor: pointer;"></div></div>
-                <div class="file-icon" style="cursor: pointer;">📄 FPSMonitor.txt</div>
-                {% endif %}
+            <textarea class="form-control" rows="3" name="description" >{{item.description}}</textarea>
+
 
             <div id="preview_tz"></div>
             <label>Размер:</label>
-            <input type="text" class="form-control" placeholder="40 cm"  name="razmer" >
+            <input type="text" class="form-control" placeholder="40 cm"  name="razmer"  value="{{item.razmer}}">
             <h6>Дизайн</h6>
-            <input type="checkbox" id="size-large" name="check_design" ><label>Дизайн выполняем мы:</label>
+            <input type="checkbox" id="size-large" name="check_design" {% if item.check_design %}checked{% endif %}><label>Дизайн выполняем мы:</label>
             <br>
                <label>Описание дизайна:</label>  <label class="file-input-wrapper">
   <span class="file-label">📎 Прикрепить файл</span>
-  <input type="file" name="design"  class="file-input" onchange="handleFile(this,'preview_design')">
+  <input type="file" name="design"  class="file-input" onchange="handleFile(this,'preview_design')" value="{{item.design}}">
 </label>
-     <textarea class="form-control" rows="3" name="description_design"  value="{{item.description_design}}"></textarea>
-             <div id="preview_design"></div>
+     <textarea class="form-control" rows="3" name="description_design" >{{item.description_design}}</textarea>
+             <div id="preview_design">
+
+             </div>
         <h3>Местоположение установки:</h3>
            <button id="pick_map"  type="button" onclick="openGeoModal()">Загрузить геолокацию</button>
-<input type="hidden" name="latitude" id="latitude" value="{{item.latitude}}">
-<input type="hidden" name="longitude" id="longitude" value="{{item.longitude}}">
+<input type="hidden" id="latitude" name="latitude" value="{{ item.latitude|default:'' }}">
+<input type="hidden" id="longitude" name="longitude" value="{{ item.longitude|default:'' }}">
 <div id="geo-status"></div>
 <!-- Map where the user picks the location -->
 
@@ -390,134 +411,15 @@ custom-dropdown {
             <input type="date" class="form-control" name="complete_order"  value="{{item.complete_order|date:'Y-m-d'}}" >
 
             <button type="submit" class="btn btn-primary w-100 mt-3">Сохранить</button>
-            </div>
+            <button type="button" class="btn btn-primary w-100 mt-3" onclick="submitDeleteForm()">Удалить</button>
             </form>
 
 
-        <form action="" method="POST" enctype="multipart/form-data">
+
+        <form id="delete-form" method="post">
             {% csrf_token %}
-            <input type="hidden"  name="action" value="legal">
-            <div id="legal" style="margin-top: 20px; display: none;">
-              <label>Наименование организации:</label>
-        <input type="text" class="form-control" placeholder="ООО 'Пример'" name="company_name" >
-
-        <label>ИНН:</label>
-        <input type="text"  class="form-control" placeholder="ИНН" name="inn" >
-
-        <label>Расчётный счёт (Р/С):</label>
-        <input type="number" class="form-control" placeholder="Р/С" name="account" >
-
-        <label>МФО:</label>
-        <input type="number" class="form-control"  placeholder="МФО" name="mfo" >
-
-        <label>Юридический адрес:</label>
-        <input type="text" class="form-control" placeholder="Адрес" name="adress" >
-
-        <label>Номер телефона:</label>
-        <input type="tel"
-       name="phone"
-       placeholder="+998901234567"
-       pattern="^\+998\d{9}$"
-       title="+998901234567"
-        class="form-control" >
-          <label>Наименование проекта:</label>
-            <input type="text" class="form-control" placeholder="Проект 1" name="order_name">
-        <label>Источник:</label>
-        <select  class="form-select" name="social" required>
-                <option value="social">Социальные сети</option>
-                <option value="cold_calls">Холодные звонки</option>
-                <option value="word_of_mouth">Сарафанное радио</option>
-            </select>
-
-                      <label>Статус заявки:</label>
-            <select class="form-select" name="zayavka" >
-                <option value="hot">Горячая</option>
-                <option value="cool">Холодная</option>
-
-            </select>
-              <label>Тип встречи:</label>
-            <select class="form-select" name="vstrecha" >
-                <option value="viezd">Выезд</option>
-                <option value="priezd">Приезд</option>
-
-            </select>
-
-
-
-
-            <label>Сумма заказа:</label>
-            <input type="number" class="form-control" placeholder="100" name="order_sum" id="order_sum"  step="0.01" >
-
-            <label>Сумма предоплаты (80% от суммы заказа):</label>
-            <input type="number" class="form-control" placeholder="80" readonly name="order_predoplata" id="order_predoplata" >
-
-            <label>Категория заказа:</label>
-            <select class="form-select" name="catigories" >
-                <option value="Наружная реклама и макеты">Наружная реклама и макеты</option>
-                <option value="Типография">Типография</option>
-                <option value="Полиграфия">Полиграфия</option>
-            </select>
-
-
-
-
-
-
-
-         <label>Описание / ТЗ:</label>
-<label class="file-input-wrapper">
-  <span class="file-label">📎 Прикрепить файл</span>
-  <input type="file" name="tz"  class="file-input" onchange="handleFile(this,'preview_tz')">
-</label>
-
-
-
-
-
-
-            <textarea class="form-control" rows="3" name="description"></textarea>
-
-
-            <div id="preview_tz"></div>
-            <label>Размер:</label>
-            <input type="text" class="form-control" placeholder="40 cm"  name="razmer"  >
-            <h6>Дизайн</h6>
-            <input type="checkbox" id="size-large" name="check_design" ><label>Дизайн выполняем мы:</label>
-            <br>
-               <label>Описание дизайна:</label>  <label class="file-input-wrapper">
-  <span class="file-label">📎 Прикрепить файл</span>
-  <input type="file" name="design"  class="file-input" onchange="handleFile(this,'preview_design')">
-</label>
-     <textarea class="form-control" rows="3" name="description_design" ></textarea>
-             <div id="preview_design"></div>
-        <h3>Местоположение установки:</h3>
-           <button id="pick_map" onclick="openGeoModal()">Загрузить геолокацию</button>
-<input type="hidden" name="latitude" id="latitude">
-<input type="hidden" name="longitude" id="longitude">
-<div id="geo-status"></div>
-<!-- Map where the user picks the location -->
-
-
-<!-- Status & result -->
-
-<div id="mini-map" style="width: 100%; max-width: 400px; height: 200px; margin-top: 10px; display: none;"></div>
-
-
-
-
-
-
-            <label>Дата добавления заказа:</label>
-            <input type="date"  class="form-control" name="add_order" >
-
-            <label>Срок выполнения:</label>
-            <input type="date" class="form-control" name="complete_order"  >
-
-            <button type="submit" class="btn btn-primary w-100 mt-3">Сохранить</button>
-
-
-    </div>
-             </form>
+            <input type="text" name="action" value="delete" hidden>
+        </form>
 
 
 
@@ -585,7 +487,56 @@ select.addEventListener("change", () => {
         }
 
 </script>
+<script>
+      document.addEventListener('DOMContentLoaded', function () {
+    {% if item.design %}
+      showExistingFilePreview("{{ item.design.url }}", "preview_design");
+    {% endif %}
+    {% if item.tz %}
+      showExistingFilePreview("{{ item.tz.url }}", "preview_tz");
+    {% endif %}
+  });
+  function showExistingFilePreview(fileUrl, previewId) {
+  const container = document.getElementById(previewId);
+  if (!container) return;
 
+  container.innerHTML = ''; // clear previous
+  const preview = document.createElement('div');
+  preview.className = 'file-preview';
+
+  const removeBtn = document.createElement('button');
+  removeBtn.innerText = '×';
+  removeBtn.className = 'remove-btn';
+  removeBtn.onclick = () => {
+    container.innerHTML = '';
+    // optionally clear hidden field or flag for deletion
+  };
+
+  preview.appendChild(removeBtn);
+
+  const isImage = /\.(jpg|jpeg|png|gif)$/i.test(fileUrl);
+  if (isImage) {
+    const img = document.createElement('img');
+    img.src = fileUrl;
+    img.alt = 'Предпросмотр изображения';
+    img.style.cursor = 'pointer';
+    img.onclick = () => window.open(fileUrl, '_blank');
+    preview.appendChild(img);
+  } else {
+    const fileIcon = document.createElement('div');
+    fileIcon.className = 'file-icon';
+    fileIcon.innerHTML = `📄 ${fileUrl.split('/').pop()}`;
+    fileIcon.style.cursor = 'pointer';
+    fileIcon.onclick = () => {
+      window.open(fileUrl, '_blank');
+    };
+    preview.appendChild(fileIcon);
+  }
+
+  container.appendChild(preview);
+}
+
+</script>
 <script>
     const btnIndividual = document.getElementById('btn-individual');
     const btnLegal = document.getElementById('btn-legal');
@@ -598,7 +549,7 @@ select.addEventListener("change", () => {
       btnLegal.classList.remove('active');
       companyInfoBlock.style.display = 'none';
       clientInfoBlock.style.display = 'block';
-
+      document.getElementById('action').value="INDIVIDUAL";
 
     });
 
@@ -608,26 +559,33 @@ select.addEventListener("change", () => {
       btnIndividual.classList.remove('active');
       clientInfoBlock.style.display = 'none';
       companyInfoBlock.style.display = 'block';
+      document.getElementById('action').value="LEGAL";
 
 
     });
+        const clientType = "{{ item.client.client_type }}";
+    if (clientType === "LEGAL_ENTITY") {
+        btnLegal.click();  // simulate click
+        document.getElementById('action').value="LEGAL";
+    } else {
+        btnIndividual.click();  // simulate click
+    }
 
   </script>
 
 
-<script>
 
+<script>
 let map, placemark, miniMapInstance;
 
 function openGeoModal() {
   document.getElementById("geoModal").style.display = "block";
 
-  // Delay map init to ensure the div is visible
   setTimeout(initMap, 300);
 }
 
 function initMap() {
-  if (map) return; // prevent re-init
+  if (map) return;
 
   map = new ymaps.Map("map", {
     center: [41.311081, 69.240562],
@@ -644,31 +602,27 @@ function initMap() {
       placemark.geometry.setCoordinates(coords);
     }
 
-    // Save coordinates
     document.getElementById('latitude').value = coords[0];
     document.getElementById('longitude').value = coords[1];
 
     document.getElementById('geo-status').innerText = '📍 Геолокация выбрана';
     document.getElementById("geoModal").style.display = "none";
 
-    // Show mini map preview
     showMiniMap(coords[0], coords[1]);
   });
 }
 
 function showMiniMap(lat, lon) {
   const miniMapContainer = document.getElementById("mini-map");
-  const pick =document.getElementById("pick_map");
-  pick.style.display="none";
-  // Make container visible
+  const pick = document.getElementById("pick_map");
+  if (pick) pick.style.display = "block";
+
   miniMapContainer.style.display = "block";
 
-  // Destroy existing map if exists
   if (miniMapInstance) {
     miniMapInstance.destroy();
   }
 
-  // Create new map instance
   miniMapInstance = new ymaps.Map("mini-map", {
     center: [lat, lon],
     zoom: 15,
@@ -679,14 +633,30 @@ function showMiniMap(lat, lon) {
   miniMapInstance.geoObjects.add(miniPlacemark);
 }
 
-// Optional: close modal on outside click
-window.onclick = function(event) {
+window.onclick = function (event) {
   const modal = document.getElementById("geoModal");
-
   if (event.target === modal) {
     modal.style.display = "none";
   }
-}
+};
+
+// ✅ Auto-run showMiniMap if latitude and longitude are filled
+ymaps.ready(function () {
+  const latInput = document.getElementById("latitude");
+  const lonInput = document.getElementById("longitude");
+
+  if (latInput && lonInput) {
+    const lat = parseFloat(latInput.value);
+    const lon = parseFloat(lonInput.value);
+
+    if (!isNaN(lat) && !isNaN(lon)) {
+      showMiniMap(lat, lon);
+      document.getElementById('geo-status').innerText = '📍 Геолокация выбрана';
+    }
+  }
+});
+
+
 </script>
 <script>
   function handleFile(input,previewId) {
@@ -732,7 +702,13 @@ window.onclick = function(event) {
 
     container.appendChild(preview);
   }
+  function submitDeleteForm() {
+    document.getElementById('delete-form').submit();
+}
 </script>
+
+
+
 </body>
 </html>
 {% else %}

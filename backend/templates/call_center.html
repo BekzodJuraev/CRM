@@ -224,21 +224,21 @@
       {% for item in order %}
       <tbody>
         <tr>
-          <td>{{item.client.lastname}}</td>
+          <td>{{item.client.lastname|default:""}}</td>
           {% if item.client.name %}
-          <td>{{item.client.name}}</td>
+          <td>{{item.client.name|default:""}}</td>
           {% else %}
-          <td>{{item.marketing.client_name}}</td>
+          <td>{{item.marketing.client_name|default:""}}</td>
           {% endif %}
 
-           <td>{{item.client.middle_name}}</td>
+           <td>{{item.client.middle_name|default:""}}</td>
 
-           <td>{{item.client.company_name}}</td>
+           <td>{{item.client.company_name|default:""}}</td>
            <td>
              {% if item.client.phone %}
-             {{item.client.phone}}
+             {{item.client.phone|default:""}}
              {% else %}
-             {{ item.marketing.phone }}
+             {{ item.marketing.phone|default:"" }}
              {% endif %}
 
            </td>
