@@ -100,6 +100,40 @@ def search_client(request):
 
 
 
+def search_profiles(request):
+    search = request.GET.get("search", "")
+    position = request.GET.get("position", "")
+
+    qs = Profile.objects.filter(
+       Q(name__icontains=search) |
+       Q(lastname__icontains=search) |
+       Q(middle_name__icontains=search),
+        position=position
+    )
+    results = [
+        {
+            "id": profile.id,
+            "full_name": f"{profile.lastname} {profile.name}"
+        }
+        for profile in qs
+    ]
+    return JsonResponse(results, safe=False)
+
+
+def assign_project(request):
+    if request.method == "POST":
+       id=request.POST.get('project_id')
+       profile_id = request.POST.get('profile_id')
+
+       try:
+          Orders.objects.filter(id=id).update(designer_id=profile_id)
+          return JsonResponse({"status": "ok"})
+
+       except Exception as e:
+          return JsonResponse({"error": str(e)}, status=400)
+
+
+
 @csrf_exempt
 @require_POST
 def telegram_webhook(request):
@@ -366,10 +400,16 @@ class Dashboard(LoginRequiredMixin,TemplateView):
       return context
 
 
+class MyProjects(LoginRequiredMixin, TemplateView):
+   login_url = reverse_lazy('login')
+   template_name = 'my_projects.html'
 
-
-
-
+   def get_context_data(self, *, object_list=None, **kwargs):
+      context = super().get_context_data(**kwargs)
+      profile=self.request.user.profile
+      context['designer_cheif']=Orders.objects.filter(stage='design').select_related('designer')
+      context['designer'] = Orders.objects.filter(stage='design',designer=profile).select_related('designer')
+      return context
 
 
 
@@ -459,49 +499,81 @@ class OrderDetail(LoginRequiredMixin,DetailView):
    context_object_name = 'item'
 
    def post(self, request, *args, **kwargs):
-      self.object = self.get_object()
+      obj = self.get_object()
+      action = request.POST.get('action')
+      vstrecha = request.POST.get('vstrecha')
+      zayavki = request.POST.get('zayavka')
+      order_name = request.POST.get('order_name')
+      order_sum = request.POST.get('order_sum') or 0
+      catigories = request.POST.get('catigories')
+      order_predoplata = request.POST.get('order_predoplata') or 0
+      tz = request.FILES.get('tz')
+      check_design = request.POST.get('check_design') == 'on'
+      design = request.FILES.get('design')
+      latitude = request.POST.get('latitude') or 0
+      longitude = request.POST.get('longitude') or 0
+      razmer = request.POST.get('razmer')
+      description = request.POST.get('description')
+      description_design = request.POST.get('description_design')
 
-      # Update fields from form data
-      self.object.client = request.POST.get('client')
-      self.object.adress = request.POST.get('adress')
-      self.object.order_sum = request.POST.get('order_sum')
-      self.object.order_predoplata = request.POST.get('order_predoplata')
-      self.object.description = request.POST.get('description')
-      self.object.phone = request.POST.get('phone')
-      self.object.social = request.POST.get('social')
-      self.object.stage = request.POST.get('stage')
-      self.object.add_order = request.POST.get('add_order')
-      self.object.complete_order = request.POST.get('complete_order')
+      add_order = request.POST.get('add_order') or None
+      complete_order = request.POST.get('complete_order') or None
+      phone = request.POST.get('phone')
+      social = request.POST.get('social')
 
-      # Handle uploaded file (delivery photo)
+      if action == 'INDIVIDUAL':
+         name = request.POST.get('name')
+         lastname = request.POST.get('lastname')
+         middle_name = request.POST.get('middle_name')
+         obj.client.adress = None
+         obj.client.inn = None
+         obj.client.account = None
+         obj.client.phone = phone
+         obj.client.company_name = None
+         obj.client.name = name
+         obj.client.lastname = lastname
+         obj.client.middle_name = middle_name
+         obj.client.phone = phone
+         obj.client.client_type = "INDIVIDUAL"
+         obj.client.save()
 
+      else:
+         adress = request.POST.get('adress')
+         company_name = request.POST.get('company_name')
+         inn = request.POST.get('inn') or None
+         account = request.POST.get('account') or None
+         mfo = request.POST.get('mfo') or None
 
-      # Save the updated order
-      self.object.save()
+         obj.client.name = None
+         obj.client.lastname = None
+         obj.client.middle_name = None
+         obj.client.company_name = company_name
+         obj.client.adress = adress
+         obj.client.inn = inn
+         obj.client.account = account
+         obj.client.phone = phone
+         obj.client.client_type = "LEGAL_ENTITY"
+         obj.client.save()
 
-      photo=request.FILES.getlist('delivery_photo')
-      delivery = [
-         Compelete_Photo(order=self.object, photo=p)
-         for p in photo
-      ]
-      Compelete_Photo.objects.bulk_create(delivery)
+      obj.order_name = order_name
+      obj.zayavki = zayavki
+      obj.vstrecha = vstrecha
+      obj.order_sum = order_sum
+      obj.order_predoplata = order_predoplata
+      obj.description = description
+      obj.catigories = catigories
+      obj.tz = tz
+      obj.check_design = check_design
+      obj.design = design
+      obj.latitude = latitude
+      obj.longitude = longitude
+      obj.razmer = razmer
+      obj.description_design = description_design
+      obj.add_order = add_order
+      obj.complete_order = complete_order
 
-      # Handle Consumables data
-      add = request.POST.getlist('add')
-      price = request.POST.getlist('price')
-      catigories = request.POST.getlist('catigories')
-      quantity = request.POST.getlist('quantity')
-
-      # Delete old consumables for this order to avoid duplication
-      Consumables.objects.filter(order=self.object).delete()
-
-      # Create new consumables
-      consumables = [
-         Consumables(order=self.object, add=a, price=p, catigories=c, quantity=d)
-         for a, p, c, d in zip(add, price, catigories, quantity)
-      ]
-      Consumables.objects.bulk_create(consumables)
-      mess(self.object.pk)
+      obj.save()
+      #mess(self.object.pk)
 
       # Redirect after successful update
       return redirect('dashboard')

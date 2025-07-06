@@ -146,6 +146,13 @@ class Orders(models.Model):
     call_center = models.ForeignKey(
         'Profile', on_delete=models.CASCADE, related_name='call_center_profile', verbose_name="Профиль",null=True
     )
+    designer = models.ForeignKey(
+        'Profile', on_delete=models.CASCADE, related_name='designer_profile', verbose_name="Профиль", null=True
+    )
+    completed_by_desinger=models.BooleanField(default=False)
+
+
+
     order_name=models.CharField(max_length=100,null=True)
     vstrecha=models.CharField(max_length=20, choices=vstrecha_choice,null=True)
     zayavki = models.CharField(max_length=20, choices=zayavki_choice, null=True)
@@ -164,6 +171,7 @@ class Orders(models.Model):
 
     stage = models.CharField(max_length=20, choices=Stage_CHOICES,default='marketing')
     add_order=models.DateField(null=True)
+
     complete_order=models.DateField(null=True)
     rezka=models.BooleanField(default=False)
     svarka=models.BooleanField(default=False)
@@ -175,6 +183,10 @@ class Orders(models.Model):
     fail_date = models.DateField(null=True)
     by_who_fail=models.CharField(max_length=50,null=True,blank=True)
     fail=models.CharField(max_length=255,null=True)
+
+
+
+
 
 
 

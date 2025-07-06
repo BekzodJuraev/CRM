@@ -313,7 +313,7 @@ custom-dropdown {
        class="form-control"
                 value="{% if item.client.phone %}{{item.client.phone}}{% else %} {{ item.marketing.phone }}{% endif %}">
                   <label>Наименование проекта:</label>
-            <input type="text" class="form-control" placeholder="Проект 1" name="order_name" value="{{item.order_name }}">
+            <input type="text" class="form-control" placeholder="Проект 1" name="order_name" value="{{item.order_name }}" required>
                     <label>Источник:</label>
               <select name="social" class="form-select" required>
     <option value="social" {% if item.client.social == "social" %}selected{% endif %}>Социальные сети</option>

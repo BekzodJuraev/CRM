@@ -1,0 +1,14 @@
+{% if request.user.profile.approve %}
+{% if request.user.profile.position == "designer_cheif" %}
+    {% include 'designer_cheif.html' %}
+
+{% elif request.user.profile.position == "designer" %}
+    {% include 'designer.html' %}
+{% endif %}
+
+
+
+{% else %}
+{% include 'waiting.html' %}
+
+{% endif %}

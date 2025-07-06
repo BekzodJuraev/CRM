@@ -170,7 +170,7 @@
     </header>
 
     <div id="client-list" class="client-list">
-      {% for item in designer %}
+      {% for item in designer_cheif %}
 
         <div class="client-card" data-name="{{ item.order_name}}">
           <div>
@@ -178,8 +178,15 @@
       <button class="btn" onclick="openStaticModal('modal-{{ item.id }}')">Перейти</button>
   </div>
 
+          {% if item.designer %}
+          <p>Передано: {{ item.designer.surname }} {{ item.designer.name }} </p>
+          {% else %}
+              <button class="btn" onclick="openAssignModal({{ item.id }})">Назначить сотрудника</button>
 
+          {% endif %}
+        {% if item.completed_by_desinger %}
           <button class="btn">Завершить</button>
+          {% endif %}
 
 
         </div>
