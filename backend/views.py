@@ -404,11 +404,39 @@ class MyProjects(LoginRequiredMixin, TemplateView):
    login_url = reverse_lazy('login')
    template_name = 'my_projects.html'
 
+   def post(self, request, *args, **kwargs):
+      action=request.POST.get('action')
+      pk=request.POST.get('pk')
+      if action == "designer_add":
+         design = request.FILES.get('design')
+         description_design = request.POST.get('description_design')
+         order = Orders.objects.filter(pk=pk).first()
+         update_fields = []
+
+         if design:
+            order.design = design
+            update_fields.append('design')
+
+         if description_design:
+            order.description_design = description_design
+            update_fields.append('description_design')
+
+         if update_fields:
+            order.save(update_fields=update_fields)
+
+
+      elif action == 'designer_complete':
+         Orders.objects.filter(pk=pk).update(completed_by_desinger=True)
+
+      elif action == 'designer_chief_complete':
+         Orders.objects.filter(pk=pk).update(stage='technologist')
+
+      return redirect(request.path)
    def get_context_data(self, *, object_list=None, **kwargs):
       context = super().get_context_data(**kwargs)
       profile=self.request.user.profile
       context['designer_cheif']=Orders.objects.filter(stage='design').select_related('designer')
-      context['designer'] = Orders.objects.filter(stage='design',designer=profile).select_related('designer')
+      context['designer'] = Orders.objects.filter(stage='design',designer=profile,completed_by_desinger=False).select_related('designer')
       return context
 
 

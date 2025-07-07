@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <title>Мои проекты</title>
   <style>
     body {
@@ -142,6 +144,32 @@
       cursor: pointer;
       font-weight: bold;
     }
+    .file-input-wrapper {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  padding: 8px 12px;
+  background-color: #007aff;
+  color: white;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  user-select: none;
+}
+
+.file-input-wrapper input[type="file"] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.file-label {
+  pointer-events: none;
+}
   </style>
 </head>
 <body>
@@ -177,9 +205,15 @@
           <strong>{{ item.order_name }}</strong>
       <button class="btn" onclick="openStaticModal('modal-{{ item.id }}')">Перейти</button>
   </div>
-
-
+          {% if item.design %}
+             <form method="post" >
+                 {% csrf_token %}
+                   <input type="text" name="action" value="designer_complete" hidden>
+                <input type="text" name="pk" value="{{item.pk}}" hidden>
           <button class="btn">Завершить</button>
+
+              </form>
+                 {% endif %}
 
 
         </div>
@@ -208,11 +242,20 @@
             <p><strong>Срок выполнения:</strong> {{ item.complete_order|date:"d.m.Y" }}</p>
 
             <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-              <button class="btn">Добавить описание</button>
-              <button class="btn">Прикрепить файл</button>
-              <button class="btn">Сохранить</button>
+              <button type="button" onclick="addDesignBlock({{ item.pk }})">Добавить</button>
+              <button  type="button" onclick="submitSaveForm({{item.pk}})">Сохранить</button>
 
             </div>
+
+
+              <form method="post" id="save_{{item.pk}}" enctype="multipart/form-data">
+                   {% csrf_token %}
+                   <div id="designContainer_{{ item.pk }}"></div>
+               <input type="text" name="action" value="designer_add" hidden>
+                <input type="text" name="pk" value="{{item.pk}}" hidden>
+
+
+              </form>
           </div>
         </div>
       {% endfor %}
@@ -235,6 +278,81 @@
       });
     </script>
   {% endfor %}
+<script>
+  function addDesignBlock(pk) {
+  const container = document.getElementById(`designContainer_${pk}`);
+  if (!container) return;
+
+  container.innerHTML = '';  // очищаем, если уже добавлено
+
+  const previewId = `preview_designn_${pk}`;
+
+  const block = document.createElement('div');
+  block.innerHTML = `
+    <label>Описание дизайна:</label>
+    <label class="file-input-wrapper">
+      <span class="file-label">📎 Прикрепить файл</span>
+      <input type="file" name="design" class="file-input" onchange="handleFile(this, '${previewId}')">
+    </label>
+    <div id="${previewId}"></div>
+    <textarea class="form-control" rows="3" name="description_design"></textarea>
+  `;
+
+  container.appendChild(block);
+}
+function handleFile(input, previewId) {
+  const file = input.files[0];
+  const container = document.getElementById(previewId);
+  container.innerHTML = '';
+
+  if (!file) return;
+
+  const preview = document.createElement('div');
+  preview.className = 'file-preview';
+
+  const removeBtn = document.createElement('button');
+  removeBtn.innerText = '×';
+  removeBtn.className = 'remove-btn';
+  removeBtn.onclick = () => {
+    input.value = '';
+    container.innerHTML = '';
+  };
+
+  preview.appendChild(removeBtn);
+
+  const isImage = file.type.startsWith('image/');
+
+  if (isImage) {
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    img.alt = 'Предпросмотр изображения';
+    img.style.cursor = 'pointer';
+    img.onclick = () => window.open(img.src, '_blank');
+    preview.appendChild(img);
+  } else {
+    const fileIcon = document.createElement('div');
+    fileIcon.className = 'file-icon';
+    fileIcon.innerHTML = `📄 ${file.name}`;
+    fileIcon.style.cursor = 'pointer';
+    fileIcon.onclick = () => {
+      const url = URL.createObjectURL(file);
+      window.open(url, '_blank');
+    };
+    preview.appendChild(fileIcon);
+  }
+
+  container.appendChild(preview);
+}
+
+
+</script>
+
+
+<script>
+      function submitSaveForm(pk) {
+    document.getElementById(`save_${pk}`).submit();
+}
+</script>
 <script>
 
   function showExistingFilePreview(fileUrl, previewId) {

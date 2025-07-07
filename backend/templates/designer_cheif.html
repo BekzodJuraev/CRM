@@ -185,8 +185,15 @@
 
           {% endif %}
         {% if item.completed_by_desinger %}
+           <form method="post" >
+                 {% csrf_token %}
+                   <input type="text" name="action" value="designer_chief_complete" hidden>
+                <input type="text" name="pk" value="{{item.pk}}" hidden>
           <button class="btn">Завершить</button>
-          {% endif %}
+
+              </form>
+                 {% endif %}
+
 
 
         </div>
@@ -214,12 +221,7 @@
             <p><strong>Дата добавления заказа:</strong> {{ item.add_order|date:"d.m.Y" }}</p>
             <p><strong>Срок выполнения:</strong> {{ item.complete_order|date:"d.m.Y" }}</p>
 
-            <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-              <button class="btn">Добавить описание</button>
-              <button class="btn">Прикрепить файл</button>
-              <button class="btn">Сохранить</button>
 
-            </div>
           </div>
         </div>
       {% endfor %}
@@ -230,7 +232,7 @@
       <button id="nextPage">❯</button>
     </div>
   </div>
-    {% for item in designer %}
+    {% for item in designer_cheif %}
      <script>
       document.addEventListener('DOMContentLoaded', function () {
         {% if item.design %}
@@ -253,7 +255,6 @@
   preview.className = 'file-preview';
 
   const removeBtn = document.createElement('button');
-
 
 
 
