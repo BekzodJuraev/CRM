@@ -124,13 +124,20 @@ def assign_project(request):
     if request.method == "POST":
        id=request.POST.get('project_id')
        profile_id = request.POST.get('profile_id')
+       action=request.POST.get('action')
+       if action == 'technologist':
+          Orders.objects.filter(id=id).update(technolgy_id=profile_id)
+          return JsonResponse({"status": "ok"})
 
+    else:
        try:
           Orders.objects.filter(id=id).update(designer_id=profile_id)
           return JsonResponse({"status": "ok"})
 
        except Exception as e:
           return JsonResponse({"error": str(e)}, status=400)
+
+
 
 
 
@@ -435,8 +442,11 @@ class MyProjects(LoginRequiredMixin, TemplateView):
    def get_context_data(self, *, object_list=None, **kwargs):
       context = super().get_context_data(**kwargs)
       profile=self.request.user.profile
+      context['technologist_cheif'] = Orders.objects.filter(stage='technologist').select_related('technolgy')
       context['designer_cheif']=Orders.objects.filter(stage='design').select_related('designer')
       context['designer'] = Orders.objects.filter(stage='design',designer=profile,completed_by_desinger=False).select_related('designer')
+      context['technologist'] = Orders.objects.filter(stage='technologist', technolgy=profile,
+                                                  completed_by_technolgy=False).select_related('technolgy')
       return context
 
 

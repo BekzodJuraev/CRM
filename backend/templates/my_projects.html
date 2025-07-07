@@ -4,6 +4,12 @@
 
 {% elif request.user.profile.position == "designer" %}
     {% include 'designer.html' %}
+
+{% elif request.user.profile.position == "technologist_cheif" %}
+    {% include 'technolgy_chief.html' %}
+{% elif request.user.profile.position == "technologist" %}
+    {% include 'technology.html' %}
+
 {% endif %}
 
 

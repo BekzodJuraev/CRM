@@ -149,8 +149,11 @@ class Orders(models.Model):
     designer = models.ForeignKey(
         'Profile', on_delete=models.CASCADE, related_name='designer_profile', verbose_name="Профиль", null=True
     )
+    technolgy = models.ForeignKey(
+        'Profile', on_delete=models.CASCADE, related_name='technolgy_profile', verbose_name="Профиль", null=True
+    )
     completed_by_desinger=models.BooleanField(default=False)
-
+    completed_by_technolgy = models.BooleanField(default=False)
 
 
     order_name=models.CharField(max_length=100,null=True)
@@ -173,6 +176,7 @@ class Orders(models.Model):
     add_order=models.DateField(null=True)
 
     complete_order=models.DateField(null=True)
+
     rezka=models.BooleanField(default=False)
     svarka=models.BooleanField(default=False)
     fill=models.BooleanField(default=False)
@@ -209,8 +213,6 @@ class Compelete_Photo(models.Model):
 
 class Consumables(models.Model):
     add=models.CharField(max_length=50)
-    price=models.DecimalField(max_digits=10, decimal_places=2,default=0)
-    catigories=models.CharField(max_length=50)
     order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name='consumables')
     quantity=models.IntegerField(default=1)
 
