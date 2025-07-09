@@ -200,12 +200,12 @@
     <div id="client-list" class="client-list">
       {% for item in designer %}
 
-        <div class="client-card" data-name="{{ item.order_name}}">
+        <div class="client-card" data-name="{{ item.order.order_name}}">
           <div>
-          <strong>{{ item.order_name }}</strong>
-      <button class="btn" onclick="openStaticModal('modal-{{ item.id }}')">Перейти</button>
+          <strong>{{ item.order.order_name }}</strong>
+      <button class="btn" onclick="openStaticModal('modal-{{ item.order.id }}')">Перейти</button>
   </div>
-          {% if item.design %}
+          {% if item.upload %}
              <form method="post" >
                  {% csrf_token %}
                    <input type="text" name="action" value="designer_complete" hidden>
@@ -219,38 +219,38 @@
         </div>
 
         <!-- Static Modal for this project -->
-        <div id="modal-{{ item.id }}" class="modal hidden">
+        <div id="modal-{{ item.order.id }}" class="modal hidden">
           <div class="modal-content">
-            <span class="close" onclick="closeStaticModal('modal-{{ item.id }}')">&times;</span>
-            <h3>Проект: {{ item.order_name }}</h3>
+            <span class="close" onclick="closeStaticModal('modal-{{ item.order.id }}')">&times;</span>
+            <h3>Проект: {{ item.order.order_name }}</h3>
 
-            <p><strong>Категория заказа:</strong> {{ item.catigories }}</p>
+            <p><strong>Категория заказа:</strong> {{ item.order.catigories }}</p>
 
-            <p><strong>Размер:</strong> {{ item.razmer }}</p>
+            <p><strong>Размер:</strong> {{ item.order.razmer }}</p>
 
-             <p><strong>Описание / ТЗ:</strong> {{ item.description }}</p>
+             <p><strong>Описание / ТЗ:</strong> {{ item.order.description }}</p>
             <p><strong>Прикреплённые файлы:</strong></p>
-            <div id="preview_tz_{{ item.id }}"></div>
+            <div id="preview_tz_{{ item.order.id }}"></div>
 
-           <p><strong>Дизайн:</strong> {{ item.description_design }}</p>
+           <p><strong>Дизайн:</strong> {{ item.order.description_design }}</p>
             <p><strong>Прикреплённые фото:</strong></p>
 
-              <div id="preview_design_{{ item.id }}"></div>
+              <div id="preview_design_{{ item.order.id }}"></div>
 
 
-            <p><strong>Дата добавления заказа:</strong> {{ item.add_order|date:"d.m.Y" }}</p>
-            <p><strong>Срок выполнения:</strong> {{ item.complete_order|date:"d.m.Y" }}</p>
+            <p><strong>Дата добавления заказа:</strong> {{ item.order.add_order|date:"d.m.Y" }}</p>
+            <p><strong>Срок выполнения:</strong> {{ item.order.complete_order|date:"d.m.Y" }}</p>
 
             <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-              <button type="button" onclick="addDesignBlock({{ item.pk }})">Добавить</button>
-              <button  type="button" onclick="submitSaveForm({{item.pk}})">Сохранить</button>
+              <button type="button" onclick="addDesignBlock({{ item.order.pk }})">Добавить</button>
+              <button  type="button" onclick="submitSaveForm({{item.order.pk}})">Сохранить</button>
 
             </div>
 
 
-              <form method="post" id="save_{{item.pk}}" enctype="multipart/form-data">
+              <form method="post" id="save_{{item.order.pk}}" enctype="multipart/form-data">
                    {% csrf_token %}
-                   <div id="designContainer_{{ item.pk }}"></div>
+                   <div id="designContainer_{{ item.order.pk }}"></div>
                <input type="text" name="action" value="designer_add" hidden>
                 <input type="text" name="pk" value="{{item.pk}}" hidden>
 
@@ -269,11 +269,11 @@
     {% for item in designer %}
      <script>
       document.addEventListener('DOMContentLoaded', function () {
-        {% if item.design %}
-          showExistingFilePreview("{{ item.design.url }}", "preview_design_{{ item.id }}");
+        {% if item.order.design %}
+          showExistingFilePreview("{{ item.order.design.url }}", "preview_design_{{ item.order.id }}");
         {% endif %}
-        {% if item.tz %}
-          showExistingFilePreview("{{ item.tz.url }}", "preview_tz_{{ item.id }}");
+        {% if item.order.tz %}
+          showExistingFilePreview("{{ item.order.tz.url }}", "preview_tz_{{ item.order.id }}");
         {% endif %}
       });
     </script>

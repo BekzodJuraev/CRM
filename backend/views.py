@@ -1,16 +1,17 @@
 import time
 from django.db import connection, reset_queries
 from django.http import JsonResponse
+from django.db.models import Prefetch
 
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django.views.generic import View,TemplateView,DetailView,UpdateView
-from .models import Profile,Rezident,Finance,Warehouse,WarehouseLimit,Consumables,Orders,Delivery_Photo,Compelete_Photo,Telegram_users,Clients,Social_clients
+from .models import Profile,Rezident,Finance,Warehouse,WarehouseLimit,Consumables,Orders,Delivery_Photo,Compelete_Photo,Telegram_users,Clients,Social_clients,OrderStaff
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Sum,Q,Count,F,Max,Prefetch,OuterRef, Subquery,Value
+from django.db.models import Sum,Q,Count,F,Max,Prefetch,OuterRef, Subquery,Value,Exists
 from django.utils.timezone import now
 from django.http import JsonResponse
 from django.contrib.auth.views import LogoutView
@@ -125,17 +126,22 @@ def assign_project(request):
        id=request.POST.get('project_id')
        profile_id = request.POST.get('profile_id')
        action=request.POST.get('action')
+
        if action == 'technologist':
           Orders.objects.filter(id=id).update(technolgy_id=profile_id)
           return JsonResponse({"status": "ok"})
+       else:
+          try:
+             OrderStaff.objects.create(order_id=id, profile_id=profile_id)
+             return JsonResponse({"status": "ok"})
 
-    else:
-       try:
-          Orders.objects.filter(id=id).update(designer_id=profile_id)
-          return JsonResponse({"status": "ok"})
+          except Exception as e:
+             return JsonResponse({"error": str(e)}, status=400)
 
-       except Exception as e:
-          return JsonResponse({"error": str(e)}, status=400)
+
+
+
+
 
 
 
@@ -414,37 +420,83 @@ class MyProjects(LoginRequiredMixin, TemplateView):
    def post(self, request, *args, **kwargs):
       action=request.POST.get('action')
       pk=request.POST.get('pk')
+      design = request.FILES.get('design')
+      description_design = request.POST.get('description_design')
       if action == "designer_add":
-         design = request.FILES.get('design')
-         description_design = request.POST.get('description_design')
-         order = Orders.objects.filter(pk=pk).first()
+         order_staff=OrderStaff.objects.filter(pk=pk).first()
+         #order = Orders.objects.filter(pk=pk).first()
          update_fields = []
 
          if design:
-            order.design = design
+            order_staff.order.design = design
             update_fields.append('design')
 
          if description_design:
-            order.description_design = description_design
+            order_staff.order.description_design = description_design
             update_fields.append('description_design')
 
          if update_fields:
-            order.save(update_fields=update_fields)
-
+            order_staff.order.save(update_fields=update_fields)
+         order_staff.upload = True
+         order_staff.save(update_fields=['upload'])
 
       elif action == 'designer_complete':
-         Orders.objects.filter(pk=pk).update(completed_by_desinger=True)
+         OrderStaff.objects.create()
+
+      elif action == 'designer_chief_add':
+         order_staff, created=OrderStaff.objects.get_or_create(order_id=pk,profile=request.user.profile)
+
+         update_fields = []
+
+         if design:
+            order_staff.order.design = design
+            update_fields.append('design')
+
+         if description_design:
+            order_staff.order.description_design = description_design
+            update_fields.append('description_design')
+
+         if update_fields:
+            order_staff.order.save(update_fields=update_fields)
+
+         order_staff.upload = True
+         order_staff.save(update_fields=['upload'])
 
       elif action == 'designer_chief_complete':
+         update = request.POST.get('update')
+
+         if update:
+            OrderStaff.objects.filter(profile=request.user.profile,order_id=pk).update(complete=True)
+         else:
+            OrderStaff.objects.create(profile=request.user.profile, complete=True, order_id=pk)
+
+
          Orders.objects.filter(pk=pk).update(stage='technologist')
+
+
+
 
       return redirect(request.path)
    def get_context_data(self, *, object_list=None, **kwargs):
       context = super().get_context_data(**kwargs)
       profile=self.request.user.profile
+      is_uploaded_by_chief = OrderStaff.objects.filter(
+         order=OuterRef('pk'),
+         profile=profile,
+         upload=True
+      )
       context['technologist_cheif'] = Orders.objects.filter(stage='technologist').select_related('technolgy')
-      context['designer_cheif']=Orders.objects.filter(stage='design').select_related('designer')
-      context['designer'] = Orders.objects.filter(stage='design',designer=profile,completed_by_desinger=False).select_related('designer')
+      context['designer_cheif']= orders = Orders.objects.annotate(
+    uploaded_by_chief=Exists(is_uploaded_by_chief)
+   ).filter(stage='design').prefetch_related(
+    Prefetch(
+        'order_staff',
+        queryset=OrderStaff.objects.filter(profile__position='designer').select_related('profile'),
+        to_attr='designer_staff'
+    )
+)
+
+      context['designer'] = OrderStaff.objects.filter(profile=profile,order__stage='design',complete=False).select_related('order')
       context['technologist'] = Orders.objects.filter(stage='technologist', technolgy=profile,
                                                   completed_by_technolgy=False).select_related('technolgy')
       return context

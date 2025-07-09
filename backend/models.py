@@ -144,13 +144,13 @@ class Orders(models.Model):
     ]
     client=models.ForeignKey(Clients, on_delete=models.CASCADE, related_name='clients_order',null=True)
     call_center = models.ForeignKey(
-        'Profile', on_delete=models.CASCADE, related_name='call_center_profile', verbose_name="Профиль",null=True
+        'Profile', on_delete=models.CASCADE, related_name='call_center_profile', verbose_name="Профиль",blank=True,null=True
     )
     designer = models.ForeignKey(
-        'Profile', on_delete=models.CASCADE, related_name='designer_profile', verbose_name="Профиль", null=True
-    )
+        'Profile', on_delete=models.CASCADE, related_name='designer_profile', verbose_name="Профиль",blank=True, null=True
+     )
     technolgy = models.ForeignKey(
-        'Profile', on_delete=models.CASCADE, related_name='technolgy_profile', verbose_name="Профиль", null=True
+        'Profile', on_delete=models.CASCADE, related_name='technolgy_profile', verbose_name="Профиль",blank=True, null=True
     )
     completed_by_desinger=models.BooleanField(default=False)
     completed_by_technolgy = models.BooleanField(default=False)
@@ -199,7 +199,13 @@ class Orders(models.Model):
 
 
 
-
+class OrderStaff(models.Model):
+    order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name='order_staff')
+    profile= models.ForeignKey(
+        'Profile', on_delete=models.CASCADE, related_name='order_profile', verbose_name="Профиль",null=True
+    )
+    complete = models.BooleanField(default=False)
+    upload = models.BooleanField(default=False)
 
 
 class Delivery_Photo(models.Model):
