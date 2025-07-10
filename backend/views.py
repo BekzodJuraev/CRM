@@ -1481,11 +1481,15 @@ class WarehouseCreateView(LoginRequiredMixin, TemplateView):
       quantity = request.POST.get('quantity')
       deliver = request.POST.get('deliver')
       created_at = request.POST.get('created_at')
-      Warehouse.objects.create(city=city,category=category,product=product,quantity=quantity,deliver=deliver,created_at=created_at)
+      user_id=request.POST.get('user_id')
+      Warehouse.objects.create(city=city,category=category,product=product,quantity=quantity,provider_id=user_id,created_at=created_at)
 
       return redirect('warehouse')
 
-
+   def get_context_data(self, *, object_list=None, **kwargs):
+      context = super().get_context_data(**kwargs)
+      context['provider']=Provider.objects.all()
+      return context
 
 
 class WarehouseLimitView(LoginRequiredMixin, TemplateView):

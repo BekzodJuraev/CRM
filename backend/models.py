@@ -271,7 +271,7 @@ class Warehouse(models.Model):
     created_at=models.DateField()
     category=models.CharField(max_length=70)
     city=models.CharField(max_length=70)
-    deliver=models.CharField(max_length=70)
+    provider=models.ForeignKey(Provider, on_delete=models.CASCADE, related_name='provider',null=True)
 
 
 

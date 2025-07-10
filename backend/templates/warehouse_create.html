@@ -114,7 +114,11 @@
       <input type="date"  name="created_at"   required/>
 
       <label >Поставщик:</label>
-      <input type="text"  name="deliver" required />
+      <select name="user_id">
+      {% for item in provider %}
+        <option value="{{ item.pk }}">{{ item.name }} {{ item.lastname }} {{ item.middle_name }}</option>
+      {% endfor %}
+    </select>
 
 
 
