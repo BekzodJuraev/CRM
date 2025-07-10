@@ -1,8 +1,14 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+       <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <script src="{% static 'js/orders.js' %}"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <title>Мои проекты</title>
   <style>
@@ -93,7 +99,7 @@
       background: white;
       padding: 30px;
       border-radius: 14px;
-      width: 500px;
+      width: 1000px;
       position: relative;
       max-height: 90vh;
       overflow-y: auto;
@@ -143,6 +149,83 @@
       cursor: pointer;
       font-weight: bold;
     }
+    .order-card {
+      border: 1px solid #ddd;
+      padding: 16px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+    }
+
+    .order-card h2 {
+      font-size: 18px;
+      margin-top: 0;
+    }
+
+    .order-info {
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+
+    .order-info b {
+      font-weight: 600;
+    }
+
+    .btn-complete {
+    width: 50%;
+      background-color: #4f46e5;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .btn-complete:hover {
+      background-color: #3730a3;
+    }
+
+    @media (max-width: 600px) {
+      .order-card {
+        padding: 12px;
+      }
+
+      .btn-complete {
+        width: 100%;
+      }
+    }
+
+        .btn-add, .btn-remove {
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+        .btn-add {
+            background: #007bff;
+            color: white;
+        }
+        .btn-add:hover {
+            background: #0056b3;
+        }
+        .btn-remove {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-remove:hover {
+            background: #a71d2a;
+        }
+        .category-group {
+            width:50%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+        }
+
   </style>
 </head>
 <body>
@@ -171,29 +254,48 @@
     </header>
 
     <div id="client-list" class="client-list">
-      {% for item in technologist %}
+      {% for item in technologist_cheif %}
 
-        <div class="client-card" data-name="{{ item.order_name}}">
+         <div class="client-card" data-name="{{ item.order_name}}">
           <div>
           <strong>{{ item.order_name }}</strong>
       <button class="btn" onclick="openStaticModal('modal-{{ item.id }}')">Перейти</button>
   </div>
 
-          {% if item.technolgy %}
-          <p>Передано: {{ item.technolgy.surname }} {{ item.technolgy.name }} </p>
-          {% else %}
-              <button class="btn" onclick="openAssignModal({{ item.id }})">Назначить сотрудника</button>
+ {% if item.designer_staff %}
+  <p>{{ item.designer_staff.0.profile.name }}</p> {# ✅ First only #}
+    {% else %}
 
-          {% endif %}
-        {% if item.completed_by_technolgy %}
+            <button class="btn" onclick="openAssignModal({{ item.id }})">Назначить сотрудника</button>
+
+              {% endif %}
+
+
+
+
+        {% if item.designer_staff.0.complete  %}
            <form method="post" >
                  {% csrf_token %}
                    <input type="text" name="action" value="designer_chief_complete" hidden>
                 <input type="text" name="pk" value="{{item.pk}}" hidden>
-          <button class="btn">Завершить</button>
+          <button class="btn">Передать менеджеру</button>
 
               </form>
                  {% endif %}
+
+             {% if item.uploaded_by_chief %}
+           <form method="post" >
+                 {% csrf_token %}
+                   <input type="text" name="action" value="designer_chief_complete" hidden>
+               <input type="text" name="update" value="update" hidden>
+               <input type="text" name="stage" value="update" hidden>
+                <input type="text" name="pk" value="{{item.pk}}" hidden>
+          <button class="btn">Передать менеджеру</button>
+
+              </form>
+                 {% endif %}
+
+
 
 
 
@@ -201,6 +303,8 @@
 
         <!-- Static Modal for this project -->
         <div id="modal-{{ item.id }}" class="modal hidden">
+            <form method="post" class="myForm">
+                   {% csrf_token %}
           <div class="modal-content">
             <span class="close" onclick="closeStaticModal('modal-{{ item.id }}')">&times;</span>
             <h3>Проект: {{ item.order_name }}</h3>
@@ -221,9 +325,25 @@
 
             <p><strong>Дата добавления заказа:</strong> {{ item.add_order|date:"d.m.Y" }}</p>
             <p><strong>Срок выполнения:</strong> {{ item.complete_order|date:"d.m.Y" }}</p>
+               <button type="button" class="btn-complete" onclick="addCategoryGroup({{item.pk}})" >+ Добавить категорию и расходник</button>
+               <div id="categories-container-{{item.pk}}">
+
+            </div>
+               <p>Отметьте галочками этапы, которые необходимо выполнить для данного заказа перед передачей в производство.</p>
+          <input type="checkbox" name="rezka" class="stage-checkbox"> Резка<br>
+  <input type="checkbox" name="svarka" class="stage-checkbox"> Сварка<br>
+  <input type="checkbox" name="fill" class="stage-checkbox"> Покраска<br>
+  <input type="checkbox" name="print" class="stage-checkbox"> Печать<br>
+   <input name="action" value="technology_chief_add" hidden>
+    <input type="text" name="pk" value="{{item.pk}}" hidden>
+               {% if not item.designer_staff %}
+   <button  type="submit"  class="btn-complete" >Сохранить</button>
+              {% endif %}
+    </form>
 
 
           </div>
+
         </div>
       {% endfor %}
     </div>
@@ -233,7 +353,7 @@
       <button id="nextPage">❯</button>
     </div>
   </div>
-    {% for item in technologist %}
+    {% for item in technologist_cheif %}
      <script>
       document.addEventListener('DOMContentLoaded', function () {
         {% if item.design %}
@@ -245,6 +365,79 @@
       });
     </script>
   {% endfor %}
+
+<script>
+    function addCategoryGroup(pk) {
+
+    let container = document.getElementById("categories-container-" + pk);
+    let newGroup = document.createElement("div");
+    newGroup.classList.add("category-group");
+
+
+    // Create a unique ID for the new dropdown
+
+
+    newGroup.innerHTML = `
+        <label>Категория заказа:</label>
+          <button type="button" class="btn btn-remove" onclick="removeCategoryGroup(this)">-</button>
+        <select class="form-select" name="catigories" >
+            <option value="Наружная реклама и макеты">Наружная реклама и макеты</option>
+            <option value="Типография">Типография</option>
+            <option value="Полиграфия">Полиграфия</option>
+        </select>
+        <label>Расходник:</label>
+
+        <div class="input-group">
+            <div class="custom-dropdown">
+                <div class="selected" onclick="toggleDropdown(this)">-- Выберите --</div>
+                <ul class="dropdown-options" id="dropdown-list"></ul><br>
+                <input type="hidden" name="add" value="selectedValue" id="selectedValue">
+            </div>
+
+            <input type="number" class="form-control" placeholder="Количество" name="quantity" min="1" required>
+
+        </div>
+    `;
+
+
+    container.appendChild(newGroup);
+
+
+    // Initialize the dropdown for this newly added group
+    const select = newGroup.querySelector('.form-select');
+const dropdownList = newGroup.querySelector('.dropdown-options');
+const selectedDisplay = newGroup.querySelector('.selected');
+const hiddenInput = newGroup.querySelector('input[type="hidden"]');
+
+// Initial dropdown build
+const selectedCategory = select.value;
+buildDropdown(categoriesMap[selectedCategory] || [], dropdownList, selectedDisplay, hiddenInput);
+
+// ⛳️ Add change listener to update dropdown on category switch
+select.addEventListener("change", () => {
+    const newCategory = select.value;
+    buildDropdown(categoriesMap[newCategory] || [], dropdownList, selectedDisplay, hiddenInput);
+});
+}
+
+
+        function removeCategoryGroup(button) {
+            button.closest(".category-group").remove();
+        }
+</script>
+<script>
+document.querySelectorAll('.myForm').forEach(form => {
+  form.addEventListener('submit', function(e) {
+    const checkboxes = form.querySelectorAll('.stage-checkbox');
+    const atLeastOneChecked = Array.from(checkboxes).some(cb => cb.checked);
+
+    if (!atLeastOneChecked) {
+      e.preventDefault();
+      alert('Выберите хотя бы один этап!');
+    }
+  });
+});
+</script>
 <script>
 
   function showExistingFilePreview(fileUrl, previewId) {

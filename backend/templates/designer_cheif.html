@@ -266,9 +266,10 @@
             <p><strong>Срок выполнения:</strong> {{ item.complete_order|date:"d.m.Y" }}</p>
 
             <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                   {% if not item.designer_staff %}
               <button type="button" onclick="addDesignBlock({{ item.pk }})">Добавить</button>
               <button  type="button" onclick="submitSaveForm({{item.pk}})">Сохранить</button>
-
+                {% endif %}
             </div>
                 <form method="post" id="save_{{item.pk}}" enctype="multipart/form-data">
                    {% csrf_token %}

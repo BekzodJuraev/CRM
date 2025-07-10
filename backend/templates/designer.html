@@ -208,7 +208,7 @@
           {% if item.upload %}
              <form method="post" >
                  {% csrf_token %}
-                   <input type="text" name="action" value="designer_complete" hidden>
+                   <input type="text" name="action" value="staff_complete" hidden>
                 <input type="text" name="pk" value="{{item.pk}}" hidden>
           <button class="btn">Завершить</button>
 

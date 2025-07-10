@@ -128,7 +128,7 @@ def assign_project(request):
        action=request.POST.get('action')
 
        if action == 'technologist':
-          Orders.objects.filter(id=id).update(technolgy_id=profile_id)
+          OrderStaff.objects.create(order_id=id, profile_id=profile_id)
           return JsonResponse({"status": "ok"})
        else:
           try:
@@ -263,9 +263,6 @@ class Dashboard(LoginRequiredMixin,TemplateView):
          return redirect(request.path)
       elif action == "technologist":
          add = request.POST.getlist('add')
-         price = request.POST.getlist('price')
-         catigories = request.POST.getlist('catigories')
-         quantity=request.POST.getlist('quantity')
          quantity=request.POST.getlist('quantity')
          rezka = request.POST.get('rezka') == 'on'
          svarka = request.POST.get('svarka') == 'on'
@@ -440,8 +437,7 @@ class MyProjects(LoginRequiredMixin, TemplateView):
          order_staff.upload = True
          order_staff.save(update_fields=['upload'])
 
-      elif action == 'designer_complete':
-         OrderStaff.objects.create()
+
 
       elif action == 'designer_chief_add':
          order_staff, created=OrderStaff.objects.get_or_create(order_id=pk,profile=request.user.profile)
@@ -464,14 +460,75 @@ class MyProjects(LoginRequiredMixin, TemplateView):
 
       elif action == 'designer_chief_complete':
          update = request.POST.get('update')
+         stage=request.POST.get('stage')
 
          if update:
             OrderStaff.objects.filter(profile=request.user.profile,order_id=pk).update(complete=True)
          else:
             OrderStaff.objects.create(profile=request.user.profile, complete=True, order_id=pk)
-
-
          Orders.objects.filter(pk=pk).update(stage='technologist')
+
+      elif action == 'technology_add':
+         add = request.POST.getlist('add')
+         rezka = request.POST.get('rezka') == 'on'
+         svarka = request.POST.get('svarka') == 'on'
+         fill = request.POST.get('fill') == 'on'
+         pechat = request.POST.get('print') == 'on'
+         quantity = request.POST.getlist('quantity')
+         if rezka:
+            pod_stage = "rezka"
+         elif svarka:
+            pod_stage = "svarka"
+         elif fill:
+            pod_stage = "fill"
+         elif pechat:
+            pod_stage = "print"
+
+         order_staff = OrderStaff.objects.filter(pk=pk).first()
+         order_pk=order_staff.order.pk
+         Orders.objects.filter(pk=order_pk).update(stage_pod=pod_stage, rezka=rezka, svarka=svarka,
+                                             fill=fill, print=pechat)
+         consumables = [
+            Consumables(order_id=order_pk, add=a, quantity=d)
+            for a, d in zip(add,quantity)
+         ]
+         Consumables.objects.bulk_create(consumables)
+
+         order_staff.upload = True
+         order_staff.save(update_fields=['upload'])
+
+      elif action == 'technology_chief_add':
+         add = request.POST.getlist('add')
+         rezka = request.POST.get('rezka') == 'on'
+         svarka = request.POST.get('svarka') == 'on'
+         fill = request.POST.get('fill') == 'on'
+         pechat = request.POST.get('print') == 'on'
+         quantity = request.POST.getlist('quantity')
+         if rezka:
+            pod_stage = "rezka"
+         elif svarka:
+            pod_stage = "svarka"
+         elif fill:
+            pod_stage = "fill"
+         elif pechat:
+            pod_stage = "print"
+
+         order_staff = OrderStaff.objects.get_or_create(order_id=pk,profile=request.user.profile,upload=True)
+         order_pk=pk
+         Orders.objects.filter(pk=order_pk).update(stage_pod=pod_stage, rezka=rezka, svarka=svarka,
+                                             fill=fill, print=pechat)
+         consumables = [
+            Consumables(order_id=order_pk, add=a, quantity=d)
+            for a, d in zip(add,quantity)
+         ]
+         Consumables.objects.bulk_create(consumables)
+
+      elif action == 'staff_complete':
+         OrderStaff.objects.filter(pk=pk).update(complete=True)
+
+
+
+
 
 
 
@@ -485,8 +542,21 @@ class MyProjects(LoginRequiredMixin, TemplateView):
          profile=profile,
          upload=True
       )
-      context['technologist_cheif'] = Orders.objects.filter(stage='technologist').select_related('technolgy')
-      context['designer_cheif']= orders = Orders.objects.annotate(
+
+
+      context['technologist_cheif'] = Orders.objects.annotate(
+    uploaded_by_chief=Exists(is_uploaded_by_chief)
+   ).filter(stage='technologist').prefetch_related(
+    Prefetch(
+        'order_staff',
+        queryset=OrderStaff.objects.filter(profile__position='technologist').select_related('profile'),
+        to_attr='designer_staff'
+    )
+)
+
+
+
+      context['designer_cheif']= Orders.objects.annotate(
     uploaded_by_chief=Exists(is_uploaded_by_chief)
    ).filter(stage='design').prefetch_related(
     Prefetch(
@@ -497,8 +567,9 @@ class MyProjects(LoginRequiredMixin, TemplateView):
 )
 
       context['designer'] = OrderStaff.objects.filter(profile=profile,order__stage='design',complete=False).select_related('order')
-      context['technologist'] = Orders.objects.filter(stage='technologist', technolgy=profile,
-                                                  completed_by_technolgy=False).select_related('technolgy')
+      context['technologist'] = OrderStaff.objects.filter(profile=profile, order__stage='technologist',
+                                                      complete=False).select_related('order')
+
       return context
 
 

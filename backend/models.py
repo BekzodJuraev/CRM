@@ -146,14 +146,8 @@ class Orders(models.Model):
     call_center = models.ForeignKey(
         'Profile', on_delete=models.CASCADE, related_name='call_center_profile', verbose_name="Профиль",blank=True,null=True
     )
-    designer = models.ForeignKey(
-        'Profile', on_delete=models.CASCADE, related_name='designer_profile', verbose_name="Профиль",blank=True, null=True
-     )
-    technolgy = models.ForeignKey(
-        'Profile', on_delete=models.CASCADE, related_name='technolgy_profile', verbose_name="Профиль",blank=True, null=True
-    )
-    completed_by_desinger=models.BooleanField(default=False)
-    completed_by_technolgy = models.BooleanField(default=False)
+
+
 
 
     order_name=models.CharField(max_length=100,null=True)
@@ -221,13 +215,14 @@ class Consumables(models.Model):
     add=models.CharField(max_length=50)
     order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name='consumables')
     quantity=models.IntegerField(default=1)
+    warehouse = models.BooleanField(default=False)
 
 
 
 
 
     def __str__(self):
-        return self.catigories
+        return self.add
 
 
 class Rezident(models.Model):
