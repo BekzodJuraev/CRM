@@ -50,5 +50,5 @@ class Finance(admin.ModelAdmin):
 
 @admin.register(Consumables)
 class Consumables(admin.ModelAdmin):
-    pass
+    list_display = ['add','warehouse']
 

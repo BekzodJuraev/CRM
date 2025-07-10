@@ -9,7 +9,8 @@
     {% include 'technolgy_chief.html' %}
 {% elif request.user.profile.position == "technologist" %}
     {% include 'technology.html' %}
-
+{% elif request.user.profile.position == "supplier" %}
+    {% include 'supplier.html' %}
 {% endif %}
 
 

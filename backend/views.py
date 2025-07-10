@@ -527,6 +527,11 @@ class MyProjects(LoginRequiredMixin, TemplateView):
          OrderStaff.objects.filter(pk=pk).update(complete=True)
 
 
+      elif action == 'warehouse':
+         order_staff=OrderStaff.objects.create(profile=request.user.profile,order_id=pk,complete=True)
+         Consumables.objects.filter(order_id=pk).update(warehouse=True)
+         Orders.objects.filter(pk=pk).update(stage='manufacturing')
+
 
 
 
@@ -569,6 +574,8 @@ class MyProjects(LoginRequiredMixin, TemplateView):
       context['designer'] = OrderStaff.objects.filter(profile=profile,order__stage='design',complete=False).select_related('order')
       context['technologist'] = OrderStaff.objects.filter(profile=profile, order__stage='technologist',
                                                       complete=False).select_related('order')
+
+      context['warehouse']=Orders.objects.filter(stage='warehouse')
 
       return context
 
@@ -1453,7 +1460,7 @@ class WarehouseView(LoginRequiredMixin, TemplateView):
       context = super().get_context_data(**kwargs)
       search = self.request.GET.get('search')
       limit_subquery = WarehouseLimit.objects.filter(product=OuterRef('product')).order_by('-id').values('limit')[:1]
-      stock_subquery = Consumables.objects.filter(add=OuterRef('product')).values('add').annotate(sum=Sum('quantity')).values('sum')[:1]
+      stock_subquery = Consumables.objects.filter(add=OuterRef('product'),warehouse=True).values('add').annotate(sum=Sum('quantity')).values('sum')[:1]
       if search:
          context['warehouse'] = Warehouse.objects.filter(product__icontains=search).values('product').annotate(
             last_added=Max('created_at'), limit=Subquery(limit_subquery), quantity=Sum('quantity'),
