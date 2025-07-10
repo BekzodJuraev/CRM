@@ -224,6 +224,12 @@ class Consumables(models.Model):
     def __str__(self):
         return self.add
 
+class Provider(models.Model):
+
+    name = models.CharField(max_length=200, null=True, blank=True, default=None)
+    lastname = models.CharField(max_length=200, null=True, blank=True, default=None)
+    middle_name = models.CharField(max_length=200, null=True, blank=True, default=None)
+    phone = PhoneNumberField()
 
 class Rezident(models.Model):
     company=models.CharField(max_length=60)

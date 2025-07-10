@@ -37,4 +37,6 @@ urlpatterns=[
     path('my_projects/',views.MyProjects.as_view(),name='my_projects'),
     path('search-profile/', views.search_profiles, name='search-profile'),
     path('assign/', views.assign_project, name='assign'),
+    path('provider/',views.ProviderView.as_view(),name='provider'),
+    path('provider/add',views.ProvideCreateView.as_view(),name='provider_add')
 ]

@@ -6,7 +6,7 @@ from django.db.models import Prefetch
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django.views.generic import View,TemplateView,DetailView,UpdateView
-from .models import Profile,Rezident,Finance,Warehouse,WarehouseLimit,Consumables,Orders,Delivery_Photo,Compelete_Photo,Telegram_users,Clients,Social_clients,OrderStaff
+from .models import Profile,Rezident,Finance,Warehouse,WarehouseLimit,Consumables,Orders,Delivery_Photo,Compelete_Photo,Telegram_users,Clients,Social_clients,OrderStaff,Provider
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
@@ -1020,9 +1020,47 @@ class ClientCreateView(LoginRequiredMixin,TemplateView):
 
       return redirect('clients')
 
+class ProviderView(LoginRequiredMixin,TemplateView):
+   template_name = 'provider.html'
+   login_url = reverse_lazy('login')
+
+
+   def get_context_data(self, *, object_list=None, **kwargs):
+      context = super().get_context_data(**kwargs)
+      search = self.request.GET.get('search')
+      profile=self.request.user.profile
+
+      if search:
+         context['profile'] = Provider.objects.filter(Q(name__icontains=search) |
+        Q(lastname__icontains=search) |
+        Q(middle_name__icontains=search))
+      else:
+         context['profile'] = Provider.objects.all()
+
+      return context
+
+
+class ProvideCreateView(LoginRequiredMixin,TemplateView):
+   template_name = 'provider_add.html'
+   login_url = reverse_lazy('login')
+
+
+   def post(self, request, *args, **kwargs):
+      name = request.POST.get('name')
+      lastname = request.POST.get('lastname')
+      middle_name = request.POST.get('middle_name')
+      phone = request.POST.get('phone')
+      Provider.objects.create(name=name,lastname=lastname,middle_name=middle_name,phone=phone)
+
+
+
+
+
+      return redirect('provider')
 class MarketingClietView(LoginRequiredMixin,TemplateView):
    template_name = 'marketing.html'
    login_url = reverse_lazy('login')
+
 
 
    def post(self, request, *args, **kwargs):
