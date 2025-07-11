@@ -13,6 +13,12 @@
     {% include 'supplier.html' %}
 {% elif request.user.profile.position == "accountant" %}
     {% include 'account.html' %}
+
+{% elif request.user.profile.position == "delivery_cheif" %}
+    {% include 'delivery_cheif.html' %}
+
+{% elif request.user.profile.position == "delivery" %}
+    {% include 'delivery.html' %}
 {% endif %}
 
 

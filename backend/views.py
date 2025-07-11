@@ -102,15 +102,9 @@ def search_client(request):
 
 
 def search_profiles(request):
-    search = request.GET.get("search", "")
     position = request.GET.get("position", "")
 
-    qs = Profile.objects.filter(
-       Q(name__icontains=search) |
-       Q(lastname__icontains=search) |
-       Q(middle_name__icontains=search),
-        position=position
-    )
+    qs = Profile.objects.filter(position=position)
     results = [
         {
             "id": profile.id,
@@ -118,6 +112,7 @@ def search_profiles(request):
         }
         for profile in qs
     ]
+
     return JsonResponse(results, safe=False)
 
 
@@ -125,18 +120,13 @@ def assign_project(request):
     if request.method == "POST":
        id=request.POST.get('project_id')
        profile_id = request.POST.get('profile_id')
-       action=request.POST.get('action')
 
-       if action == 'technologist':
-          OrderStaff.objects.create(order_id=id, profile_id=profile_id)
+       try:
+          OrderStaff.objects.get_or_create(order_id=id, profile_id=profile_id)
           return JsonResponse({"status": "ok"})
-       else:
-          try:
-             OrderStaff.objects.create(order_id=id, profile_id=profile_id)
-             return JsonResponse({"status": "ok"})
 
-          except Exception as e:
-             return JsonResponse({"error": str(e)}, status=400)
+       except Exception as e:
+          return JsonResponse({"error": str(e)}, status=400)
 
 
 
@@ -543,6 +533,13 @@ class MyProjects(LoginRequiredMixin, TemplateView):
          else:
             Orders.objects.filter(pk=pk).update(stage=stage)
 
+      elif action =='delivery':
+
+       order_staff,created=OrderStaff.objects.get_or_create(order_id=pk,profile=request.user.profile)
+       Orders.objects.filter(pk=pk).update(stage='installation')
+       order_staff.complete = True
+       order_staff.save(update_fields=['complete'])
+
 
 
 
@@ -589,6 +586,18 @@ class MyProjects(LoginRequiredMixin, TemplateView):
 
       context['warehouse']=Orders.objects.filter(stage='warehouse')
       context['account']=Orders.objects.filter(stage__in=['accounting', 'accounting_2']).select_related('client')
+
+      context['delivery_cheif']= Orders.objects.annotate(
+    uploaded_by_chief=Exists(is_uploaded_by_chief)
+   ).filter(stage='delivery').prefetch_related(
+    Prefetch(
+        'order_staff',
+        queryset=OrderStaff.objects.filter(profile__position='delivery').select_related('profile'),
+        to_attr='designer_staff'
+    )
+)
+      context['delivery'] = OrderStaff.objects.filter(profile=profile, order__stage='delivery',
+                                                          complete=False).select_related('order')
 
       return context
 
