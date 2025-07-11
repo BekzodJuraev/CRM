@@ -11,6 +11,8 @@
     {% include 'technology.html' %}
 {% elif request.user.profile.position == "supplier" %}
     {% include 'supplier.html' %}
+{% elif request.user.profile.position == "accountant" %}
+    {% include 'account.html' %}
 {% endif %}
 
 

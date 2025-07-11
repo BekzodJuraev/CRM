@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <title>Мои проекты</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+    header {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .back-arrow {
+      font-size: 24px;
+      cursor: pointer;
+    }
+    h2 {
+      flex-grow: 1;
+      text-align: center;
+      margin: 0;
+    }
+    #search {
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      flex-grow: 1;
+      max-width: 300px;
+    }
+    .client-card {
+      background: white;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+    .client-card .btn {
+      background: #007aff;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-left: 10px;
+      margin-top: 10px;
+    }
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .pagination button {
+      padding: 8px 16px;
+      font-size: 20px;
+      border-radius: 10px;
+      border: none;
+      background: #007aff;
+      color: white;
+      cursor: pointer;
+    }
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal.hidden {
+      display: none;
+    }
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 14px;
+      width: 500px;
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .close {
+      position: absolute;
+      right: 15px;
+      top: 10px;
+      font-size: 24px;
+      cursor: pointer;
+      color: red;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    img {
+      max-width: 100%;
+      margin-top: 10px;
+      border-radius: 10px;
+    }
+    .file-preview {
+      margin-top: 10px;
+      position: relative;
+      display: inline-block;
+      max-width: 150px;
+    }
+
+    .file-preview img,
+    .file-preview .file-icon {
+      max-width: 100%;
+      max-height: 150px;
+      border: 1px solid #ccc;
+      padding: 5px;
+      border-radius: 5px;
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .file-input-wrapper {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  padding: 8px 12px;
+  background-color: #007aff;
+  color: white;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  user-select: none;
+}
+
+.file-input-wrapper input[type="file"] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.file-label {
+  pointer-events: none;
+}
+  </style>
+</head>
+<body>
+<div id="assignModal" class="modal hidden">
+  <div class="modal-content" style="max-width: 500px;">
+    <span class="close" onclick="closeAssignModal()">&times;</span>
+
+    <h3>Выберите сотрудника (должность: Дизайнер)</h3>
+
+    <input type="text" id="searchEmployee" placeholder="Поиск по имени..." style="width:100%;padding:8px;border-radius:8px;border:1px solid #ccc;" />
+
+    <div id="employeeList" style="max-height: 200px; overflow-y: auto; margin-top: 10px;"></div>
+
+    <div id="confirmBlock" style="margin-top: 20px; display: none;">
+      <p>Вы уверены, что хотите передать проект <strong id="selectedName"></strong>?</p>
+      <button class="btn" onclick="confirmAssign()">Да</button>
+      <button class="btn" onclick="closeAssignModal()">Нет</button>
+    </div>
+  </div>
+</div>
+  <div class="container">
+    <header>
+      <span class="back-arrow" onclick="history.back()">←</span>
+      <h2>📁 Мои проекты</h2>
+      <input type="text" id="search" placeholder="Поиск проектов..." />
+    </header>
+
+    <div id="client-list" class="client-list">
+      {% for item in account %}
+
+        <div class="client-card" data-name="{{ item.order_name}}">
+          <div>
+          <strong>{{ item.order_name }}</strong>
+      <button class="btn" onclick="openStaticModal('modal-{{ item.id }}')">Перейти</button>
+  </div>
+
+
+
+
+
+
+        </div>
+
+        <!-- Static Modal for this project -->
+        <div id="modal-{{ item.id }}" class="modal hidden">
+          <div class="modal-content">
+            <span class="close" onclick="closeStaticModal('modal-{{ item.id }}')">&times;</span>
+            <h3>Проект: {{ item.order_name }}</h3>
+            {% if item.client.client_type == 'INDIVIDUAL' %}
+            <p><strong>Фамилия:</strong> {{ item.client.name }}</p>
+            <p><strong>Имя:</strong> {{ item.client.lastname }}</p>
+            <p><strong>Отчество:</strong> {{ item.client.middle_name }}</p>
+
+            {% else %}
+
+
+            <p><strong>Наименование организации:</strong> {{ item.client.company_name }}</p>
+            <p><strong>ИНН:</strong> {{ item.client.inn }}</p>
+            <p><strong>Расчётный счёт (Р/С):</strong> {{ item.client.account }}</p>
+             <p><strong>МФО:</strong> {{ item.client.mfo }}</p>
+            <p><strong>Юридический адрес:</strong> {{ item.client.adress }}</p>
+
+            {% endif %}
+
+
+            <p><strong>Номер телефона:</strong> {{ item.client.phone }}</p>
+            <p><strong>Источник:</strong> {{ item.client.get_social_display }}</p>
+            <p><strong>Дата регистрации клиента:</strong> {{ item.client.created_at|date:"d.m.Y" }}</p>
+            <p><strong>Сумма заказа: </strong> {{ item.order_sum }}</p>
+            <p><strong>Предоплата</strong> {{ item.order_predoplata}}</p>
+
+
+             <p><strong>Описание / ТЗ:</strong> {{ item.description }}</p>
+            <p><strong>Прикреплённые файлы:</strong></p>
+            <div id="preview_tz_{{ item.id }}"></div>
+
+            <p><strong>Размер:</strong> {{ item.razmer }}</p>
+
+          {% if item.stage == "accounting_2" %}
+            Выбранные этапы на производстве: {{ item.rezka|yesno:"Резка," }}
+                        {{ item.svarka|yesno:"Сварка," }}
+                        {{ item.fill|yesno:"Покраска," }}
+                        {{ item.print|yesno:"Печать," }}
+            {% endif %}
+
+
+            <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+              {% if item.stage == "accounting_2" %}
+              <p>Подтвердите предоплату 100% в размере {{item.order_sum}} сум</p>
+
+              <button  type="button" onclick="FullPayment({{item.pk}})">Подтвердить</button>
+              {% else %}
+              <p>Подтвердите предоплату 80% в размере {{item.order_predoplata}} сум</p>
+             <button type="button" onclick="PartPayment({{ item.pk }})">Подтвердить</button>
+              <button  type="button" onclick="FullPayment({{item.pk}})">Подтвердить 100% оплату</button>
+              {% endif %}
+
+
+            </div>
+                <form method="post" id="full_{{item.pk}}" >
+                   {% csrf_token %}
+                 {% if item.stage == "accounting_2" %}
+                    <input type="text" name="stage" value="delivery" hidden>
+                    {% else %}
+                    <input type="text" name="stage" value="warehouse" hidden>
+                    {% endif %}
+               <input type="text" name="action" value="account" hidden>
+                   <input type="text" name="payment" value="full" hidden>
+                <input type="text" name="pk" value="{{item.pk}}" hidden>
+
+
+
+              </form>
+             <form method="post" id="part_{{item.pk}}">
+                   {% csrf_token %}
+                  {% if item.stage == "accounting_2" %}
+                    <input type="text" name="stage" value="delivery" hidden>
+                    {% else %}
+                    <input type="text" name="stage" value="warehouse" hidden>
+                    {% endif %}
+               <input type="text" name="action" value="account" hidden>
+
+                <input type="text" name="pk" value="{{item.pk}}" hidden>
+
+
+              </form>
+
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="pagination">
+      <button id="prevPage">❮</button>
+      <button id="nextPage">❯</button>
+    </div>
+  </div>
+    {% for item in account %}
+     <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        {% if item.design %}
+          showExistingFilePreview("{{ item.design.url }}", "preview_design_{{ item.id }}");
+        {% endif %}
+        {% if item.tz %}
+          showExistingFilePreview("{{ item.tz.url }}", "preview_tz_{{ item.id }}");
+        {% endif %}
+      });
+    </script>
+  {% endfor %}
+<script>
+  function addDesignBlock(pk) {
+  const container = document.getElementById(`designContainer_${pk}`);
+  if (!container) return;
+
+  container.innerHTML = '';  // очищаем, если уже добавлено
+
+  const previewId = `preview_designn_${pk}`;
+
+  const block = document.createElement('div');
+  block.innerHTML = `
+    <label>Описание дизайна:</label>
+    <label class="file-input-wrapper">
+      <span class="file-label">📎 Прикрепить файл</span>
+      <input type="file" name="design" class="file-input" onchange="handleFile(this, '${previewId}')">
+    </label>
+    <div id="${previewId}"></div>
+    <textarea class="form-control" rows="3" name="description_design"></textarea>
+  `;
+
+  container.appendChild(block);
+}
+function handleFile(input, previewId) {
+  const file = input.files[0];
+  const container = document.getElementById(previewId);
+  container.innerHTML = '';
+
+  if (!file) return;
+
+  const preview = document.createElement('div');
+  preview.className = 'file-preview';
+
+  const removeBtn = document.createElement('button');
+  removeBtn.innerText = '×';
+  removeBtn.className = 'remove-btn';
+  removeBtn.onclick = () => {
+    input.value = '';
+    container.innerHTML = '';
+  };
+
+  preview.appendChild(removeBtn);
+
+  const isImage = file.type.startsWith('image/');
+
+  if (isImage) {
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    img.alt = 'Предпросмотр изображения';
+    img.style.cursor = 'pointer';
+    img.onclick = () => window.open(img.src, '_blank');
+    preview.appendChild(img);
+  } else {
+    const fileIcon = document.createElement('div');
+    fileIcon.className = 'file-icon';
+    fileIcon.innerHTML = `📄 ${file.name}`;
+    fileIcon.style.cursor = 'pointer';
+    fileIcon.onclick = () => {
+      const url = URL.createObjectURL(file);
+      window.open(url, '_blank');
+    };
+    preview.appendChild(fileIcon);
+  }
+
+  container.appendChild(preview);
+}
+
+
+</script>
+<script>
+      function FullPayment(pk) {
+    document.getElementById(`full_${pk}`).submit();
+}
+    function PartPayment(pk) {
+    document.getElementById(`part_${pk}`).submit();
+}
+</script>
+<script>
+
+  function showExistingFilePreview(fileUrl, previewId) {
+  const container = document.getElementById(previewId);
+  if (!container) return;
+
+  container.innerHTML = ''; // clear previous
+  const preview = document.createElement('div');
+  preview.className = 'file-preview';
+
+  const removeBtn = document.createElement('button');
+
+
+
+
+
+  const isImage = /\.(jpg|jpeg|png|gif)$/i.test(fileUrl);
+  if (isImage) {
+    const img = document.createElement('img');
+    img.src = fileUrl;
+    img.alt = 'Предпросмотр изображения';
+    img.style.cursor = 'pointer';
+    img.onclick = () => window.open(fileUrl, '_blank');
+    preview.appendChild(img);
+  } else {
+    const fileIcon = document.createElement('div');
+    fileIcon.className = 'file-icon';
+    fileIcon.innerHTML = `📄 ${fileUrl.split('/').pop()}`;
+    fileIcon.style.cursor = 'pointer';
+    fileIcon.onclick = () => {
+      window.open(fileUrl, '_blank');
+    };
+    preview.appendChild(fileIcon);
+  }
+
+  container.appendChild(preview);
+}
+
+</script>
+  <script>
+    const allCards = Array.from(document.querySelectorAll(".client-card"));
+    const itemsPerPage = 5;
+    let currentPage = 0;
+
+    function renderPage() {
+      const start = currentPage * itemsPerPage;
+      const end = start + itemsPerPage;
+      allCards.forEach((card, index) => {
+        card.style.display = index >= start && index < end ? "block" : "none";
+      });
+    }
+
+    document.getElementById("prevPage").onclick = () => {
+      if (currentPage > 0) {
+        currentPage--;
+        renderPage();
+      }
+    };
+
+    document.getElementById("nextPage").onclick = () => {
+      if ((currentPage + 1) * itemsPerPage < allCards.length) {
+        currentPage++;
+        renderPage();
+      }
+    };
+
+    document.getElementById("search").addEventListener("input", function () {
+      const searchTerm = this.value.toLowerCase();
+      allCards.forEach(card => {
+        const name = card.dataset.name;
+        card.style.display = name.includes(searchTerm) ? "block" : "none";
+      });
+    });
+
+    function openStaticModal(id) {
+      document.getElementById(id).classList.remove("hidden");
+    }
+
+    function closeStaticModal(id) {
+      document.getElementById(id).classList.add("hidden");
+    }
+
+    renderPage();
+  </script>
+
+<script>
+  let currentProjectId = null;
+  let selectedEmployeeId = null;
+
+  function openAssignModal(projectId) {
+    currentProjectId = projectId;
+    selectedEmployeeId = null;
+    document.getElementById('employeeList').innerHTML = '';
+    document.getElementById('confirmBlock').style.display = 'none';
+    document.getElementById('searchEmployee').value = '';
+    document.getElementById('assignModal').classList.remove('hidden');
+  }
+
+  function closeAssignModal() {
+    document.getElementById('assignModal').classList.add('hidden');
+  }
+
+  // AJAX поиск сотрудников
+  document.getElementById('searchEmployee').addEventListener('input', function () {
+    const query = this.value;
+
+    if (query.length < 2) return;
+
+    fetch(`/search-profile/?position=designer&search=${encodeURIComponent(query)}`)
+      .then(res => res.json())
+      .then(data => {
+        const list = document.getElementById('employeeList');
+        list.innerHTML = '';
+        data.forEach(user => {
+          const div = document.createElement('div');
+          div.textContent = user.full_name;
+          div.style.cursor = 'pointer';
+          div.style.padding = '5px 10px';
+          div.style.borderBottom = '1px solid #ddd';
+          div.onclick = () => {
+            selectedEmployeeId = user.id;
+            document.getElementById('selectedName').textContent = user.full_name;
+            document.getElementById('confirmBlock').style.display = 'block';
+          };
+          list.appendChild(div);
+        });
+      });
+  });
+
+  // Подтверждение отправки
+  function confirmAssign() {
+    fetch(`/assign/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRFToken': '{{ csrf_token }}',
+      },
+      body: new URLSearchParams({
+        project_id: currentProjectId,
+        profile_id: selectedEmployeeId
+      })
+    }).then(res => {
+      if (res.ok) {
+        alert('Проект успешно передан!');
+        closeAssignModal();
+        location.reload();
+      } else {
+        alert('Ошибка при передаче!');
+      }
+    });
+  }
+</script>
+
+</body>
+</html>

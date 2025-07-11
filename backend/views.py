@@ -533,6 +533,18 @@ class MyProjects(LoginRequiredMixin, TemplateView):
          Orders.objects.filter(pk=pk).update(stage='manufacturing')
 
 
+      elif action == 'account':
+         payment=request.POST.get('payment')
+         stage = request.POST.get('stage')
+
+         if payment:
+            Orders.objects.filter(pk=pk).update(stage=stage,full_pay=True)
+
+         else:
+            Orders.objects.filter(pk=pk).update(stage=stage)
+
+
+
 
 
 
@@ -576,6 +588,7 @@ class MyProjects(LoginRequiredMixin, TemplateView):
                                                       complete=False).select_related('order')
 
       context['warehouse']=Orders.objects.filter(stage='warehouse')
+      context['account']=Orders.objects.filter(stage__in=['accounting', 'accounting_2']).select_related('client')
 
       return context
 

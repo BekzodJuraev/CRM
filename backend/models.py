@@ -166,7 +166,7 @@ class Orders(models.Model):
     tz=models.FileField(blank=True, upload_to='pictures/')
     design=models.FileField(blank=True, upload_to='pictures/')
 
-    stage = models.CharField(max_length=20, choices=Stage_CHOICES,default='marketing')
+    stage = models.CharField(max_length=20, choices=Stage_CHOICES,default='manager')
     add_order=models.DateField(null=True)
 
     complete_order=models.DateField(null=True)
@@ -181,6 +181,8 @@ class Orders(models.Model):
     fail_date = models.DateField(null=True)
     by_who_fail=models.CharField(max_length=50,null=True,blank=True)
     fail=models.CharField(max_length=255,null=True)
+
+    full_pay=models.BooleanField(default=False)
 
 
 
