@@ -19,6 +19,11 @@
 
 {% elif request.user.profile.position == "delivery" %}
     {% include 'delivery.html' %}
+{% elif request.user.profile.position == "installer_cheif" %}
+    {% include 'installer_cheif.html' %}
+{% elif request.user.profile.position == "installer" %}
+    {% include 'installer.html' %}
+
 {% endif %}
 
 
