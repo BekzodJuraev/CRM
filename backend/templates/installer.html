@@ -222,7 +222,7 @@
     </header>
 
     <div id="client-list" class="client-list">
-      {% for item in delivery %}
+      {% for item in installer %}
 
         <div class="client-card" data-name="{{ item.order.order_name}}">
           <div>
@@ -234,13 +234,14 @@
 
 
 
-
+                {% if item.upload %}
             <form method="post">
                  {% csrf_token %}
-                <input name="action" value="delivery" hidden>
+                <input name="action" value="installer" hidden>
                 <input name="pk" value="{{item.order.pk}}" hidden>
-                <button class="btn"  type="submit">Подтвердить доставку</button>
+                <button class="btn"  type="submit">Подтвердить установку</button>
             </form>
+            {% endif %}
 
 
 
@@ -254,7 +255,9 @@
 
         <!-- Static Modal for this project -->
         <div id="modal-{{ item.order.id }}" class="modal hidden">
-          <div class="modal-content">
+          <form method="post"   enctype="multipart/form-data">
+              {% csrf_token %}
+            <div class="modal-content">
             <span class="close" onclick="closeStaticModal('modal-{{ item.order.id }}')">&times;</span>
             <h3>Проект: {{ item.order.order_name }}</h3>
 
@@ -273,9 +276,26 @@
 <!-- Status & result -->
 
 <div id="mini-map" style="width: 100%; max-width: 400px; height: 200px; margin-top: 10px; display: none;"></div>
+              <label class="file-input-wrapper">
+  <span class="file-label">📎 Прикрепить фото</span>
+  <input
+    type="file"
+    name="photo"
+    accept="image/*"
+    multiple
+    class="file-input"
+    onchange="handleFile(this, 'preview_design_{{ item.pk }}')"
+    required
+  />
+</label>
 
+<div id="preview_design_{{ item.pk }}"></div>
+                <input name="pk" value="{{item.order.pk}}" hidden>
+                <input name="action" value="installer" hidden>
+          <button  type="submit"  class="btn-complete" >Сохранить</button>
           </div>
         </div>
+        </form>
       {% endfor %}
     </div>
 
@@ -371,6 +391,51 @@
 
     renderPage();
   </script>
+
+<script>
+function handleFile(input, previewId) {
+  const files = input.files;
+  const container = document.getElementById(previewId);
+
+  if (!files.length) return;
+
+  Array.from(files).forEach(file => {
+    if (!file.type.startsWith('image/')) {
+      alert('Только изображения разрешены.');
+      return;
+    }
+
+    const preview = document.createElement('div');
+    preview.className = 'file-preview';
+
+    const removeBtn = document.createElement('button');
+    removeBtn.innerText = '×';
+    removeBtn.className = 'remove-btn';
+    removeBtn.onclick = () => {
+      preview.remove();
+      // Optionally, remove this file from a custom list if managing manually
+    };
+
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    img.alt = 'Предпросмотр изображения';
+    img.style.cursor = 'pointer';
+    img.onclick = () => window.open(img.src, '_blank');
+
+    preview.appendChild(removeBtn);
+    preview.appendChild(img);
+
+    container.appendChild(preview);
+  });
+
+  // DO NOT clear input here, or form won't send files
+  // input.value = '';
+}
+</script>
+
+
+
+
 
 
 

@@ -540,6 +540,34 @@ class MyProjects(LoginRequiredMixin, TemplateView):
        order_staff.complete = True
        order_staff.save(update_fields=['complete'])
 
+      elif action == 'installer':
+         order_staff, created = OrderStaff.objects.get_or_create(order_id=pk, profile=request.user.profile)
+         if order_staff.upload:
+            Orders.objects.filter(pk=pk).update(stage='quality_control')
+            order_staff.complete = True
+            order_staff.save(update_fields=['complete'])
+
+
+         else:
+            photo = request.FILES.getlist('photo')
+            print(photo)
+            delivery = [
+               Delivery_Photo(order_id=pk, photo=p)
+               for p in photo
+            ]
+            Delivery_Photo.objects.bulk_create(delivery)
+            if photo:
+               order_staff.upload = True
+               order_staff.save(update_fields=['upload'])
+
+
+
+
+
+
+
+
+
 
 
 
@@ -598,6 +626,15 @@ class MyProjects(LoginRequiredMixin, TemplateView):
 )
       context['delivery'] = OrderStaff.objects.filter(profile=profile, order__stage='delivery',
                                                           complete=False).select_related('order')
+
+      context['installer_chief']=Orders.objects.annotate(uploaded_by_chief=Exists(is_uploaded_by_chief)).filter(stage='installation').prefetch_related(
+    Prefetch(
+        'order_staff',
+        queryset=OrderStaff.objects.filter(profile__position='installer').select_related('profile'),
+        to_attr='designer_staff'
+    ))
+      context['installer'] = OrderStaff.objects.filter(profile=profile, order__stage='installation',
+                                                      complete=False).select_related('order')
 
       return context
 

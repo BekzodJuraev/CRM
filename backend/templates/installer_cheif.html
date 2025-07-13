@@ -222,7 +222,7 @@
     </header>
 
     <div id="client-list" class="client-list">
-      {% for item in delivery_cheif %}
+      {% for item in installer_chief %}
 
         <div class="client-card" data-name="{{ item.order_name}}">
           <div>
@@ -232,16 +232,19 @@
             {% if item.designer_staff %}
   <p>{{ item.designer_staff.0.profile.name }}</p> {# ✅ First only #}
     {% else %}
-
+             {% if not item.uploaded_by_chief  %}
             <button class="btn" onclick="openAssignModal({{ item.id }})">Назначить сотрудника</button>
-
+                {% endif %}
               {% endif %}
-            {% if not  item.designer_staff  %}
+
+
+
+              {% if item.uploaded_by_chief  %}
             <form method="post">
-                {% csrf_token %}
-                <input name="action" value="delivery" hidden>
+                 {% csrf_token %}
+                <input name="action" value="installer" hidden>
                 <input name="pk" value="{{item.pk}}" hidden>
-                <button class="btn"  type="submit">Подтвердить доставку</button>
+                <button class="btn"  type="submit">Подтвердить установку</button>
             </form>
             {% endif %}
 
@@ -256,7 +259,9 @@
 
         <!-- Static Modal for this project -->
         <div id="modal-{{ item.id }}" class="modal hidden">
-          <div class="modal-content">
+          <form method="post"  enctype="multipart/form-data">
+              {% csrf_token %}
+            <div class="modal-content">
             <span class="close" onclick="closeStaticModal('modal-{{ item.id }}')">&times;</span>
             <h3>Проект: {{ item.order_name }}</h3>
 
@@ -265,6 +270,8 @@
              <p><strong>Описание / ТЗ:</strong> {{ item.description }}</p>
 
               <p><strong>Местоположение установки:</strong></p>
+
+
 
   <input type="hidden" id="latitude-{{ item.pk }}" value="{{ item.latitude|default:'' }}">
   <input type="hidden" id="longitude-{{ item.pk }}" value="{{ item.longitude|default:'' }}">
@@ -275,9 +282,28 @@
 <!-- Status & result -->
 
 <div id="mini-map" style="width: 100%; max-width: 400px; height: 200px; margin-top: 10px; display: none;"></div>
+{% if not item.designer_staff %}
+                      <label class="file-input-wrapper">
+  <span class="file-label">📎 Прикрепить фото</span>
+  <input
+    type="file"
+    name="photo"
+    accept="image/*"
+    multiple
+    class="file-input"
+    onchange="handleFile(this, 'preview_design_{{ item.pk }}')"
+    required
+  />
+</label>
 
+<div id="preview_design_{{ item.pk }}"></div>
+               <input name="pk" value="{{item.pk}}" hidden>
+                <input name="action" value="installer" hidden>
+          <button  type="submit"  class="btn-complete" >Сохранить</button>
+{% endif %}
           </div>
         </div>
+          </form>
       {% endfor %}
     </div>
 
@@ -386,7 +412,7 @@ function openAssignModal(projectId) {
   document.getElementById('assignModal').classList.remove('hidden');
 
   // ✅ Fetch employees when modal is opened
-  fetch('/search-profile/?position=delivery')
+  fetch('/search-profile/?position=installer')
     .then(res => res.json())
     .then(data => {
       const list = document.getElementById('employeeList');
@@ -435,6 +461,47 @@ function confirmAssign() {
 }
 
 </script>
+<script>
+function handleFile(input, previewId) {
+  const files = input.files;
+  const container = document.getElementById(previewId);
+
+  if (!files.length) return;
+
+  Array.from(files).forEach(file => {
+    if (!file.type.startsWith('image/')) {
+      alert('Только изображения разрешены.');
+      return;
+    }
+
+    const preview = document.createElement('div');
+    preview.className = 'file-preview';
+
+    const removeBtn = document.createElement('button');
+    removeBtn.innerText = '×';
+    removeBtn.className = 'remove-btn';
+    removeBtn.onclick = () => {
+      preview.remove();
+      // Optionally, remove this file from a custom list if managing manually
+    };
+
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    img.alt = 'Предпросмотр изображения';
+    img.style.cursor = 'pointer';
+    img.onclick = () => window.open(img.src, '_blank');
+
+    preview.appendChild(removeBtn);
+    preview.appendChild(img);
+
+    container.appendChild(preview);
+  });
+
+  // DO NOT clear input here, or form won't send files
+  // input.value = '';
+}
+</script>
+
 
 </body>
 </html>
