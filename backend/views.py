@@ -550,7 +550,7 @@ class MyProjects(LoginRequiredMixin, TemplateView):
 
          else:
             photo = request.FILES.getlist('photo')
-            print(photo)
+
             delivery = [
                Delivery_Photo(order_id=pk, photo=p)
                for p in photo

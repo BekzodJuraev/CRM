@@ -109,24 +109,29 @@
         <h1 class="mb-0">Главная</h1>
     </div>
 
-    <!-- Колокольчик справа -->
-    <div id="notification-icon" class="position-relative">
-        <span style="font-size: 24px; cursor: pointer;">🔔</span>
-        <span id="notification-badge" style="
-            display: none;
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 10px;
-            height: 10px;
-            background: red;
-            border-radius: 50%;
-            border: 2px solid white;
-        "></span>
-    </div>
-
+<div style="position: relative;" onclick="togglePopup()">
+  <div id="notification-icon" style="cursor: pointer; font-size: 28px; position: relative;">
+    🔔
+    <!-- Red dot if there are unread notifications -->
+    <span id="main-badge" style="
+      display: none;
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 10px;
+      height: 10px;
+      background: red;
+      border-radius: 50%;
+      border: 2px solid white;
+    "></span>
+  </div>
 </div>
 
+
+
+
+
+             </div>
 
 
 
@@ -384,6 +389,44 @@
             </main>
         </div>
     </div>
+
+
+
+
+<div id="overlay" style="
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+">
+  <div id="notification-popup" style="
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    color: black;
+    width: 400px;
+    max-height: 70vh;
+    overflow-y: auto;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  ">
+    <h4 style="margin-bottom: 15px;">🔔 Уведомления</h4>
+    <ul id="notification-list" style="list-style: none; padding: 0; margin: 0;"></ul>
+    <div style="text-align: right; margin-top: 15px;">
+      <button onclick="closePopup()" style="background: #f44336; color: white; border: none; padding: 6px 12px; border-radius: 5px;">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+
+
    <script>
 function allowDrop(event) {
     event.preventDefault();
@@ -435,5 +478,58 @@ function drop(event) {
     }
 
 </script>
+<script>
+  const notifications = [
+    { id: 1, text: "🔥 Новый заказ поступил", read: true },
+    { id: 2, text: "📢 Уведомление об обновлении", read: true },
+    { id: 3, text: "✅ Всё работает!", read: true }
+  ];
+
+  function renderNotifications() {
+    const list = document.getElementById('notification-list');
+    list.innerHTML = '';
+
+    notifications.forEach(notif => {
+      const li = document.createElement('li');
+      li.style.display = 'flex';
+      li.style.justifyContent = 'space-between';
+      li.style.alignItems = 'center';
+      li.style.marginBottom = '10px';
+
+      li.innerHTML = `
+        <span>${notif.text}</span>
+        ${!notif.read ? '<span style="background:red; width:10px; height:10px; border-radius:50%; display:inline-block;"></span>' : ''}
+      `;
+
+      list.appendChild(li);
+    });
+
+    // Toggle bell icon badge
+    const hasUnread = notifications.some(n => !n.read);
+    document.getElementById('main-badge').style.display = hasUnread ? 'block' : 'none';
+  }
+
+  function togglePopup() {
+    document.getElementById('overlay').style.display = 'block';
+    renderNotifications();
+  }
+
+  function closePopup() {
+    document.getElementById('overlay').style.display = 'none';
+  }
+
+  // Close popup when clicking outside
+  document.getElementById('overlay').addEventListener('click', function (event) {
+    const popup = document.getElementById('notification-popup');
+    if (!popup.contains(event.target)) {
+      closePopup();
+    }
+  });
+
+  // Initial badge check on load
+  window.onload = renderNotifications;
+</script>
+
+
 </body>
 </html>
