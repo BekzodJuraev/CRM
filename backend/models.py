@@ -193,7 +193,14 @@ class Orders(models.Model):
 
 
 
-
+class Notification(models.Model):
+    order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name='notifications')
+    #message = models.CharField(max_length=255,null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+    profile = models.ForeignKey(
+        'Profile', on_delete=models.CASCADE, related_name='profile_notifcation', verbose_name="Профиль", null=True
+    )
 
 class OrderStaff(models.Model):
     order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name='order_staff')

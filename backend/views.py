@@ -636,6 +636,20 @@ class MyProjects(LoginRequiredMixin, TemplateView):
       context['installer'] = OrderStaff.objects.filter(profile=profile, order__stage='installation',
                                                       complete=False).select_related('order')
 
+      context['manufacturing'] = Orders.objects.annotate(uploaded_by_chief=Exists(is_uploaded_by_chief)).filter(
+         stage='manufacturing').prefetch_related(
+         Prefetch(
+            'order_staff',
+            queryset=OrderStaff.objects.filter(profile__position='chief_staff').select_related('profile'),
+            to_attr='designer_staff'
+         ))
+
+
+      context['rezka'] = [o for o in context['manufacturing'] if o.stage_pod == 'rezka']
+      context['svarka'] = [o for o in context['manufacturing'] if o.stage_pod == 'svarka']
+      context['fill'] = [o for o in context['manufacturing'] if o.stage_pod == 'fill']
+      context['print'] = [o for o in context['manufacturing'] if o.stage_pod == 'print']
+
       return context
 
 

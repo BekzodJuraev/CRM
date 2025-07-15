@@ -98,6 +98,101 @@
                 align-items: center;
             }
         }
+         img {
+      max-width: 100%;
+      margin-top: 10px;
+      border-radius: 10px;
+    }
+    .file-preview {
+      margin-top: 10px;
+      position: relative;
+      display: inline-block;
+      max-width: 150px;
+    }
+
+    .file-preview img,
+    .file-preview .file-icon {
+      max-width: 100%;
+      max-height: 150px;
+      border: 1px solid #ccc;
+      padding: 5px;
+      border-radius: 5px;
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .file-input-wrapper {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  padding: 8px 12px;
+  background-color: #007aff;
+  color: white;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  user-select: none;
+}
+
+.file-input-wrapper input[type="file"] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.file-label {
+  pointer-events: none;
+}
+.modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal.hidden {
+      display: none;
+    }
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 14px;
+      width: 500px;
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .close {
+      position: absolute;
+      right: 15px;
+      top: 10px;
+      font-size: 24px;
+      cursor: pointer;
+      color: red;
+    }
+    ul {
+      padding-left: 20px;
+    }
     </style>
 </head>
 <body>
@@ -109,29 +204,74 @@
     <div class="column" ondragover="allowDrop(event)" data-stage="manufacturing" data-pod_stage="rezka"  ondrop="drop(event)">
         <h3>Резка</h3>
         {% for item in rezka %}
+        <div id="assignModal" class="modal hidden">
+  <div class="modal-content" style="max-width: 500px;">
+    <span class="close" onclick="closeAssignModal()">&times;</span>
+
+    <h3>Выберите сотрудника </h3>
+
+            <p>{{ item.rezka|yesno:"Резка," }}</p>
+                         <p>{{ item.svarka|yesno:"Сварка," }} </p>
+                        <p> {{ item.fill|yesno:"Покраска," }}</p>
+                        <p> {{ item.print|yesno:"Печать," }}</p>
+
+
+    <div id="employeeList" style="max-height: 200px; overflow-y: auto; margin-top: 10px;"></div>
+
+    <div id="confirmBlock" style="margin-top: 20px; display: none;">
+      <p>Вы уверены, что хотите передать проект <strong id="selectedName"></strong>?</p>
+      <button class="btn" onclick="confirmAssign()">Да</button>
+      <button class="btn" onclick="closeAssignModal()">Нет</button>
+    </div>
+  </div>
+</div>
     <div class="card" data-pk="{{item.pk}}" draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
         <div class="preview">
-        <p><strong>Клиент:</strong> {{item.client}}</p>
+        <p><strong>Проект:</strong> {{item.order_name}}</p>
         <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
     </div>
     <div class="details" style="display: none;">
-        <h2>{{item.client}}</h2>
-        <p><strong>Дата добавления:</strong> {{item.add_order|date:"d.m.Y"}} | <strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
-        <p><strong>Предоплата:</strong> {{item.order_predoplata}} сум | <strong>Сумма заказа:</strong> {{item.order_sum}} сум</p>
-        <p><strong>Адрес:</strong> {{item.adress}} </p>
-        <p><strong>Телефон:</strong> {{item.phone}} </p>
-        {% with item.consumables.all as consumables|distinct_categories %}
-        <p><strong>Категория:</strong> {% for rek in consumables %}
-      {{ rek.catigories }}{% if not forloop.last %}, {% endif %}
-    {% endfor %}</p>
-        <p><strong>Расходники:</strong> {% for rek in consumables %}
-      {{ rek.add }} ({{ rek.price }} сум);
-    {% endfor %} </p>
-        {% endwith %}
+<h3>Проект: {{ item.order_name }}</h3>
+
+            <p><strong>Категория заказа:</strong> {{ item.catigories }}</p>
+
+            <p><strong>Размер:</strong> {{ item.razmer }}</p>
+
+             <p><strong>Описание / ТЗ:</strong> {{ item.description }}</p>
+            <p><strong>Прикреплённые файлы:</strong></p>
+            <div id="preview_tz_{{ item.id }}"></div>
+
+           <p><strong>Дизайн:</strong> {{ item.description_design }}</p>
+            <p><strong>Прикреплённые фото:</strong></p>
+
+              <div id="preview_design_{{ item.id }}"></div>
+
+
+            <p><strong>Дата добавления заказа:</strong> {{ item.add_order|date:"d.m.Y" }}</p>
+            <p><strong>Срок выполнения:</strong> {{ item.complete_order|date:"d.m.Y" }}</p>
+            Выбранные этапы на производстве:
+                    <p>{{ item.rezka|yesno:"Резка," }}</p>
+                         <p>{{ item.svarka|yesno:"Сварка," }} </p>
+                        <p> {{ item.fill|yesno:"Покраска," }}</p>
+                        <p> {{ item.print|yesno:"Печать," }}</p>
+
+            <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+
+              <button type="button" onclick="addDesignBlock({{ item.pk }})">Сообщить об ошибке</button>
+              <button  type="button" onclick="openAssignModal({{ item.id }})">Передать сотруднику</button>
+
+            </div>
+                <form method="post" id="save_{{item.pk}}" enctype="multipart/form-data">
+                   {% csrf_token %}
+                   <div id="designContainer_{{ item.pk }}"></div>
+               <input type="text" name="action" value="designer_chief_add" hidden>
+                <input type="text" name="pk" value="{{item.pk}}" hidden>
+
+
+              </form>
 
 
 
-        <p><strong>Описание / ТЗ:</strong> {{item.description}} </p>
     </div>
 </div>
           {% endfor %}
@@ -211,14 +351,14 @@
         <p><strong>Предоплата:</strong> {{item.order_predoplata}} сум | <strong>Сумма заказа:</strong> {{item.order_sum}} сум</p>
         <p><strong>Адрес:</strong> {{item.adress}} </p>
         <p><strong>Телефон:</strong> {{item.phone}} </p>
-        {% with item.consumables.all as consumables %}
-        <p><strong>Категория:</strong> {% for rek in consumables|distinct_categories %}
-      {{ rek.catigories }}{% if not forloop.last %}, {% endif %}
-    {% endfor %}</p>
-        <p><strong>Расходники:</strong> {% for rek in consumables %}
-      {{ rek.add }} ({{ rek.price }} сум);
-    {% endfor %} </p>
-        {% endwith %}
+
+        <p><strong>Категория:</strong>
+
+
+        <p><strong>Расходники:</strong>
+
+    </p>
+
 
 
 
@@ -258,7 +398,37 @@
           {% endfor %}
     </div>
     <div class="column" ondragover="allowDrop(event)"  data-stage="delivery"  ondragstart="drag(event)" data-pod_stage="" ondrop="drop(event)">
-        <h3>Доставка и установка</h3>
+        <h3>Готово</h3>
+             {% for item in delivery %}
+      <div class="card" data-pk="{{item.pk}}"  draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
+        <div class="preview">
+        <p><strong>Клиент:</strong> {{item.client}}</p>
+        <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
+    </div>
+    <div class="details" style="display: none;">
+        <h2>{{ item.client}}</h2>
+        <p><strong>Дата добавления:</strong> {{item.add_order|date:"d.m.Y"}} | <strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
+        <p><strong>Предоплата:</strong> {{item.order_predoplata}} сум | <strong>Сумма заказа:</strong> {{item.order_sum}} сум</p>
+        <p><strong>Адрес:</strong> {{item.adress}} </p>
+        <p><strong>Телефон:</strong> {{item.phone}} </p>
+        {% with item.consumables.all as consumables %}
+        <p><strong>Категория:</strong> {% for rek in consumables|distinct_categories %}
+      {{ rek.catigories }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}</p>
+        <p><strong>Расходники:</strong> {% for rek in consumables %}
+      {{ rek.add }} ({{ rek.price }} сум);
+    {% endfor %} </p>
+        {% endwith %}
+
+
+
+        <p><strong>Описание / ТЗ:</strong> {{item.description}} </p>
+    </div>
+</div>
+          {% endfor %}
+    </div>
+    <div class="column" ondragover="allowDrop(event)"  data-stage="account"  ondragstart="drag(event)" data-pod_stage="" ondrop="drop(event)">
+        <h3>Бухгалтерия</h3>
              {% for item in delivery %}
       <div class="card" data-pk="{{item.pk}}"  draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
         <div class="preview">
@@ -294,6 +464,58 @@
 
     <button onclick="closePopup()">Закрыть</button>
 </div>
+
+
+   {% for item in manufacturing %}
+     <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        {% if item.design %}
+          showExistingFilePreview("{{ item.design.url }}", "preview_design_{{ item.id }}");
+        {% endif %}
+        {% if item.tz %}
+          showExistingFilePreview("{{ item.tz.url }}", "preview_tz_{{ item.id }}");
+        {% endif %}
+      });
+    </script>
+  {% endfor %}
+
+<script>
+      function showExistingFilePreview(fileUrl, previewId) {
+  const container = document.getElementById(previewId);
+  if (!container) return;
+
+  container.innerHTML = ''; // clear previous
+  const preview = document.createElement('div');
+  preview.className = 'file-preview';
+
+  const removeBtn = document.createElement('button');
+
+
+
+
+
+  const isImage = /\.(jpg|jpeg|png|gif)$/i.test(fileUrl);
+  if (isImage) {
+    const img = document.createElement('img');
+    img.src = fileUrl;
+    img.alt = 'Предпросмотр изображения';
+    img.style.cursor = 'pointer';
+    img.onclick = () => window.open(fileUrl, '_blank');
+    preview.appendChild(img);
+  } else {
+    const fileIcon = document.createElement('div');
+    fileIcon.className = 'file-icon';
+    fileIcon.innerHTML = `📄 ${fileUrl.split('/').pop()}`;
+    fileIcon.style.cursor = 'pointer';
+    fileIcon.onclick = () => {
+      window.open(fileUrl, '_blank');
+    };
+    preview.appendChild(fileIcon);
+  }
+
+  container.appendChild(preview);
+}
+</script>
 
 <script>
     let dragged = null;
@@ -366,6 +588,67 @@
         popup.style.display = 'none';
         }
 </script>
+<script>
+  let currentProjectId = null;
+let selectedEmployeeId = null;
 
+function openAssignModal(projectId) {
+  currentProjectId = projectId;
+  selectedEmployeeId = null;
+  closePopup()
+  document.getElementById('employeeList').innerHTML = '';
+  document.getElementById('confirmBlock').style.display = 'none';
+  document.getElementById('assignModal').classList.remove('hidden');
+
+  // ✅ Fetch employees when modal is opened
+  fetch('/search-profile/?position=chief_staff')
+    .then(res => res.json())
+    .then(data => {
+      const list = document.getElementById('employeeList');
+      list.innerHTML = '';
+      data.forEach(user => {
+        const div = document.createElement('div');
+        div.textContent = user.full_name;
+        div.style.cursor = 'pointer';
+        div.style.padding = '5px 10px';
+        div.style.borderBottom = '1px solid #ddd';
+        div.onclick = () => {
+          selectedEmployeeId = user.id;
+          document.getElementById('selectedName').textContent = user.full_name;
+          document.getElementById('confirmBlock').style.display = 'block';
+        };
+        list.appendChild(div);
+      });
+    });
+}
+
+function closeAssignModal() {
+  document.getElementById('assignModal').classList.add('hidden');
+}
+
+// Confirm project assignment
+function confirmAssign() {
+  fetch(`/assign/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'X-CSRFToken': '{{ csrf_token }}',
+    },
+    body: new URLSearchParams({
+      project_id: currentProjectId,
+      profile_id: selectedEmployeeId
+    })
+  }).then(res => {
+    if (res.ok) {
+      alert('Проект успешно передан!');
+      closeAssignModal();
+      location.reload();
+    } else {
+      alert('Ошибка при передаче!');
+    }
+  });
+}
+
+</script>
 </body>
 </html>

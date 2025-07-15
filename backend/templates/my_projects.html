@@ -23,7 +23,8 @@
     {% include 'installer_cheif.html' %}
 {% elif request.user.profile.position == "installer" %}
     {% include 'installer.html' %}
-
+{% elif request.user.profile.position == "chief" %}
+    {% include 'chief.html' %}
 {% endif %}
 
 
