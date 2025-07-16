@@ -120,6 +120,34 @@ def assign_project(request):
     if request.method == "POST":
        id=request.POST.get('project_id')
        profile_id = request.POST.get('profile_id')
+       action=request.POST.get('action')
+       rezka = svarka = fill = print_stage = sborka = 'no'
+       if request.POST.get('rezka') == 'true':
+          rezka = 'chief'
+       if request.POST.get('svarka') == 'true':
+          svarka = 'chief'
+       if request.POST.get('fill') == 'true':
+          fill = 'chief'
+       if request.POST.get('print') == 'true':
+          print_stage = 'chief'
+       if request.POST.get('sborka') == 'true':
+          sborka = 'chief'
+
+          # Now update the corresponding order_staff object or create a new one
+       OrderStaff.objects.get_or_create(
+          order_id=id,
+          profile_id=profile_id,
+          rezka=rezka,
+          svarka=svarka,
+          fill=fill,
+          print=print_stage,
+          sborka=sborka
+       )
+
+       return JsonResponse({"status": "ok"})
+
+
+    else:
 
        try:
           OrderStaff.objects.get_or_create(order_id=id, profile_id=profile_id)
@@ -560,7 +588,34 @@ class MyProjects(LoginRequiredMixin, TemplateView):
                order_staff.upload = True
                order_staff.save(update_fields=['upload'])
 
+      elif action == 'chief_staff':
+         rezka = request.POST.get('rezka') == 'on'
+         svarka = request.POST.get('svarka') == 'on'
+         fill = request.POST.get('fill') == 'on'
+         pechat = request.POST.get('print') == 'on'
+         sborka = request.POST.get('sborka') == 'on'
 
+         order_staff = OrderStaff.objects.filter(order_id=pk, profile=request.user.profile).first()
+
+
+
+         if rezka:
+            order_staff.rezka='staff'
+            order_staff.order.stage_pod='svarka'
+         if svarka:
+            order_staff.svarka = 'staff'
+            order_staff.order.stage_pod = 'fill'
+         if fill:
+            order_staff.fill = 'staff'
+            order_staff.order.stage_pod = 'print'
+         if pechat:
+            order_staff.order.stage_pod = 'sborka'
+            order_staff.print = 'staff'
+         if sborka:
+            order_staff.sborka = 'staff'
+
+         order_staff.order.save(update_fields=['stage_pod'])
+         order_staff.save()
 
 
 
@@ -624,8 +679,11 @@ class MyProjects(LoginRequiredMixin, TemplateView):
         to_attr='designer_staff'
     )
 )
-      context['delivery'] = OrderStaff.objects.filter(profile=profile, order__stage='delivery',
+      context['chief_staff'] = OrderStaff.objects.filter(profile=profile, order__stage='manufacturing',
                                                           complete=False).select_related('order')
+
+      context['delivery'] = OrderStaff.objects.filter(profile=profile, order__stage='delivery',
+                                                      complete=False).select_related('order')
 
       context['installer_chief']=Orders.objects.annotate(uploaded_by_chief=Exists(is_uploaded_by_chief)).filter(stage='installation').prefetch_related(
     Prefetch(
@@ -636,7 +694,7 @@ class MyProjects(LoginRequiredMixin, TemplateView):
       context['installer'] = OrderStaff.objects.filter(profile=profile, order__stage='installation',
                                                       complete=False).select_related('order')
 
-      context['manufacturing'] = Orders.objects.annotate(uploaded_by_chief=Exists(is_uploaded_by_chief)).filter(
+      context['manufacturing'] = Orders.objects.filter(
          stage='manufacturing').prefetch_related(
          Prefetch(
             'order_staff',
@@ -649,6 +707,8 @@ class MyProjects(LoginRequiredMixin, TemplateView):
       context['svarka'] = [o for o in context['manufacturing'] if o.stage_pod == 'svarka']
       context['fill'] = [o for o in context['manufacturing'] if o.stage_pod == 'fill']
       context['print'] = [o for o in context['manufacturing'] if o.stage_pod == 'print']
+      context['sborka'] = [o for o in context['manufacturing'] if o.stage_pod == 'sborka']
+      context['ready'] = [o for o in context['manufacturing'] if o.stage_pod == 'ready']
 
       return context
 

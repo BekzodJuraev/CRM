@@ -131,6 +131,8 @@ class Orders(models.Model):
         ("svarka", "Сварка"),
         ("fill", "Покраска"),
         ("print", "Печать"),
+        ('sborka',"Сборка"),
+        ('ready','Готово')
     ]
     vstrecha_choice = [
         ("viezd", "Выезд"),
@@ -175,6 +177,7 @@ class Orders(models.Model):
     svarka=models.BooleanField(default=False)
     fill=models.BooleanField(default=False)
     print=models.BooleanField(default=False)
+    sborka = models.BooleanField(default=False)
     stage_pod=models.CharField(max_length=20, choices=Stage_pod_CHOICES,default="rezka")
     payment_data=models.DateField(null=True)
     complete_date=models.DateField(null=True)
@@ -203,6 +206,16 @@ class Notification(models.Model):
     )
 
 class OrderStaff(models.Model):
+    CLIENT_TYPE_CHOICES = [
+        ('no', 'no'),
+        ('chief', 'chief'),
+        ('staff','staff')
+    ]
+    rezka = models.CharField(max_length=20, choices=CLIENT_TYPE_CHOICES, default='no')
+    svarka = models.CharField(max_length=20, choices=CLIENT_TYPE_CHOICES, default='no')
+    fill = models.CharField(max_length=20, choices=CLIENT_TYPE_CHOICES, default='no')
+    print = models.CharField(max_length=20, choices=CLIENT_TYPE_CHOICES, default='no')
+    sborka = models.CharField(max_length=20, choices=CLIENT_TYPE_CHOICES, default='no')
     order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name='order_staff')
     profile= models.ForeignKey(
         'Profile', on_delete=models.CASCADE, related_name='order_profile', verbose_name="Профиль",null=True

@@ -198,23 +198,15 @@
 <body>
 
 <h1>Производство</h1>
-
-<div class="board">
-
-    <div class="column" ondragover="allowDrop(event)" data-stage="manufacturing" data-pod_stage="rezka"  ondrop="drop(event)">
-        <h3>Резка</h3>
-        {% for item in rezka %}
-        <div id="assignModal" class="modal hidden">
+<div id="assignModal" class="modal hidden">
   <div class="modal-content" style="max-width: 500px;">
     <span class="close" onclick="closeAssignModal()">&times;</span>
 
     <h3>Выберите сотрудника </h3>
 
-            <p>{{ item.rezka|yesno:"Резка," }}</p>
-                         <p>{{ item.svarka|yesno:"Сварка," }} </p>
-                        <p> {{ item.fill|yesno:"Покраска," }}</p>
-                        <p> {{ item.print|yesno:"Печать," }}</p>
+      <div id="stageContainer"></div>
 
+        <input type="text" name="pk" value="{{item.pk}}" hidden>
 
     <div id="employeeList" style="max-height: 200px; overflow-y: auto; margin-top: 10px;"></div>
 
@@ -225,8 +217,20 @@
     </div>
   </div>
 </div>
+<div class="board">
+
+    <div class="column" ondragover="allowDrop(event)" data-stage="manufacturing" data-pod_stage="rezka"  ondrop="drop(event)">
+        <h3>Резка</h3>
+        {% for item in rezka %}
+
     <div class="card" data-pk="{{item.pk}}" draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
         <div class="preview">
+                  {% for i in item.designer_staff %}
+                {% if i.rezka == 'chief' %}
+            <p>{{ i.profile.name }}</p>
+            {% endif %}
+    {% endfor %}
+
         <p><strong>Проект:</strong> {{item.order_name}}</p>
         <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
     </div>
@@ -249,16 +253,143 @@
 
             <p><strong>Дата добавления заказа:</strong> {{ item.add_order|date:"d.m.Y" }}</p>
             <p><strong>Срок выполнения:</strong> {{ item.complete_order|date:"d.m.Y" }}</p>
+
             Выбранные этапы на производстве:
                     <p>{{ item.rezka|yesno:"Резка," }}</p>
                          <p>{{ item.svarka|yesno:"Сварка," }} </p>
                         <p> {{ item.fill|yesno:"Покраска," }}</p>
                         <p> {{ item.print|yesno:"Печать," }}</p>
+                            <p> {{ item.sborka|yesno:"Сборка," }}</p>
 
             <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
 
               <button type="button" onclick="addDesignBlock({{ item.pk }})">Сообщить об ошибке</button>
-              <button  type="button" onclick="openAssignModal({{ item.id }})">Передать сотруднику</button>
+              <button
+                      type="button"
+                      onclick="openAssignModal({{ item.pk }}, {
+                        {% if item.designer_staff %}
+                        {% for i in item.designer_staff %}
+                        {% if i.rezka == 'no'%}
+                        rezka: {{ item.rezka|yesno:"true,false" }},
+                        {% endif %}
+                        {% if i.svarka == 'no' %}
+                        svarka: {{ item.svarka|yesno:"true,false" }},
+                        {% endif %}
+                        {% if i.fill == 'no' %}
+                        fill: {{ item.fill|yesno:"true,false" }},
+                        {% endif %}
+                        {% if i.print == 'no' %}
+                        print: {{ item.print|yesno:"true,false" }},
+                        {% endif %}
+                        {% if i.sborka == 'no' %}
+                        sborka: {{ item.sborka|yesno:"true,false" }}
+                        {% endif %}
+                {% endfor %}
+                {% else %}
+                rezka: {{ item.rezka|yesno:"true,false" }},
+                   svarka: {{ item.svarka|yesno:"true,false" }},
+                        fill: {{ item.fill|yesno:"true,false" }},
+                        print: {{ item.print|yesno:"true,false" }},
+                        sborka: {{ item.sborka|yesno:"true,false" }}
+
+                {% endif %}
+                      })"
+                    >
+                      Передать сотруднику
+                    </button>
+
+            </div>
+                <form method="post" id="save_{{item.pk}}" enctype="multipart/form-data">
+                   {% csrf_token %}
+                   <div id="designContainer_{{ item.pk }}"></div>
+               <input type="text" name="action" value="designer_chief_add" hidden>
+                <input type="text" name="pk" value="{{item.pk}}" hidden>
+
+
+              </form>
+
+
+
+    </div>
+</div>
+          {% endfor %}
+    </div>
+    <div class="column" ondragover="allowDrop(event)" data-stage="manufacturing" data-pod_stage="svarka"  ondrop="drop(event)">
+        <h3>Сварка</h3>
+        {% for item in svarka %}
+
+    <div class="card" data-pk="{{item.pk}}" draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
+        <div class="preview">
+                  {% for i in item.designer_staff %}
+                {% if i.svarka == 'chief' %}
+            <p>{{ i.profile.name }}</p>
+            {% endif %}
+    {% endfor %}
+
+        <p><strong>Проект:</strong> {{item.order_name}}</p>
+        <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
+    </div>
+    <div class="details" style="display: none;">
+<h3>Проект: {{ item.order_name }}</h3>
+
+            <p><strong>Категория заказа:</strong> {{ item.catigories }}</p>
+
+            <p><strong>Размер:</strong> {{ item.razmer }}</p>
+
+             <p><strong>Описание / ТЗ:</strong> {{ item.description }}</p>
+            <p><strong>Прикреплённые файлы:</strong></p>
+            <div id="preview_tz_{{ item.id }}"></div>
+
+           <p><strong>Дизайн:</strong> {{ item.description_design }}</p>
+            <p><strong>Прикреплённые фото:</strong></p>
+
+              <div id="preview_design_{{ item.id }}"></div>
+
+
+            <p><strong>Дата добавления заказа:</strong> {{ item.add_order|date:"d.m.Y" }}</p>
+            <p><strong>Срок выполнения:</strong> {{ item.complete_order|date:"d.m.Y" }}</p>
+
+            Выбранные этапы на производстве:
+                    <p>{{ item.rezka|yesno:"Резка," }}</p>
+                         <p>{{ item.svarka|yesno:"Сварка," }} </p>
+                        <p> {{ item.fill|yesno:"Покраска," }}</p>
+                        <p> {{ item.print|yesno:"Печать," }}</p>
+                            <p> {{ item.sborka|yesno:"Сборка," }}</p>
+
+            <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+
+              <button type="button" onclick="addDesignBlock({{ item.pk }})">Сообщить об ошибке</button>
+              <button
+                      type="button"
+                      onclick="openAssignModal({{ item.pk }}, {
+                        {% if item.designer_staff %}
+                        {% for i in item.designer_staff %}
+
+                        {% if i.svarka == 'no' %}
+                        svarka: {{ item.svarka|yesno:"true,false" }},
+                        {% endif %}
+                        {% if i.fill == 'no' %}
+                        fill: {{ item.fill|yesno:"true,false" }},
+                        {% endif %}
+                        {% if i.print == 'no' %}
+                        print: {{ item.print|yesno:"true,false" }},
+                        {% endif %}
+                        {% if i.sborka == 'no' %}
+                        sborka: {{ item.sborka|yesno:"true,false" }}
+                        {% endif %}
+                {% endfor %}
+                {% else %}
+
+                   svarka: {{ item.svarka|yesno:"true,false" }},
+                        fill: {{ item.fill|yesno:"true,false" }},
+                        print: {{ item.print|yesno:"true,false" }},
+                        sborka: {{ item.sborka|yesno:"true,false" }}
+
+                {% endif %}
+                      })"
+                    >
+                      Передать сотруднику
+                    </button>
 
             </div>
                 <form method="post" id="save_{{item.pk}}" enctype="multipart/form-data">
@@ -277,152 +408,327 @@
           {% endfor %}
     </div>
 
-    <div class="column" ondragover="allowDrop(event)"  data-stage="manufacturing" data-pod_stage="svarka" ondrop="drop(event)">
-        <h3>Сварка</h3>
-           {% for item in svarka %}
-    <div class="card" data-pk="{{item.pk}}" draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
-        <div class="preview">
-        <p><strong>Клиент:</strong> {{item.client}}</p>
-        <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
-    </div>
-    <div class="details" style="display: none;">
-        <h2>{{ item.client}}</h2>
-        <p><strong>Дата добавления:</strong> {{item.add_order|date:"d.m.Y"}} | <strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
-        <p><strong>Предоплата:</strong> {{item.order_predoplata}} сум | <strong>Сумма заказа:</strong> {{item.order_sum}} сум</p>
-        <p><strong>Адрес:</strong> {{item.adress}} </p>
-        <p><strong>Телефон:</strong> {{item.phone}} </p>
-        {% with item.consumables.all as consumables %}
-        <p><strong>Категория:</strong> {% for rek in consumables|distinct_categories %}
-      {{ rek.catigories }}{% if not forloop.last %}, {% endif %}
-    {% endfor %}</p>
-        <p><strong>Расходники:</strong> {% for rek in consumables %}
-      {{ rek.add }} ({{ rek.price }} сум);
-    {% endfor %} </p>
-        {% endwith %}
 
 
 
-        <p><strong>Описание / ТЗ:</strong> {{item.description}} </p>
-    </div>
-</div>
-          {% endfor %}
-    </div>
-    <div class="column" ondragover="allowDrop(event)"  data-stage="manufacturing" data-pod_stage="fill" ondrop="drop(event)">
+
+    <div class="column" ondragover="allowDrop(event)" data-stage="manufacturing" data-pod_stage="fill"  ondrop="drop(event)">
         <h3>Покраска</h3>
-             {% for item in fill %}
+        {% for item in fill %}
+
     <div class="card" data-pk="{{item.pk}}" draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
         <div class="preview">
-        <p><strong>Клиент:</strong> {{item.client}}</p>
+             {% for i in item.designer_staff %}
+                {% if i.fill == 'chief' %}
+            <p>{{ i.profile.name }}</p>
+            {% endif %}
+    {% endfor %}
+
+        <p><strong>Проект:</strong> {{item.order_name}}</p>
         <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
     </div>
     <div class="details" style="display: none;">
-        <h2>{{ item.client}}</h2>
-        <p><strong>Дата добавления:</strong> {{item.add_order|date:"d.m.Y"}} | <strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
-        <p><strong>Предоплата:</strong> {{item.order_predoplata}} сум | <strong>Сумма заказа:</strong> {{item.order_sum}} сум</p>
-        <p><strong>Адрес:</strong> {{item.adress}} </p>
-        <p><strong>Телефон:</strong> {{item.phone}} </p>
-        {% with item.consumables.all as consumables %}
-        <p><strong>Категория:</strong> {% for rek in consumables|distinct_categories %}
-      {{ rek.catigories }}{% if not forloop.last %}, {% endif %}
-    {% endfor %}</p>
-        <p><strong>Расходники:</strong> {% for rek in consumables %}
-      {{ rek.add }} ({{ rek.price }} сум);
-    {% endfor %} </p>
-        {% endwith %}
+<h3>Проект: {{ item.order_name }}</h3>
+
+            <p><strong>Категория заказа:</strong> {{ item.catigories }}</p>
+
+            <p><strong>Размер:</strong> {{ item.razmer }}</p>
+
+             <p><strong>Описание / ТЗ:</strong> {{ item.description }}</p>
+            <p><strong>Прикреплённые файлы:</strong></p>
+            <div id="preview_tz_{{ item.id }}"></div>
+
+           <p><strong>Дизайн:</strong> {{ item.description_design }}</p>
+            <p><strong>Прикреплённые фото:</strong></p>
+
+              <div id="preview_design_{{ item.id }}"></div>
+
+
+            <p><strong>Дата добавления заказа:</strong> {{ item.add_order|date:"d.m.Y" }}</p>
+            <p><strong>Срок выполнения:</strong> {{ item.complete_order|date:"d.m.Y" }}</p>
+
+            Выбранные этапы на производстве:
+                    <p>{{ item.rezka|yesno:"Резка," }}</p>
+                         <p>{{ item.svarka|yesno:"Сварка," }} </p>
+                        <p> {{ item.fill|yesno:"Покраска," }}</p>
+                        <p> {{ item.print|yesno:"Печать," }}</p>
+                            <p> {{ item.sborka|yesno:"Сборка," }}</p>
+
+            <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+
+              <button type="button" onclick="addDesignBlock({{ item.pk }})">Сообщить об ошибке</button>
+            <button
+                      type="button"
+                      onclick="openAssignModal({{ item.pk }}, {
+                        {% if item.designer_staff %}
+                        {% for i in item.designer_staff %}
+                        {% if i.fill == 'no' %}
+                        fill: {{ item.fill|yesno:"true,false" }},
+                        {% endif %}
+                        {% if i.print == 'no' %}
+                        print: {{ item.print|yesno:"true,false" }},
+                        {% endif %}
+                        {% if i.sborka == 'no' %}
+                        sborka: {{ item.sborka|yesno:"true,false" }}
+                        {% endif %}
+                {% endfor %}
+                {% else %}
+
+                        fill: {{ item.fill|yesno:"true,false" }},
+                        print: {{ item.print|yesno:"true,false" }},
+                        sborka: {{ item.sborka|yesno:"true,false" }}
+
+                {% endif %}
+                      })"
+                    >
+                      Передать сотруднику
+                    </button>
+
+            </div>
+                <form method="post" id="save_{{item.pk}}" enctype="multipart/form-data">
+                   {% csrf_token %}
+                   <div id="designContainer_{{ item.pk }}"></div>
+               <input type="text" name="action" value="designer_chief_add" hidden>
+                <input type="text" name="pk" value="{{item.pk}}" hidden>
+
+
+              </form>
 
 
 
-        <p><strong>Описание / ТЗ:</strong> {{item.description}} </p>
     </div>
 </div>
           {% endfor %}
     </div>
     <div class="column" ondragover="allowDrop(event)" data-stage="manufacturing" data-pod_stage="print"  ondrop="drop(event)">
         <h3>Печать</h3>
-              {% for item in print %}
+        {% for item in print %}
+
     <div class="card" data-pk="{{item.pk}}" draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
         <div class="preview">
-        <p><strong>Клиент:</strong> {{item.client}}</p>
+                  {% for i in item.designer_staff %}
+                {% if i.print == 'chief' %}
+            <p>{{ i.profile.name }}</p>
+            {% endif %}
+    {% endfor %}
+
+        <p><strong>Проект:</strong> {{item.order_name}}</p>
         <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
     </div>
     <div class="details" style="display: none;">
-        <h2>{{ item.client}}</h2>
-        <p><strong>Дата добавления:</strong> {{item.add_order|date:"d.m.Y"}} | <strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
-        <p><strong>Предоплата:</strong> {{item.order_predoplata}} сум | <strong>Сумма заказа:</strong> {{item.order_sum}} сум</p>
-        <p><strong>Адрес:</strong> {{item.adress}} </p>
-        <p><strong>Телефон:</strong> {{item.phone}} </p>
+<h3>Проект: {{ item.order_name }}</h3>
 
-        <p><strong>Категория:</strong>
+            <p><strong>Категория заказа:</strong> {{ item.catigories }}</p>
+
+            <p><strong>Размер:</strong> {{ item.razmer }}</p>
+
+             <p><strong>Описание / ТЗ:</strong> {{ item.description }}</p>
+            <p><strong>Прикреплённые файлы:</strong></p>
+            <div id="preview_tz_{{ item.id }}"></div>
+
+           <p><strong>Дизайн:</strong> {{ item.description_design }}</p>
+            <p><strong>Прикреплённые фото:</strong></p>
+
+              <div id="preview_design_{{ item.id }}"></div>
 
 
-        <p><strong>Расходники:</strong>
+            <p><strong>Дата добавления заказа:</strong> {{ item.add_order|date:"d.m.Y" }}</p>
+            <p><strong>Срок выполнения:</strong> {{ item.complete_order|date:"d.m.Y" }}</p>
 
-    </p>
+            Выбранные этапы на производстве:
+                    <p>{{ item.rezka|yesno:"Резка," }}</p>
+                         <p>{{ item.svarka|yesno:"Сварка," }} </p>
+                        <p> {{ item.fill|yesno:"Покраска," }}</p>
+                        <p> {{ item.print|yesno:"Печать," }}</p>
+                            <p> {{ item.sborka|yesno:"Сборка," }}</p>
+
+            <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+
+              <button type="button" onclick="addDesignBlock({{ item.pk }})">Сообщить об ошибке</button>
+               <button
+                      type="button"
+                      onclick="openAssignModal({{ item.pk }}, {
+                        {% if item.designer_staff %}
+                        {% for i in item.designer_staff %}
+                        {% if i.print == 'no' %}
+                        print: {{ item.print|yesno:"true,false" }},
+                        {% endif %}
+                        {% if i.sborka == 'no' %}
+                        sborka: {{ item.sborka|yesno:"true,false" }}
+                        {% endif %}
+                {% endfor %}
+                {% else %}
+                        print: {{ item.print|yesno:"true,false" }},
+                        sborka: {{ item.sborka|yesno:"true,false" }}
+
+                {% endif %}
+                      })"
+                    >
+                      Передать сотруднику
+                    </button>
+
+            </div>
+                <form method="post" id="save_{{item.pk}}" enctype="multipart/form-data">
+                   {% csrf_token %}
+                   <div id="designContainer_{{ item.pk }}"></div>
+               <input type="text" name="action" value="designer_chief_add" hidden>
+                <input type="text" name="pk" value="{{item.pk}}" hidden>
+
+
+              </form>
 
 
 
-
-        <p><strong>Описание / ТЗ:</strong> {{item.description}} </p>
     </div>
 </div>
           {% endfor %}
     </div>
-    <div class="column" ondragover="allowDrop(event)"  data-stage="assembly" data-pod_stage=""  ondrop="drop(event)">
+    <div class="column" ondragover="allowDrop(event)" data-stage="manufacturing" data-pod_stage="sborka"  ondrop="drop(event)">
         <h3>Сборка</h3>
-              {% for item in assembly %}
-    <div class="card" data-pk="{{item.pk}}"  draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
+        {% for item in sborka %}
+
+    <div class="card" data-pk="{{item.pk}}" draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
         <div class="preview">
-        <p><strong>Клиент:</strong> {{item.client}}</p>
+                   {% for i in item.designer_staff %}
+                {% if i.sborka == 'chief' %}
+            <p>{{ i.profile.name }}</p>
+            {% endif %}
+    {% endfor %}
+
+        <p><strong>Проект:</strong> {{item.order_name}}</p>
         <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
     </div>
     <div class="details" style="display: none;">
-        <h2>{{ item.client}}</h2>
-        <p><strong>Дата добавления:</strong> {{item.add_order|date:"d.m.Y"}} | <strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
-        <p><strong>Предоплата:</strong> {{item.order_predoplata}} сум | <strong>Сумма заказа:</strong> {{item.order_sum}} сум</p>
-        <p><strong>Адрес:</strong> {{item.adress}} </p>
-        <p><strong>Телефон:</strong> {{item.phone}} </p>
-        {% with item.consumables.all as consumables %}
-        <p><strong>Категория:</strong> {% for rek in consumables|distinct_categories %}
-      {{ rek.catigories }}{% if not forloop.last %}, {% endif %}
-    {% endfor %}</p>
-        <p><strong>Расходники:</strong> {% for rek in consumables %}
-      {{ rek.add }} ({{ rek.price }} сум);
-    {% endfor %} </p>
-        {% endwith %}
+<h3>Проект: {{ item.order_name }}</h3>
+
+            <p><strong>Категория заказа:</strong> {{ item.catigories }}</p>
+
+            <p><strong>Размер:</strong> {{ item.razmer }}</p>
+
+             <p><strong>Описание / ТЗ:</strong> {{ item.description }}</p>
+            <p><strong>Прикреплённые файлы:</strong></p>
+            <div id="preview_tz_{{ item.id }}"></div>
+
+           <p><strong>Дизайн:</strong> {{ item.description_design }}</p>
+            <p><strong>Прикреплённые фото:</strong></p>
+
+              <div id="preview_design_{{ item.id }}"></div>
+
+
+            <p><strong>Дата добавления заказа:</strong> {{ item.add_order|date:"d.m.Y" }}</p>
+            <p><strong>Срок выполнения:</strong> {{ item.complete_order|date:"d.m.Y" }}</p>
+
+            Выбранные этапы на производстве:
+                    <p>{{ item.rezka|yesno:"Резка," }}</p>
+                         <p>{{ item.svarka|yesno:"Сварка," }} </p>
+                        <p> {{ item.fill|yesno:"Покраска," }}</p>
+                        <p> {{ item.print|yesno:"Печать," }}</p>
+                            <p> {{ item.sborka|yesno:"Сборка," }}</p>
+
+            <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+
+              <button type="button" onclick="addDesignBlock({{ item.pk }})">Сообщить об ошибке</button>
+              <button
+                      type="button"
+                      onclick="openAssignModal({{ item.pk }}, {
+                        {% if item.designer_staff %}
+                        {% for i in item.designer_staff %}
+                        {% if i.sborka == 'no' %}
+                        sborka: {{ item.sborka|yesno:"true,false" }}
+                        {% endif %}
+                {% endfor %}
+                {% else %}
+
+                        sborka: {{ item.sborka|yesno:"true,false" }}
+
+                {% endif %}
+                      })"
+                    >
+                      Передать сотруднику
+                    </button>
+
+            </div>
+                <form method="post" id="save_{{item.pk}}" enctype="multipart/form-data">
+                   {% csrf_token %}
+                   <div id="designContainer_{{ item.pk }}"></div>
+               <input type="text" name="action" value="designer_chief_add" hidden>
+                <input type="text" name="pk" value="{{item.pk}}" hidden>
+
+
+              </form>
 
 
 
-        <p><strong>Описание / ТЗ:</strong> {{item.description}} </p>
     </div>
 </div>
           {% endfor %}
     </div>
-    <div class="column" ondragover="allowDrop(event)"  data-stage="delivery"  ondragstart="drag(event)" data-pod_stage="" ondrop="drop(event)">
+    <div class="column" ondragover="allowDrop(event)" data-stage="manufacturing" data-pod_stage="ready"  ondrop="drop(event)">
         <h3>Готово</h3>
-             {% for item in delivery %}
-      <div class="card" data-pk="{{item.pk}}"  draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
+        {% for item in ready %}
+
+    <div class="card" data-pk="{{item.pk}}" draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
         <div class="preview">
-        <p><strong>Клиент:</strong> {{item.client}}</p>
+
+
+        <p><strong>Проект:</strong> {{item.order_name}}</p>
         <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
     </div>
     <div class="details" style="display: none;">
-        <h2>{{ item.client}}</h2>
-        <p><strong>Дата добавления:</strong> {{item.add_order|date:"d.m.Y"}} | <strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
-        <p><strong>Предоплата:</strong> {{item.order_predoplata}} сум | <strong>Сумма заказа:</strong> {{item.order_sum}} сум</p>
-        <p><strong>Адрес:</strong> {{item.adress}} </p>
-        <p><strong>Телефон:</strong> {{item.phone}} </p>
-        {% with item.consumables.all as consumables %}
-        <p><strong>Категория:</strong> {% for rek in consumables|distinct_categories %}
-      {{ rek.catigories }}{% if not forloop.last %}, {% endif %}
-    {% endfor %}</p>
-        <p><strong>Расходники:</strong> {% for rek in consumables %}
-      {{ rek.add }} ({{ rek.price }} сум);
-    {% endfor %} </p>
-        {% endwith %}
+<h3>Проект: {{ item.order_name }}</h3>
+
+            <p><strong>Категория заказа:</strong> {{ item.catigories }}</p>
+
+            <p><strong>Размер:</strong> {{ item.razmer }}</p>
+
+             <p><strong>Описание / ТЗ:</strong> {{ item.description }}</p>
+            <p><strong>Прикреплённые файлы:</strong></p>
+            <div id="preview_tz_{{ item.id }}"></div>
+
+           <p><strong>Дизайн:</strong> {{ item.description_design }}</p>
+            <p><strong>Прикреплённые фото:</strong></p>
+
+              <div id="preview_design_{{ item.id }}"></div>
+
+
+            <p><strong>Дата добавления заказа:</strong> {{ item.add_order|date:"d.m.Y" }}</p>
+            <p><strong>Срок выполнения:</strong> {{ item.complete_order|date:"d.m.Y" }}</p>
+
+            Выбранные этапы на производстве:
+                    <p>{{ item.rezka|yesno:"Резка," }}</p>
+                         <p>{{ item.svarka|yesno:"Сварка," }} </p>
+                        <p> {{ item.fill|yesno:"Покраска," }}</p>
+                        <p> {{ item.print|yesno:"Печать," }}</p>
+                            <p> {{ item.sborka|yesno:"Сборка," }}</p>
+
+            <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+
+              <button type="button" onclick="addDesignBlock({{ item.pk }})">Сообщить об ошибке</button>
+              <button
+                      type="button"
+                      onclick="openAssignModal({{ item.pk }}, {
+                        rezka: {{ item.rezka|yesno:"true,false" }},
+                        svarka: {{ item.svarka|yesno:"true,false" }},
+                        fill: {{ item.fill|yesno:"true,false" }},
+                        print: {{ item.print|yesno:"true,false" }},
+                        sborka: {{ item.sborka|yesno:"true,false" }}
+                      })"
+                    >
+                      Передать сотруднику
+                    </button>
+
+            </div>
+                <form method="post" id="save_{{item.pk}}" enctype="multipart/form-data">
+                   {% csrf_token %}
+                   <div id="designContainer_{{ item.pk }}"></div>
+               <input type="text" name="action" value="designer_chief_add" hidden>
+                <input type="text" name="pk" value="{{item.pk}}" hidden>
+
+
+              </form>
 
 
 
-        <p><strong>Описание / ТЗ:</strong> {{item.description}} </p>
     </div>
 </div>
           {% endfor %}
@@ -592,15 +898,28 @@
   let currentProjectId = null;
 let selectedEmployeeId = null;
 
-function openAssignModal(projectId) {
-  currentProjectId = projectId;
+function openAssignModal(projectId, stages) {
+   currentProjectId = projectId;
   selectedEmployeeId = null;
-  closePopup()
+  closePopup();
+
+  // Reset modal
   document.getElementById('employeeList').innerHTML = '';
   document.getElementById('confirmBlock').style.display = 'none';
+
+  // Dynamically generate stage checkboxes
+  const stageContainer = document.getElementById('stageContainer');
+  stageContainer.innerHTML = `
+    <input type="checkbox" name="all" class="stage-checkbox"> Весь проект <br>
+    ${stages.rezka ? '<input type="checkbox" name="rezka" class="stage-checkbox"> Резка<br>' : ''}
+    ${stages.svarka ? '<input type="checkbox" name="svarka" class="stage-checkbox"> Сварка<br>' : ''}
+    ${stages.fill ? '<input type="checkbox" name="fill" class="stage-checkbox"> Покраска<br>' : ''}
+    ${stages.print ? '<input type="checkbox" name="print" class="stage-checkbox"> Печать<br>' : ''}
+    ${stages.sborka ? '<input type="checkbox" name="sborka" class="stage-checkbox"> Сборка<br>' : ''}
+  `;
+
   document.getElementById('assignModal').classList.remove('hidden');
 
-  // ✅ Fetch employees when modal is opened
   fetch('/search-profile/?position=chief_staff')
     .then(res => res.json())
     .then(data => {
@@ -628,16 +947,38 @@ function closeAssignModal() {
 
 // Confirm project assignment
 function confirmAssign() {
+  const params = new URLSearchParams({
+    project_id: currentProjectId,
+    profile_id: selectedEmployeeId,
+  });
+
+  const allCheckbox = document.querySelector('.stage-checkbox[name="all"]');
+  const allChecked = allCheckbox && allCheckbox.checked;
+
+  if (allChecked) {
+    // If "Весь проект" is checked, include all other checkboxes that exist
+    document.querySelectorAll('.stage-checkbox').forEach(cb => {
+      if (cb.name !== 'all') {
+        params.append(cb.name, 'true');
+      }
+    });
+    params.append('all', 'true');
+  } else {
+    // Only include individually selected checkboxes
+    document.querySelectorAll('.stage-checkbox').forEach(cb => {
+      if (cb.name !== 'all' && cb.checked) {
+        params.append(cb.name, 'true');
+      }
+    });
+  }
+
   fetch(`/assign/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
       'X-CSRFToken': '{{ csrf_token }}',
     },
-    body: new URLSearchParams({
-      project_id: currentProjectId,
-      profile_id: selectedEmployeeId
-    })
+    body: params,
   }).then(res => {
     if (res.ok) {
       alert('Проект успешно передан!');
@@ -648,7 +989,16 @@ function confirmAssign() {
     }
   });
 }
-
+document.addEventListener('change', function (e) {
+  if (e.target.matches('input[name="all"]')) {
+    const isChecked = e.target.checked;
+    document.querySelectorAll('.stage-checkbox').forEach(cb => {
+      if (cb.name !== 'all') {
+        cb.checked = isChecked;
+      }
+    });
+  }
+});
 </script>
 </body>
 </html>

@@ -25,6 +25,9 @@
     {% include 'installer.html' %}
 {% elif request.user.profile.position == "chief" %}
     {% include 'chief.html' %}
+
+{% elif request.user.profile.position == "chief_staff" %}
+    {% include 'chief_staff.html' %}
 {% endif %}
 
 
