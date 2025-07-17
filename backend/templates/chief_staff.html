@@ -245,7 +245,7 @@
                 <p>Выберите этапы которые завершили</p>
                      {% if item.rezka == 'chief' %}
                       <input type="checkbox" name="rezka"  data-stage="rezka" class="stage-checkbox"> Резка<br>
-              {% elif not  item.order.rezka or  item.rezka == 'staff' or item.order.stage_pod != 'rezka'  %}
+              {% elif not  item.order.rezka or  item.rezka == 'staff' or item.order.stage_pod == 'svarka'  or item.order.stage_pod == 'fill' or item.order.stage_pod == 'print' or  item.order.stage_pod == 'sborka' %}
 
               {% else %}
               <input type="checkbox" name="rezka"  data-stage="rezka" class="stage-checkbox" hidden>
@@ -253,27 +253,27 @@
               {% endif %}
               {% if item.svarka == 'chief' %}
               <input type="checkbox" name="svarka" class="stage-checkbox" data-stage="svarka"> Сварка<br>
-              {% elif not item.order.svarka  or  item.svarka == 'staff'   or item.order.stage_pod != 'svarka'   %}
+              {% elif not item.order.svarka  or  item.svarka == 'staff'  or item.order.stage_pod == 'fill' or item.order.stage_pod == 'print' or  item.order.stage_pod == 'sborka'  %}
              {% else %}
               <input type="checkbox" name="svarka" class="stage-checkbox" data-stage="svarka" hidden>
 
               {% endif %}
               {% if item.fill == 'chief' %}
               <input type="checkbox" name="fill" class="stage-checkbox" data-stage="fill" > Покраска<br>
-              {% elif not item.order.fill  or  item.fill == 'staff' or item.order.stage_pod != 'fill'  %}
+              {% elif not item.order.fill  or  item.fill == 'staff'  or item.order.stage_pod == 'print' or  item.order.stage_pod == 'sborka'   %}
               {% else %}
                <input type="checkbox" name="fill" class="stage-checkbox" data-stage="fill" hidden >
               {% endif %}
 
               {% if item.print == 'chief'  %}
               <input type="checkbox" name="print" class="stage-checkbox" data-stage="print" > Печать<br>
-               {% elif not item.order.print   or  item.print == 'staff' or item.order.stage_pod != 'print' %}
+               {% elif not item.order.print   or  item.print == 'staff' or item.order.stage_pod == 'sborka'   %}
               {% else %}
               <input type="checkbox" name="print" class="stage-checkbox" data-stage="print" hidden>
               {% endif %}
               {% if item.sborka == 'chief'  %}
                <input type="checkbox" name="sborka" class="stage-checkbox" data-stage="sborka"> Сборка<br>
-              {% elif not item.order.sborka  or  item.sborka == 'staff' or item.order.stage_pod != 'sborka'  %}
+              {% elif not item.order.sborka  or  item.sborka == 'staff'   %}
               {% else %}
               <input type="checkbox" name="sborka" class="stage-checkbox" data-stage="sborka" hidden>
               {% endif %}
