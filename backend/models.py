@@ -116,7 +116,6 @@ class Orders(models.Model):
         ("warehouse", "Склад"),
 
         ("manufacturing", "Производство"),
-        ("assembly_stage", "Сборка"),
         ("accounting_2", "Бухгалтерия_2"),
         ("delivery", "Доставка"),
         ("installation", "Установка"),

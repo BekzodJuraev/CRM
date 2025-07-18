@@ -733,32 +733,47 @@
 </div>
           {% endfor %}
     </div>
-    <div class="column" ondragover="allowDrop(event)"  data-stage="account"  ondragstart="drag(event)" data-pod_stage="" ondrop="drop(event)">
+    <div class="column" ondragover="allowDrop(event)"  data-stage="accounting_2"  ondragstart="drag(event)" data-pod_stage="" ondrop="drop(event)">
         <h3>Бухгалтерия</h3>
-             {% for item in delivery %}
-      <div class="card" data-pk="{{item.pk}}"  draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
+             {% for item in accounting_or_delivery %}
+      <div class="card" data-pk="{{item.pk}}" draggable="true" ondragstart="drag(event)" onclick="showPopup(this)">
         <div class="preview">
-        <p><strong>Клиент:</strong> {{item.client}}</p>
+
+
+        <p><strong>Проект:</strong> {{item.order_name}}</p>
         <p><strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
     </div>
     <div class="details" style="display: none;">
-        <h2>{{ item.client}}</h2>
-        <p><strong>Дата добавления:</strong> {{item.add_order|date:"d.m.Y"}} | <strong>Срок:</strong> {{item.complete_order|date:"d.m.Y"}}</p>
-        <p><strong>Предоплата:</strong> {{item.order_predoplata}} сум | <strong>Сумма заказа:</strong> {{item.order_sum}} сум</p>
-        <p><strong>Адрес:</strong> {{item.adress}} </p>
-        <p><strong>Телефон:</strong> {{item.phone}} </p>
-        {% with item.consumables.all as consumables %}
-        <p><strong>Категория:</strong> {% for rek in consumables|distinct_categories %}
-      {{ rek.catigories }}{% if not forloop.last %}, {% endif %}
-    {% endfor %}</p>
-        <p><strong>Расходники:</strong> {% for rek in consumables %}
-      {{ rek.add }} ({{ rek.price }} сум);
-    {% endfor %} </p>
-        {% endwith %}
+<h3>Проект: {{ item.order_name }}</h3>
+
+            <p><strong>Категория заказа:</strong> {{ item.catigories }}</p>
+
+            <p><strong>Размер:</strong> {{ item.razmer }}</p>
+
+             <p><strong>Описание / ТЗ:</strong> {{ item.description }}</p>
+            <p><strong>Прикреплённые файлы:</strong></p>
+            <div id="preview_tz_{{ item.id }}"></div>
+
+           <p><strong>Дизайн:</strong> {{ item.description_design }}</p>
+            <p><strong>Прикреплённые фото:</strong></p>
+
+              <div id="preview_design_{{ item.id }}"></div>
+
+
+            <p><strong>Дата добавления заказа:</strong> {{ item.add_order|date:"d.m.Y" }}</p>
+            <p><strong>Срок выполнения:</strong> {{ item.complete_order|date:"d.m.Y" }}</p>
+
+
+            <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
 
 
 
-        <p><strong>Описание / ТЗ:</strong> {{item.description}} </p>
+
+            </div>
+
+
+
+
     </div>
 </div>
           {% endfor %}
@@ -773,6 +788,19 @@
 
 
    {% for item in manufacturing %}
+     <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        {% if item.design %}
+          showExistingFilePreview("{{ item.design.url }}", "preview_design_{{ item.id }}");
+        {% endif %}
+        {% if item.tz %}
+          showExistingFilePreview("{{ item.tz.url }}", "preview_tz_{{ item.id }}");
+        {% endif %}
+      });
+    </script>
+  {% endfor %}
+
+   {% for item in accounting_or_delivery %}
      <script>
       document.addEventListener('DOMContentLoaded', function () {
         {% if item.design %}

@@ -208,7 +208,7 @@
           {% if  item.rezka != 'chief' and    item.svarka  != 'chief' and item.fill != 'chief' and item.print != 'chief' and item.sborka != 'chief' %}
              <form method="post" >
                  {% csrf_token %}
-                   <input type="text" name="action" value="staff_complete" hidden>
+                   <input type="text" name="action" value="chief_staff_complete" hidden>
                 <input type="text" name="pk" value="{{item.pk}}" hidden>
           <button class="btn">Завершить</button>
 

@@ -347,10 +347,13 @@ class Dashboard(LoginRequiredMixin,TemplateView):
          if stage_pod:
             Orders.objects.filter(pk=pk).update(stage=stage,stage_pod=stage_pod)
          else:
-            Orders.objects.filter(pk=pk).update(stage=stage)
-            mess(pk)
-         if stage == "delivery":
-            admin_tech(pk)
+            if order.full_pay:
+               Orders.objects.filter(pk=pk).update(stage='delivery')
+               # admin_tech(pk)
+            else:
+               Orders.objects.filter(pk=pk).update(stage=stage)
+            #mess(pk)
+
 
 
 
@@ -596,26 +599,79 @@ class MyProjects(LoginRequiredMixin, TemplateView):
          sborka = request.POST.get('sborka') == 'on'
 
          order_staff = OrderStaff.objects.filter(order_id=pk, profile=request.user.profile).first()
+         stages=[]
+
+         check_stages = []
+         for stage in ['rezka', 'svarka', 'fill', 'print', 'sborka']:
+            if getattr(order_staff.order, stage):
+               check_stages.append(stage)
+
+
+
+
+
 
 
 
          if rezka:
             order_staff.rezka='staff'
-            order_staff.order.stage_pod='svarka'
+            check_stages.remove('rezka')
+
+         elif  order_staff.order.stage_pod in ['svarka', 'fill', 'print', 'sborka'] and 'rezka' in check_stages:
+            check_stages.remove('rezka')
+
          if svarka:
+            check_stages.remove('svarka')
             order_staff.svarka = 'staff'
-            order_staff.order.stage_pod = 'fill'
+
+         elif order_staff.order.stage_pod in [ 'fill', 'print', 'sborka'] and 'svarka' in check_stages:
+            check_stages.remove('svarka')
+
+
          if fill:
+
+            check_stages.remove('fill')
             order_staff.fill = 'staff'
-            order_staff.order.stage_pod = 'print'
+
+         elif order_staff.order.stage_pod in ['print', 'sborka'] and 'fill' in check_stages:
+            check_stages.remove('fill')
+
          if pechat:
-            order_staff.order.stage_pod = 'sborka'
+            check_stages.remove('print')
             order_staff.print = 'staff'
+
+         elif  order_staff.order.stage_pod in [ 'sborka'] and 'print' in check_stages:
+            check_stages.remove('print')
          if sborka:
+            check_stages.remove('sborka')
             order_staff.sborka = 'staff'
+
+
+
+         if check_stages:
+            order_staff.order.stage_pod = check_stages[0]
+
+         else:
+            order_staff.order.stage_pod='ready'
+
+
+
+
+
 
          order_staff.order.save(update_fields=['stage_pod'])
          order_staff.save()
+
+      elif action == 'chief_staff_complete':
+         orderstaff=OrderStaff.objects.filter(pk=pk).first()
+
+         if orderstaff.sborka == 'staff':
+            orderstaff.order.stage_pod='ready'
+            orderstaff.order.save(update_fields=['stage_pod'])
+
+         orderstaff.complete=True
+         orderstaff.save()
+
 
 
 
@@ -702,7 +758,7 @@ class MyProjects(LoginRequiredMixin, TemplateView):
             to_attr='designer_staff'
          ))
 
-
+      context['accounting_or_delivery']=Orders.objects.filter(stage__in=['accounting_2','delivery'])
       context['rezka'] = [o for o in context['manufacturing'] if o.stage_pod == 'rezka']
       context['svarka'] = [o for o in context['manufacturing'] if o.stage_pod == 'svarka']
       context['fill'] = [o for o in context['manufacturing'] if o.stage_pod == 'fill']
