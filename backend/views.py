@@ -998,7 +998,9 @@ class Order(LoginRequiredMixin,TemplateView):
 
       return redirect('dashboard')
 
-
+class FinanceProfileView(LoginRequiredMixin,TemplateView):
+   template_name = 'finance_profile.html'
+   login_url = reverse_lazy('login')
 class ProfileView(LoginRequiredMixin,TemplateView):
    template_name = 'profile.html'
    login_url = reverse_lazy('login')
@@ -1568,8 +1570,10 @@ class Money(LoginRequiredMixin,TemplateView):
          order=order.filter(complete_date__range=(first,second))
          order1=order1.filter(complete_date__range=(first,second))
 
-      marja=Consumables.objects.filter(order__in=order).aggregate(total_sum=Sum(F('price')*F('quantity')))['total_sum'] or 0
-      marja1 = Consumables.objects.filter(order__in=order1).aggregate(total_sum=Sum(F('price') * F('quantity')))[
+
+      price_subquery = Warehouse.objects.filter(product=OuterRef('add')).order_by('-id').values('price')[:1]
+      marja=Consumables.objects.filter(order__in=order,warehouse=True).aggregate(total_sum=Sum(Subquery(price_subquery)*F('quantity')))['total_sum'] or 0
+      marja1 = Consumables.objects.filter(order__in=order1,warehouse=True).aggregate(total_sum=Sum(Subquery(price_subquery) * F('quantity')))[
                  'total_sum'] or 0
 
       total_sum=order.aggregate(total_sum=Sum('order_sum'))['total_sum'] or 0
@@ -1678,7 +1682,8 @@ class WarehouseCreateView(LoginRequiredMixin, TemplateView):
       deliver = request.POST.get('deliver')
       created_at = request.POST.get('created_at')
       user_id=request.POST.get('user_id')
-      Warehouse.objects.create(city=city,category=category,product=product,quantity=quantity,provider_id=user_id,created_at=created_at)
+      price=request.POST.get('price')
+      Warehouse.objects.create(city=city,category=category,product=product,quantity=quantity,provider_id=user_id,created_at=created_at,price=price)
 
       return redirect('warehouse')
 

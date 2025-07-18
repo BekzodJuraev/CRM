@@ -39,6 +39,10 @@ class Profile(models.Model):
     photo = models.ImageField(blank=True, upload_to='pictures/',null=True)
     approve=models.BooleanField(default=False)
     archive=models.BooleanField(default=True)
+    balance = models.DecimalField(max_digits=10, decimal_places=2,default=0)
+    salary_pure=models.DecimalField(max_digits=10, decimal_places=2,default=0)
+    salary_black=models.DecimalField(max_digits=10, decimal_places=2,default=0)
+    approve_accounting=models.BooleanField(default=False)
 
 
 
@@ -292,6 +296,7 @@ class Warehouse(models.Model):
     created_at=models.DateField()
     category=models.CharField(max_length=70)
     city=models.CharField(max_length=70)
+    price=models.DecimalField(max_digits=10, decimal_places=2,default=0)
     provider=models.ForeignKey(Provider, on_delete=models.CASCADE, related_name='provider',null=True)
 
 

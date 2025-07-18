@@ -38,5 +38,6 @@ urlpatterns=[
     path('search-profile/', views.search_profiles, name='search-profile'),
     path('assign/', views.assign_project, name='assign'),
     path('provider/',views.ProviderView.as_view(),name='provider'),
-    path('provider/add',views.ProvideCreateView.as_view(),name='provider_add')
+    path('provider/add',views.ProvideCreateView.as_view(),name='provider_add'),
+    path('finance-profile/',views.FinanceProfileView.as_view(),name='finance_profile')
 ]

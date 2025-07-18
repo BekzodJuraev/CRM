@@ -296,22 +296,7 @@
                              {% endif %}
                              {% endfor %}
                         </div>
-                        <div class="kanban-column"  ondrop="drop(event)" data-stage="assembly"  ondragover="allowDrop(event)">
-                            <h5>Сборка</h5>
-                            {% for item in assembly %}
 
-                             {% if item.today >= item.complete_order %}
-
-
-
-                              <div class="kanban-item"  style="background-color: red;" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
-                            {% else %}
-                              <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.client}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
-
-
-                             {% endif %}
-                             {% endfor %}
-                        </div>
                         <div class="kanban-column"  data-stage="accounting_2" ondrop="drop(event)" ondragover="allowDrop(event)">
                             <h5>Бухгалтерия</h5>
 
