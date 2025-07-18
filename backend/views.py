@@ -1025,10 +1025,17 @@ class Applications(LoginRequiredMixin,TemplateView):
    def post(self, request, *args, **kwargs):
       action=request.POST.get('action')
       pk = request.POST.get('pk')
-
-      if action == "approve":
+      who = request.POST.get('who')
+      salary_pure = request.POST.get('salary_pure') or 0
+      salary_black = request.POST.get('salary_black') or 0
+      if action == "approve" and who =='manager':
          Profile.objects.filter(id=pk).update(approve=True)
-      else:
+      elif action == 'approve' and who == 'admin':
+         Profile.objects.filter(id=pk).update(approve=True,salary_pure=salary_pure,salary_black=salary_black)
+      elif action == 'approve' and who == 'account':
+
+         Profile.objects.filter(id=pk).update(approve_accounting=True,salary_pure=salary_pure,salary_black=salary_black)
+      elif action == 'reject':
          User.objects.filter(profile__id=pk).delete()
          #Profile.objects.filter(id=pk).delete()
 
@@ -1045,7 +1052,7 @@ class Applications(LoginRequiredMixin,TemplateView):
       context = super().get_context_data(**kwargs)
 
       context['profile']=Profile.objects.filter(approve=False).order_by('-id')
-
+      context['account'] = Profile.objects.filter(approve=True,approve_accounting=False).order_by('-id')
       return context
 
 
