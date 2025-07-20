@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Уведомления</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #1c1c1c, #2c2c2c);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .notification-wrapper {
+            background-color: #111;
+            border: 2px solid gold;
+            border-radius: 16px;
+            padding: 30px;
+            width: 500px;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+            animation: fadeIn 1.2s ease-in-out;
+        }
+
+        .notification-header {
+            font-size: 24px;
+            font-weight: bold;
+            color: gold;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .notification-box {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 5px solid gold;
+        }
+
+        .notification-box p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        .highlight {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="notification-wrapper">
+        <div class="notification-header">Уведомление</div>
+        <div class="notification-box">
+            <p><span class="highlight">Новая заявка от соц. маркетинга</span></p>
+            <p>Клиент: <span class="highlight">Максим</span></p>
+            <p>Номер телефона: <span class="highlight">+9989145889</span></p>
+            <p>Комментарий: Клиент интересуется установкой наружной рекламы. Просит связаться в ближайшее время.</p>
+        </div>
+    </div>
+
+</body>
+</html>

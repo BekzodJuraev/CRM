@@ -6,7 +6,7 @@ from django.db.models import Prefetch
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django.views.generic import View,TemplateView,DetailView,UpdateView
-from .models import Profile,Rezident,Finance,Warehouse,WarehouseLimit,Consumables,Orders,Delivery_Photo,Compelete_Photo,Telegram_users,Clients,Social_clients,OrderStaff,Provider
+from .models import Profile,Rezident,Finance,Warehouse,WarehouseLimit,Consumables,Orders,Delivery_Photo,Compelete_Photo,Telegram_users,Clients,Social_clients,OrderStaff,Provider,Notification
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
@@ -259,7 +259,17 @@ def mess(pk):
 
       pass
 
+class NotificationVIew(LoginRequiredMixin,DetailView):
+   login_url = reverse_lazy('login')
+   template_name = 'notification.html'
+   model = Notification
 
+   def get_context_data(self, *, object_list=None, **kwargs):
+      context = super().get_context_data(**kwargs)
+      notify=self.object
+      notify.is_read=True
+      notify.save()
+      return context
 class Dashboard(LoginRequiredMixin,TemplateView):
    login_url = reverse_lazy('login')
    template_name = 'dashboard.html'
@@ -427,7 +437,7 @@ class Dashboard(LoginRequiredMixin,TemplateView):
       context['fill'] = [o for o in context['manufacturing'] if o.stage_pod == 'fill']
       context['print'] = [o for o in context['manufacturing'] if o.stage_pod == 'print']
 
-
+      context['Notifcation']=Notification.objects.all()
       return context
 
 
