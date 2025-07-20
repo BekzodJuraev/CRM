@@ -672,6 +672,9 @@ class MyProjects(LoginRequiredMixin, TemplateView):
          orderstaff.complete=True
          orderstaff.save()
 
+      elif action == 'qa_chief':
+         order=Orders.objects.filter(pk=pk).update(stage='finished')
+         #OrderStaff.objects.create(order=order,profile=request.user.profile,complete=True)
 
 
 
@@ -757,7 +760,13 @@ class MyProjects(LoginRequiredMixin, TemplateView):
             queryset=OrderStaff.objects.filter(profile__position='chief_staff').select_related('profile'),
             to_attr='designer_staff'
          ))
-
+      context['quality_control'] = Orders.objects.filter(
+         stage='quality_control').prefetch_related(
+         Prefetch(
+            'order_staff',
+            queryset=OrderStaff.objects.filter(profile__position='qa_staff').select_related('profile'),
+            to_attr='designer_staff'
+         ))
       context['accounting_or_delivery']=Orders.objects.filter(stage__in=['accounting_2','delivery'])
       context['rezka'] = [o for o in context['manufacturing'] if o.stage_pod == 'rezka']
       context['svarka'] = [o for o in context['manufacturing'] if o.stage_pod == 'svarka']

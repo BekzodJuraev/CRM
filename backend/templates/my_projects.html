@@ -28,6 +28,12 @@
 
 {% elif request.user.profile.position == "chief_staff" %}
     {% include 'chief_staff.html' %}
+
+{% elif request.user.profile.position == "qa_cheif" %}
+    {% include 'qa_cheif.html' %}
+
+{% elif request.user.profile.position == "qa_staff" %}
+    {% include 'qa_staff.html' %}
 {% endif %}
 
 
