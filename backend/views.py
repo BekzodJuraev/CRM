@@ -263,7 +263,13 @@ class NotificationVIew(LoginRequiredMixin,DetailView):
    login_url = reverse_lazy('login')
    template_name = 'notification.html'
    model = Notification
+   context_object_name = 'item'
 
+   def get_queryset(self):
+      return super().get_queryset().select_related(
+         'order',
+         'order__marketing',
+      )
    def get_context_data(self, *, object_list=None, **kwargs):
       context = super().get_context_data(**kwargs)
       notify=self.object
@@ -1289,7 +1295,11 @@ class MarketingClietView(LoginRequiredMixin,TemplateView):
 
    def post(self, request, *args, **kwargs):
       pk = request.POST.get('pk')
-      Orders.objects.filter(marketing__id=pk).update(stage='call_center')
+      order = Orders.objects.filter(marketing__id=pk).first()
+      if order:
+         order.stage = 'call_center'
+         order.save(update_fields=['stage'])
+         Notification.objects.create(order=order, stage='call_center')
       return redirect(request.path)
 
 
@@ -1462,17 +1472,18 @@ class DetailCall(LoginRequiredMixin,DetailView):
             name = request.POST.get('name')
             lastname = request.POST.get('lastname')
             middle_name = request.POST.get('middle_name')
-            obj.client.adress = None
-            obj.client.inn = None
-            obj.client.account = None
-            obj.client.phone = phone
-            obj.client.company_name = None
-            obj.client.name=name
-            obj.client.lastname = lastname
-            obj.client.middle_name = middle_name
-            obj.client.phone = phone
-            obj.client.client_type="INDIVIDUAL"
-            obj.client.save()
+            if obj.client:
+               obj.client.phone = phone
+               obj.client.name = name
+               obj.client.lastname = lastname
+               obj.client.middle_name = middle_name
+               obj.client.client_type = "INDIVIDUAL"
+               obj.client.save()
+            else:
+               c=Clients.objects.create(phone=phone,name=name,lastname=lastname,middle_name=middle_name,client_type="INDIVIDUAL")
+               obj.client=c
+
+
 
          else:
             adress = request.POST.get('adress')
@@ -1481,16 +1492,20 @@ class DetailCall(LoginRequiredMixin,DetailView):
             account = request.POST.get('account') or None
             mfo = request.POST.get('mfo') or None
 
-            obj.client.name = None
-            obj.client.lastname = None
-            obj.client.middle_name = None
-            obj.client.company_name = company_name
-            obj.client.adress = adress
-            obj.client.inn = inn
-            obj.client.account = account
-            obj.client.phone = phone
-            obj.client.client_type = "LEGAL_ENTITY"
-            obj.client.save()
+            if obj.client:
+               obj.client.company_name = company_name
+               obj.client.adress = adress
+               obj.client.inn = inn
+               obj.client.account = account
+               obj.client.phone = phone
+               obj.client.client_type = "LEGAL_ENTITY"
+               obj.client.save()
+            else:
+               c = Clients.objects.create(company_name=company_name, adress=adress, inn=inn, account=account,
+                                          client_type="LEGAL_ENTITY",phone=phone)
+               obj.client = c
+
+
 
          obj.order_name = order_name
          obj.zayavki = zayavki
@@ -1499,9 +1514,13 @@ class DetailCall(LoginRequiredMixin,DetailView):
          obj.order_predoplata = order_predoplata
          obj.description = description
          obj.catigories = catigories
-         obj.tz = tz
+         if tz:
+            obj.tz = tz
+
+         if design:
+            obj.design = design
          obj.check_design = check_design
-         obj.design = design
+
          obj.latitude = latitude
          obj.longitude = longitude
          obj.razmer = razmer
@@ -1557,7 +1576,7 @@ class MarketingClientCreateView(LoginRequiredMixin,TemplateView):
       client_name = request.POST.get('client')
       comment = request.POST.get('comment')
       profile=request.user.profile
-      order=Orders.objects.create()
+      order=Orders.objects.create(stage='marketing')
       Social_clients.objects.create(profile=profile,client_name=client_name,phone=phone,comment=comment,order=order)
 
 

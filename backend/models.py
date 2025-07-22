@@ -207,6 +207,23 @@ class Orders(models.Model):
 class Notification(models.Model):
     order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name='notifications')
     #message = models.CharField(max_length=255,null=True)
+    Stage_CHOICES = [
+        ("call_center", "Колл-центр"),
+        ("manager", "Менеджер"),
+        ("design", "Проектирование"),
+        ("technologist", "Технолог"),
+        ("manager_2", "Менеджер_2"),
+        ("accounting", "Бухгалтерия"),
+        ("warehouse", "Склад"),
+
+        ("manufacturing", "Производство"),
+        ("accounting_2", "Бухгалтерия_2"),
+        ("delivery", "Доставка"),
+        ("installation", "Установка"),
+        ("quality_control", "Контроль качества"),
+
+    ]
+    stage = models.CharField(max_length=20, choices=Stage_CHOICES,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
     profile = models.ForeignKey(

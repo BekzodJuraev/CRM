@@ -311,7 +311,7 @@ custom-dropdown {
        pattern="^\+998\d{9}$"
        title="+998901234567"
        class="form-control"
-                value="{% if item.client.phone %}{{item.client.phone}}{% else %} {{ item.marketing.phone }}{% endif %}">
+                value="{% if item.client.phone %}{{item.client.phone}}{% else %}{{ item.marketing.phone }}{% endif %}">
                   <label>Наименование проекта:</label>
             <input type="text" class="form-control" placeholder="Проект 1" name="order_name" value="{{item.order_name }}" required>
                     <label>Источник:</label>
@@ -373,7 +373,7 @@ custom-dropdown {
             <textarea class="form-control" rows="3" name="description" >{{item.description}}</textarea>
 
 
-            <div id="preview_tz"></div>
+              <div id="preview_tz"></div>
             <label>Размер:</label>
             <input type="text" class="form-control" placeholder="40 cm"  name="razmer"  value="{{item.razmer}}">
             <h6>Дизайн</h6>
@@ -384,9 +384,7 @@ custom-dropdown {
   <input type="file" name="design"  class="file-input" onchange="handleFile(this,'preview_design')" value="{{item.design}}">
 </label>
      <textarea class="form-control" rows="3" name="description_design" >{{item.description_design}}</textarea>
-             <div id="preview_design">
-
-             </div>
+             <div id="preview_design"></div>
         <h3>Местоположение установки:</h3>
            <button id="pick_map"  type="button" onclick="openGeoModal()">Загрузить геолокацию</button>
 <input type="hidden" id="latitude" name="latitude" value="{{ item.latitude|default:'' }}">
@@ -706,6 +704,7 @@ ymaps.ready(function () {
     document.getElementById('delete-form').submit();
 }
 </script>
+
 
 
 

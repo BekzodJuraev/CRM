@@ -242,7 +242,7 @@
              {% endif %}
 
            </td>
-           <td>{{item.get_zayavki_display}}</td>
+           <td>{{item.get_zayavki_display|default:""}}</td>
 
             <td><div>
                 <button onclick="window.location.href='{% url 'call_cente_detail' item.pk %}'">Подробнее</button>

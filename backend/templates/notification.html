@@ -59,15 +59,16 @@
 </head>
 <body>
 
+    {% if item.stage == 'call_center' %}
     <div class="notification-wrapper">
         <div class="notification-header">Уведомление</div>
         <div class="notification-box">
             <p><span class="highlight">Новая заявка от соц. маркетинга</span></p>
-            <p>Клиент: <span class="highlight">Максим</span></p>
-            <p>Номер телефона: <span class="highlight">+9989145889</span></p>
-            <p>Комментарий: Клиент интересуется установкой наружной рекламы. Просит связаться в ближайшее время.</p>
+            <p>Клиент: <span class="highlight">{{item.order.marketing.name}}</span></p>
+            <p>Номер телефона: <span class="highlight">{{item.order.marketing.phone}}</span></p>
+            <p>Комментарий: {{item.order.marketing.comment}}</p>
         </div>
     </div>
-
+    {% endif %}
 </body>
 </html>
