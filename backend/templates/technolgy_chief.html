@@ -226,6 +226,7 @@
             background: #f9f9f9;
         }
 
+
   </style>
 </head>
 <body>
@@ -233,9 +234,8 @@
   <div class="modal-content" style="max-width: 500px;">
     <span class="close" onclick="closeAssignModal()">&times;</span>
 
-    <h3>Выберите сотрудника (должность: Дизайнер)</h3>
+    <h3>Выберите сотрудника</h3>
 
-    <input type="text" id="searchEmployee" placeholder="Поиск по имени..." style="width:100%;padding:8px;border-radius:8px;border:1px solid #ccc;" />
 
     <div id="employeeList" style="max-height: 200px; overflow-y: auto; margin-top: 10px;"></div>
 
@@ -290,7 +290,9 @@
                <input type="text" name="update" value="update" hidden>
                <input type="text" name="stage" value="update" hidden>
                 <input type="text" name="pk" value="{{item.pk}}" hidden>
-          <button class="btn">Передать менеджеру</button>
+          <button class="btn" id="send-to-manager" data-item-id="{{ item.pk }}">
+  Передать менеджеру
+</button>
 
               </form>
                  {% endif %}
@@ -523,73 +525,68 @@ document.querySelectorAll('.myForm').forEach(form => {
     renderPage();
   </script>
 
+
+
 <script>
   let currentProjectId = null;
-  let selectedEmployeeId = null;
+let selectedEmployeeId = null;
 
-  function openAssignModal(projectId) {
-    currentProjectId = projectId;
-    selectedEmployeeId = null;
-    document.getElementById('employeeList').innerHTML = '';
-    document.getElementById('confirmBlock').style.display = 'none';
-    document.getElementById('searchEmployee').value = '';
-    document.getElementById('assignModal').classList.remove('hidden');
-  }
+function openAssignModal(projectId) {
+  currentProjectId = projectId;
+  selectedEmployeeId = null;
+  document.getElementById('employeeList').innerHTML = '';
+  document.getElementById('confirmBlock').style.display = 'none';
+  document.getElementById('assignModal').classList.remove('hidden');
 
-  function closeAssignModal() {
-    document.getElementById('assignModal').classList.add('hidden');
-  }
-
-  // AJAX поиск сотрудников
-  document.getElementById('searchEmployee').addEventListener('input', function () {
-    const query = this.value;
-
-    if (query.length < 2) return;
-
-    fetch(`/search-profile/?position=technologist&search=${encodeURIComponent(query)}`)
-      .then(res => res.json())
-      .then(data => {
-        const list = document.getElementById('employeeList');
-        list.innerHTML = '';
-        data.forEach(user => {
-          const div = document.createElement('div');
-          div.textContent = user.full_name;
-          div.style.cursor = 'pointer';
-          div.style.padding = '5px 10px';
-          div.style.borderBottom = '1px solid #ddd';
-          div.onclick = () => {
-            selectedEmployeeId = user.id;
-            document.getElementById('selectedName').textContent = user.full_name;
-            document.getElementById('confirmBlock').style.display = 'block';
-          };
-          list.appendChild(div);
-        });
+  // ✅ Fetch employees when modal is opened
+  fetch('/search-profile/?position=technologist')
+    .then(res => res.json())
+    .then(data => {
+      const list = document.getElementById('employeeList');
+      list.innerHTML = '';
+      data.forEach(user => {
+        const div = document.createElement('div');
+        div.textContent = user.full_name;
+        div.style.cursor = 'pointer';
+        div.style.padding = '5px 10px';
+        div.style.borderBottom = '1px solid #ddd';
+        div.onclick = () => {
+          selectedEmployeeId = user.id;
+          document.getElementById('selectedName').textContent = user.full_name;
+          document.getElementById('confirmBlock').style.display = 'block';
+        };
+        list.appendChild(div);
       });
-  });
-
-  // Подтверждение отправки
-  function confirmAssign() {
-    fetch(`/assign/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'X-CSRFToken': '{{ csrf_token }}',
-      },
-      body: new URLSearchParams({
-        project_id: currentProjectId,
-        profile_id: selectedEmployeeId,
-        action:'technologist'
-      })
-    }).then(res => {
-      if (res.ok) {
-        alert('Проект успешно передан!');
-        closeAssignModal();
-        location.reload();
-      } else {
-        alert('Ошибка при передаче!');
-      }
     });
-  }
+}
+
+function closeAssignModal() {
+  document.getElementById('assignModal').classList.add('hidden');
+}
+
+// Confirm project assignment
+function confirmAssign() {
+  fetch(`/assign/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'X-CSRFToken': '{{ csrf_token }}',
+    },
+    body: new URLSearchParams({
+      project_id: currentProjectId,
+      profile_id: selectedEmployeeId
+    })
+  }).then(res => {
+    if (res.ok) {
+      alert('Проект успешно передан!');
+      closeAssignModal();
+      location.reload();
+    } else {
+      alert('Ошибка при передаче!');
+    }
+  });
+}
+
 </script>
 
 </body>

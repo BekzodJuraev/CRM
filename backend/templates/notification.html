@@ -210,6 +210,18 @@
         </form>
     </div>
 
+    {% elif item.stage == 'design' or item.stage == 'technologist' %}
+  <div class="notification-wrapper">
+        <div class="notification-header">Уведомление</div>
+        {% if item.profile %}
+      <div class="notification-box">
+            <p><span class="highlight">Проект "{{item.order.order_name}}": сотрудник {{item.profile.lastname}} {{item.profile.name}} подтвердил завершение работы</span></p>
+    </div>
+      {% else %}
+      <div class="notification-box">
+            <p><span class="highlight">Вам назначен новый проект «{{item.order.order_name}}». Перейдите в раздел проектов для ознакомления с подробной информацией.</span></p>
+    </div>
+    {% endif %}
   {% elif item.stage == 'manager_qa_back' %}
      <div class="notification-wrapper">
         <div class="notification-header">Уведомление</div>

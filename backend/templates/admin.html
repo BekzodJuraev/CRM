@@ -447,7 +447,12 @@ function drop(event) {
             })
         })
         .then(res => res.json())
-        .then(data => console.log("Updated:", data))
+        .then(data => {
+            console.log("Updated:", data);
+            if (data.reload) {
+                location.reload();  // 🔁 Reload the page
+            }
+        })
         .catch(err => console.error("Error:", err));
     }
 }

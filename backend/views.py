@@ -323,106 +323,31 @@ class Dashboard(LoginRequiredMixin,TemplateView):
       stage=request.POST.get('stage')
 
 
-
-      if action == "designer":
-         Orders.objects.filter(pk=pk).update(stage="technologist")
-         mess(pk)
-
-         return redirect(request.path)
-      elif action == "technologist":
-         add = request.POST.getlist('add')
-         quantity=request.POST.getlist('quantity')
-         rezka = request.POST.get('rezka') == 'on'
-         svarka = request.POST.get('svarka') == 'on'
-         fill = request.POST.get('fill') == 'on'
-         pechat = request.POST.get('print') == 'on'
-
-         if rezka:
-            pod_stage="rezka"
-         elif svarka:
-            pod_stage="svarka"
-         elif fill:
-            pod_stage="fill"
-         elif pechat:
-            pod_stage="print"
-
-
-         Orders.objects.filter(pk=pk).update(stage="manufacturing",stage_pod=pod_stage,rezka=rezka,svarka=svarka,fill=fill,print=pechat)
-         consumables = [
-            Consumables(order_id=pk, add=a, price=p, catigories=c, quantity=d)
-            for a, p, c, d in zip(add, price, catigories, quantity)
-         ]
-         Consumables.objects.bulk_create(consumables)
-
-         mess(pk)
-
-         return redirect(request.path)
-      elif action == "delivery":
-         photo = request.FILES.getlist('photo')
-
-         order=Orders.objects.filter(pk=pk).update(stage='order_ready')
-         delivery = [
-            Delivery_Photo(order_id=pk, photo=p)
-            for p in photo
-         ]
-         Delivery_Photo.objects.bulk_create(delivery)
-
-
-         mess(pk)
-
-         return redirect(request.path)
-
-      elif action == 'chief':
-         stage_pod=request.POST.get('pod_stage')
-         order=Orders.objects.filter(pk=pk).first()
-         check=getattr(order,stage_pod,None)
-
-
-         if check is False:
-            services = []
-            if order.rezka:
-               services.append("Резка")
-            if order.svarka:
-               services.append("Сварка")
-            if order.fill:
-               services.append("Покраска")
-            if order.print:
-               services.append("Печать")
-
-            x = ", ".join(services)
-            return JsonResponse({'message': f'Для данного проекта технолог выбрал только этапы: {x}'}, status=401)
-
-
-
-         if stage_pod:
-            Orders.objects.filter(pk=pk).update(stage=stage,stage_pod=stage_pod)
-         else:
-            if order.full_pay:
-               Orders.objects.filter(pk=pk).update(stage='delivery')
-               # admin_tech(pk)
-            else:
-               Orders.objects.filter(pk=pk).update(stage=stage)
-            #mess(pk)
-
-
-
-
-         return JsonResponse({'status': 'success'})
-
-
-
-      elif action == "admin":
+      if action == "admin":
          if stage == "finished":
             Orders.objects.filter(pk=pk).update(stage=stage, complete_date=now().date())
 
          elif stage == 'delivery':
             Orders.objects.filter(pk=pk).update(stage=stage)
-            admin_tech(pk)
+           # admin_tech(pk)
+
+         elif stage == 'design':
+            order=Orders.objects.filter(pk=pk).first()
+            if order.check_design:
+               order.stage=stage
+               order.save(update_fields=['stage'])
+               Notification.objects.create(stage=stage,order=order)
+            else:
+               order.stage = 'technologist'
+               order.save(update_fields=['stage'])
+               Notification.objects.create(stage='technologist', order=order)
+
+            return JsonResponse({'status': 'success', 'reload': True})
          else:
             Orders.objects.filter(pk=pk).update(stage=stage)
 
 
-         mess(pk)
+         #mess(pk)
 
 
 
@@ -430,6 +355,97 @@ class Dashboard(LoginRequiredMixin,TemplateView):
 
          return JsonResponse({'status': 'success'})
       return JsonResponse({'status': 'error', 'message': 'Invalid action'}, status=400)
+
+
+
+      # if action == "designer":
+      #    Orders.objects.filter(pk=pk).update(stage="technologist")
+      #    mess(pk)
+      #
+      #    return redirect(request.path)
+      # elif action == "technologist":
+      #    add = request.POST.getlist('add')
+      #    quantity=request.POST.getlist('quantity')
+      #    rezka = request.POST.get('rezka') == 'on'
+      #    svarka = request.POST.get('svarka') == 'on'
+      #    fill = request.POST.get('fill') == 'on'
+      #    pechat = request.POST.get('print') == 'on'
+      #
+      #    if rezka:
+      #       pod_stage="rezka"
+      #    elif svarka:
+      #       pod_stage="svarka"
+      #    elif fill:
+      #       pod_stage="fill"
+      #    elif pechat:
+      #       pod_stage="print"
+      #
+      #
+      #    Orders.objects.filter(pk=pk).update(stage="manufacturing",stage_pod=pod_stage,rezka=rezka,svarka=svarka,fill=fill,print=pechat)
+      #    consumables = [
+      #       Consumables(order_id=pk, add=a, price=p, catigories=c, quantity=d)
+      #       for a, p, c, d in zip(add, price, catigories, quantity)
+      #    ]
+      #    Consumables.objects.bulk_create(consumables)
+      #
+      #    mess(pk)
+      #
+      #    return redirect(request.path)
+      # elif action == "delivery":
+      #    photo = request.FILES.getlist('photo')
+      #
+      #    order=Orders.objects.filter(pk=pk).update(stage='order_ready')
+      #    delivery = [
+      #       Delivery_Photo(order_id=pk, photo=p)
+      #       for p in photo
+      #    ]
+      #    Delivery_Photo.objects.bulk_create(delivery)
+      #
+      #
+      #    mess(pk)
+      #
+      #    return redirect(request.path)
+      #
+      # elif action == 'chief':
+      #    stage_pod=request.POST.get('pod_stage')
+      #    order=Orders.objects.filter(pk=pk).first()
+      #    check=getattr(order,stage_pod,None)
+      #
+      #
+      #    if check is False:
+      #       services = []
+      #       if order.rezka:
+      #          services.append("Резка")
+      #       if order.svarka:
+      #          services.append("Сварка")
+      #       if order.fill:
+      #          services.append("Покраска")
+      #       if order.print:
+      #          services.append("Печать")
+      #
+      #       x = ", ".join(services)
+      #       return JsonResponse({'message': f'Для данного проекта технолог выбрал только этапы: {x}'}, status=401)
+      #
+      #
+      #
+      #    if stage_pod:
+      #       Orders.objects.filter(pk=pk).update(stage=stage,stage_pod=stage_pod)
+      #    else:
+      #       if order.full_pay:
+      #          Orders.objects.filter(pk=pk).update(stage='delivery')
+      #          # admin_tech(pk)
+      #       else:
+      #          Orders.objects.filter(pk=pk).update(stage=stage)
+      #       #mess(pk)
+      #
+      #
+      #
+      #
+      #    return JsonResponse({'status': 'success'})
+
+
+
+
 
 
 
@@ -538,6 +554,7 @@ class MyProjects(LoginRequiredMixin, TemplateView):
          else:
             OrderStaff.objects.create(profile=request.user.profile, complete=True, order_id=pk)
          Orders.objects.filter(pk=pk).update(stage='technologist')
+         Notification.objects.create(stage='technologist', order_id=pk)
 
       elif action == 'technology_add':
          add = request.POST.getlist('add')
@@ -596,6 +613,8 @@ class MyProjects(LoginRequiredMixin, TemplateView):
 
       elif action == 'staff_complete':
          OrderStaff.objects.filter(pk=pk).update(complete=True)
+         order=OrderStaff.objects.filter(pk=pk).first()
+         Notification.objects.create(profile=request.user.profile,stage=order.order.stage,order=order.order)
 
 
       elif action == 'warehouse':
@@ -917,6 +936,9 @@ class OrderDetail(LoginRequiredMixin,DetailView):
    def post(self, request, *args, **kwargs):
       obj = self.get_object()
       action = request.POST.get('action')
+      if action == 'delete':
+         obj.delete()
+         return redirect('dashboard')
       vstrecha = request.POST.get('vstrecha')
       zayavki = request.POST.get('zayavka')
       order_name = request.POST.get('order_name')
