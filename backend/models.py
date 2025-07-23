@@ -206,10 +206,13 @@ class Orders(models.Model):
 
 class Notification(models.Model):
     order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name='notifications')
-    #message = models.CharField(max_length=255,null=True)
+    message = models.CharField(max_length=255,null=True)
     Stage_CHOICES = [
         ("call_center", "Колл-центр"),
+        ("call_center_back", "Колл-центр_назад"),
         ("manager", "Менеджер"),
+        ('manager_qa',"Менеджер_встреча"),
+        ('manager_qa_back', "Менеджер_встреча_назад"),
         ("design", "Проектирование"),
         ("technologist", "Технолог"),
         ("manager_2", "Менеджер_2"),

@@ -265,10 +265,44 @@ class NotificationVIew(LoginRequiredMixin,DetailView):
    model = Notification
    context_object_name = 'item'
 
+
+
+   def post(self,request,*args, **kwargs):
+      action=request.POST.get('action')
+      message=request.POST.get('message')
+      pk=request.POST.get('pk')
+      if action == 'call_center_back':
+         Orders.objects.filter(pk=pk).update(stage='call_center')
+         Notification.objects.create(order_id=pk,stage=action,message=message)
+
+      elif action == 'fail':
+         fail=request.POST.get('fail')
+         Orders.objects.filter(pk=pk).update(stage='failed',fail=fail,by_who_fail='менеджером')
+
+      elif action == 'manager':
+         staff_pk=request.POST.get('staff_pk')
+         if staff_pk:
+            Notification.objects.create(order_id=pk,stage='manager_qa',profile_id=staff_pk)
+
+      elif action == 'manager_qa':
+         message=request.POST.get('message')
+         if message == 'approve':
+            Notification.objects.create(order_id=pk, stage='manager_qa_back', profile_id=request.POST.get('staff_pk'),message=message)
+         else:
+            Notification.objects.create(order_id=pk, stage='manager_qa_back',profile_id=request.POST.get('staff_pk'), message=message)
+
+
+
+
+
+
+
+      return redirect('dashboard')
    def get_queryset(self):
       return super().get_queryset().select_related(
          'order',
          'order__marketing',
+         'order__client'
       )
    def get_context_data(self, *, object_list=None, **kwargs):
       context = super().get_context_data(**kwargs)
@@ -443,7 +477,7 @@ class Dashboard(LoginRequiredMixin,TemplateView):
       context['fill'] = [o for o in context['manufacturing'] if o.stage_pod == 'fill']
       context['print'] = [o for o in context['manufacturing'] if o.stage_pod == 'print']
 
-      context['Notifcation']=Notification.objects.all()
+      context['Notifcation']=Notification.objects.all().order_by('-id')
       return context
 
 
@@ -917,6 +951,7 @@ class OrderDetail(LoginRequiredMixin,DetailView):
          obj.client.middle_name = middle_name
          obj.client.phone = phone
          obj.client.client_type = "INDIVIDUAL"
+         obj.client.active = True
          obj.client.save()
 
       else:
@@ -935,6 +970,7 @@ class OrderDetail(LoginRequiredMixin,DetailView):
          obj.client.account = account
          obj.client.phone = phone
          obj.client.client_type = "LEGAL_ENTITY"
+         obj.client.active=True
          obj.client.save()
 
       obj.order_name = order_name
@@ -1338,6 +1374,7 @@ class Call_center(LoginRequiredMixin,TemplateView):
    def post(self, request, *args, **kwargs):
       pk = request.POST.get('pk')
       Orders.objects.filter(id=pk).update(stage='manager')
+      Notification.objects.create(order_id=pk,stage='manager')
       return redirect(request.path)
 
    def get_context_data(self, *, object_list=None, **kwargs):
