@@ -140,6 +140,44 @@
     ul {
       padding-left: 20px;
     }
+    .file-preview {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.file-preview img {
+    max-width: 200px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.file-preview a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: #2a2a2a;
+    background-color: #f1f1f1;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    transition: background 0.3s ease;
+    font-size: 14px;
+    max-width: 300px;
+    overflow-wrap: break-word;
+}
+
+.file-preview a:hover {
+    background-color: #e0e0e0;
+}
+
+.file-preview a::before {
+    content: "📄";
+    font-size: 18px;
+}
     </style>
 </head>
 <body>
@@ -209,7 +247,33 @@
   </div>
         </form>
     </div>
+    {% elif item.stage == 'manager_2' %}
+   <div class="notification-wrapper">
+        <div class="notification-header">Уведомление</div>
+        <form method="POST">
+            {% csrf_token %}
+        <div class="notification-box">
+            <p><span class="highlight">Проект "{{item.order.order_name }}": технолог прикрепил файл</span></p>
+            <p>Комментарий: {{item.message}}</p>
+            <p>Прикрепленный файл:</p>
+    <div id="preview-{{ item.pk }}" class="file-preview">
+    {% for file in item.manager_photo.all %}
+        <div class="file-data"
+             data-url="{{ file.photo.url }}"
+             data-name="{{ file.photo.name }}"
+             data-type="{{ file.photo.file.content_type }}">
+        </div>
+    {% endfor %}
+</div>
 
+      <input name="pk" value="{{item.order.pk }}" hidden>
+        <input name="staff_pk"  value="{{item.profile.pk}}" hidden>
+        <input name="action" value="manager_qa" hidden>
+       <button class="btn" >Передать проект бухгалтеру</button>
+
+  </div>
+        </form>
+    </div>
     {% elif item.stage == 'design' or item.stage == 'technologist' %}
   <div class="notification-wrapper">
         <div class="notification-header">Уведомление</div>
@@ -381,6 +445,38 @@ function confirmAssign() {
   document.getElementById('confirmBlock').style.display = 'none';
 }
 
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".file-preview").forEach(preview => {
+        const fileDivs = preview.querySelectorAll(".file-data");
+        fileDivs.forEach(div => {
+            const url = div.dataset.url;
+            const name = div.dataset.name;
+            const type = div.dataset.type;
+
+            const container = document.createElement("div");
+            container.style.marginBottom = "10px";
+
+            if (type.startsWith("image/")) {
+                const img = document.createElement("img");
+                img.src = url;
+                img.alt = name;
+                img.style.maxWidth = "200px";
+                img.style.border = "1px solid #ccc";
+                container.appendChild(img);
+            } else {
+                const link = document.createElement("a");
+                link.href = url;
+                link.target = "_blank";
+                link.textContent = `📄 ${name}`;
+                container.appendChild(link);
+            }
+
+            preview.appendChild(container);
+        });
+    });
+});
 </script>
 
 </body>

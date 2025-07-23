@@ -6,7 +6,7 @@ from django.db.models import Prefetch
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django.views.generic import View,TemplateView,DetailView,UpdateView
-from .models import Profile,Rezident,Finance,Warehouse,WarehouseLimit,Consumables,Orders,Delivery_Photo,Compelete_Photo,Telegram_users,Clients,Social_clients,OrderStaff,Provider,Notification
+from .models import Profile,Rezident,Finance,Warehouse,WarehouseLimit,Consumables,Orders,Delivery_Photo,Compelete_Photo,Telegram_users,Clients,Social_clients,OrderStaff,Provider,Notification,Manager_Photo
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
@@ -584,6 +584,18 @@ class MyProjects(LoginRequiredMixin, TemplateView):
 
          order_staff.upload = True
          order_staff.save(update_fields=['upload'])
+      elif action == 'technology_chief_complete':
+         photo=request.FILES.getlist('photo')
+         message=request.POST.get('message')
+         Orders.objects.filter(pk=pk).update(stage='manager_2')
+         notification=Notification.objects.create(stage='manager_2',order_id=pk,message=message)
+         photo = request.FILES.getlist('photo')
+
+         delivery = [
+            Manager_Photo(notification=notification, photo=p)
+            for p in photo
+         ]
+         Manager_Photo.objects.bulk_create(delivery)
 
       elif action == 'technology_chief_add':
          add = request.POST.getlist('add')

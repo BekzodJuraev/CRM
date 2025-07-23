@@ -251,6 +251,9 @@ class OrderStaff(models.Model):
     complete = models.BooleanField(default=False)
     upload = models.BooleanField(default=False)
 
+class Manager_Photo(models.Model):
+    notification = models.ForeignKey(Notification, on_delete=models.CASCADE, related_name='manager_photo')
+    photo=models.FileField(blank=True, upload_to='manager/')
 
 class Delivery_Photo(models.Model):
     order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name='delivery_photo')

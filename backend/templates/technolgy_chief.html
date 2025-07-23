@@ -225,7 +225,56 @@
             margin-bottom: 10px;
             background: #f9f9f9;
         }
+            .popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .popup.active {
+      display: flex;
+    }
+    .popup-content {
+      background: white;
+      padding: 20px;
+      width: 600px;
+      border-radius: 10px;
+      position: relative;
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 24px;
+      cursor: pointer;
+    }
+       .btn {
+      padding: 8px 16px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .file-preview img {
+    width: 100px;
+    height: auto;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
 
+  .file-icon {
+    background: #eee;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+  }
 
   </style>
 </head>
@@ -274,27 +323,16 @@
 
 
         {% if item.designer_staff.0.complete  %}
-           <form method="post" >
-                 {% csrf_token %}
-                   <input type="text" name="action" value="designer_chief_complete" hidden>
-                <input type="text" name="pk" value="{{item.pk}}" hidden>
-          <button class="btn">Передать менеджеру</button>
+  <button class="btn open-popup" data-popup-id="popup-{{ item.pk }}">Передать менеджеру</button>
 
-              </form>
                  {% endif %}
 
              {% if item.uploaded_by_chief %}
-           <form method="post" >
-                 {% csrf_token %}
-                   <input type="text" name="action" value="designer_chief_complete" hidden>
-               <input type="text" name="update" value="update" hidden>
-               <input type="text" name="stage" value="update" hidden>
-                <input type="text" name="pk" value="{{item.pk}}" hidden>
-          <button class="btn" id="send-to-manager" data-item-id="{{ item.pk }}">
-  Передать менеджеру
-</button>
 
-              </form>
+    <button class="btn open-popup" data-popup-id="popup-{{ item.pk }}">Передать менеджеру</button>
+
+
+
                  {% endif %}
 
 
@@ -302,7 +340,31 @@
 
 
         </div>
+      <div id="popup-{{ item.pk }}" class="popup">
+      <div class="popup-content">
+        <span class="close-btn" data-popup-id="popup-{{ item.pk }}">&times;</span>
 
+        <form method="post"  enctype="multipart/form-data">
+  {% csrf_token %}
+  <input type="hidden" name="item_id" value="{{ item.pk }}">
+
+  <label>Комментарий:</label><br>
+  <textarea name="message"  class="client-card" style="width:100%;"></textarea><br><br>
+
+  <button type="button" class="btn attach-btn" data-input-id="file-{{ item.pk }}">📎 Прикрепить файл</button>
+  <input type="file"  name="photo" class="hidden file-input" id="file-{{ item.pk }}" multiple data-preview-id="preview-{{ item.pk }}" hidden>
+
+  <!-- Hidden dynamic file holder -->
+  <div id="file-list-{{ item.pk }}" style="display: none;"></div>
+
+  <div id="preview-{{ item.pk }}" class="file-preview" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;"></div>
+   <input name="pk" value="{{item.pk}}" hidden>
+   <input name="action" value="technology_chief_complete" hidden>
+  <br>
+  <button type="submit" class="btn">Отправить</button>
+</form>
+      </div>
+    </div>
         <!-- Static Modal for this project -->
         <div id="modal-{{ item.id }}" class="modal hidden">
             <form method="post" class="myForm">
@@ -588,6 +650,98 @@ function confirmAssign() {
 }
 
 </script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Open popup
+    document.querySelectorAll(".open-popup").forEach(button => {
+      button.addEventListener("click", () => {
+        const popupId = button.getAttribute("data-popup-id");
+        document.getElementById(popupId).classList.add("active");
+      });
+    });
+
+    // Close popup
+    document.querySelectorAll(".close-btn").forEach(close => {
+      close.addEventListener("click", () => {
+        const popupId = close.getAttribute("data-popup-id");
+        document.getElementById(popupId).classList.remove("active");
+      });
+    });
+
+    // Attach button opens hidden file input
+    document.querySelectorAll(".attach-btn").forEach(button => {
+      button.addEventListener("click", (e) => {
+        const inputId = button.getAttribute("data-input-id");
+        const input = document.getElementById(inputId);
+        if (input) {
+          input.click();
+        }
+      });
+    });
+
+    // File preview and append logic
+    document.querySelectorAll(".file-input").forEach(input => {
+      const storedFiles = []; // Custom array to keep files manually
+
+      input.addEventListener("change", function () {
+        const previewId = input.getAttribute("data-preview-id");
+        const preview = document.getElementById(previewId);
+
+        Array.from(input.files).forEach(file => {
+          storedFiles.push(file);
+
+          const fileUrl = URL.createObjectURL(file);
+          const container = document.createElement('div');
+          container.classList.add("file-preview");
+          container.style.position = 'relative';
+          container.style.maxWidth = '150px';
+          container.style.margin = '10px';
+
+          const removeBtn = document.createElement('button');
+          removeBtn.innerHTML = '❌';
+          removeBtn.style.position = 'absolute';
+          removeBtn.style.top = '2px';
+          removeBtn.style.right = '2px';
+          removeBtn.style.border = 'none';
+          removeBtn.style.background = 'transparent';
+          removeBtn.style.cursor = 'pointer';
+          removeBtn.onclick = () => {
+            preview.removeChild(container);
+            const index = storedFiles.indexOf(file);
+            if (index > -1) storedFiles.splice(index, 1);
+          };
+
+          if (/\.(jpg|jpeg|png|gif)$/i.test(file.name)) {
+            const img = document.createElement('img');
+            img.src = fileUrl;
+            img.style.width = '100%';
+            img.style.border = '1px solid #ccc';
+            img.style.borderRadius = '5px';
+            img.style.cursor = 'pointer';
+            img.alt = file.name;
+            img.onclick = () => window.open(fileUrl, '_blank');
+            container.appendChild(img);
+          } else {
+            const fileIcon = document.createElement('div');
+            fileIcon.textContent = `📄 ${file.name}`;
+            fileIcon.style.padding = '8px';
+            fileIcon.style.background = '#f0f0f0';
+            fileIcon.style.borderRadius = '4px';
+            fileIcon.style.cursor = 'pointer';
+            fileIcon.onclick = () => window.open(fileUrl, '_blank');
+            container.appendChild(fileIcon);
+          }
+
+          container.appendChild(removeBtn);
+          preview.appendChild(container);
+        });
+
+
+      });
+    });
+  });
+</script>
+
 
 </body>
 </html>
