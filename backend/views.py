@@ -354,7 +354,36 @@ class Dashboard(LoginRequiredMixin,TemplateView):
 
          #mess(pk)
 
+      elif action == 'chief':
+         stage_pod = request.POST.get('pod_stage')
+         order = Orders.objects.filter(pk=pk).first()
+         check = getattr(order, stage_pod, None)
 
+         if check is False:
+            services = []
+            if order.rezka:
+               services.append("Резка")
+            if order.svarka:
+               services.append("Сварка")
+            if order.fill:
+               services.append("Покраска")
+            if order.print:
+               services.append("Печать")
+
+            x = ", ".join(services)
+            return JsonResponse({'message': f'Для данного проекта технолог выбрал только этапы: {x}'}, status=401)
+
+         if stage_pod:
+            Orders.objects.filter(pk=pk).update(stage=stage, stage_pod=stage_pod)
+         else:
+            if order.full_pay:
+               Orders.objects.filter(pk=pk).update(stage='delivery')
+               Notification.objects.create(order_id=pk,stage='delivery')
+               # admin_tech(pk)
+            else:
+               Orders.objects.filter(pk=pk).update(stage=stage)
+               Notification.objects.create(order_id=pk, stage='accounting_2')
+            # mess(pk)
 
 
 
@@ -362,7 +391,7 @@ class Dashboard(LoginRequiredMixin,TemplateView):
       return JsonResponse({'status': 'error', 'message': 'Invalid action'}, status=400)
 
 
-
+      #
       # if action == "designer":
       #    Orders.objects.filter(pk=pk).update(stage="technologist")
       #    mess(pk)
@@ -411,37 +440,7 @@ class Dashboard(LoginRequiredMixin,TemplateView):
       #
       #    return redirect(request.path)
       #
-      # elif action == 'chief':
-      #    stage_pod=request.POST.get('pod_stage')
-      #    order=Orders.objects.filter(pk=pk).first()
-      #    check=getattr(order,stage_pod,None)
       #
-      #
-      #    if check is False:
-      #       services = []
-      #       if order.rezka:
-      #          services.append("Резка")
-      #       if order.svarka:
-      #          services.append("Сварка")
-      #       if order.fill:
-      #          services.append("Покраска")
-      #       if order.print:
-      #          services.append("Печать")
-      #
-      #       x = ", ".join(services)
-      #       return JsonResponse({'message': f'Для данного проекта технолог выбрал только этапы: {x}'}, status=401)
-      #
-      #
-      #
-      #    if stage_pod:
-      #       Orders.objects.filter(pk=pk).update(stage=stage,stage_pod=stage_pod)
-      #    else:
-      #       if order.full_pay:
-      #          Orders.objects.filter(pk=pk).update(stage='delivery')
-      #          # admin_tech(pk)
-      #       else:
-      #          Orders.objects.filter(pk=pk).update(stage=stage)
-      #       #mess(pk)
       #
       #
       #
@@ -638,7 +637,7 @@ class MyProjects(LoginRequiredMixin, TemplateView):
          order_staff=OrderStaff.objects.create(profile=request.user.profile,order_id=pk,complete=True)
          Consumables.objects.filter(order_id=pk).update(warehouse=True)
          Orders.objects.filter(pk=pk).update(stage='manufacturing')
-
+         Notification.objects.create(stage='manufacturing',order_id=pk)
 
       elif action == 'account':
          payment=request.POST.get('payment')
@@ -646,9 +645,11 @@ class MyProjects(LoginRequiredMixin, TemplateView):
 
          if payment:
             Orders.objects.filter(pk=pk).update(stage=stage,full_pay=True)
+            Notification.objects.create(stage=stage,order_id=pk)
 
          else:
             Orders.objects.filter(pk=pk).update(stage=stage)
+
 
       elif action =='delivery':
 
@@ -656,6 +657,7 @@ class MyProjects(LoginRequiredMixin, TemplateView):
        Orders.objects.filter(pk=pk).update(stage='installation')
        order_staff.complete = True
        order_staff.save(update_fields=['complete'])
+       Notification.objects.create(order_id=pk,profile=request.user.profile,stage=action)
 
       elif action == 'installer':
          order_staff, created = OrderStaff.objects.get_or_create(order_id=pk, profile=request.user.profile)
@@ -757,6 +759,8 @@ class MyProjects(LoginRequiredMixin, TemplateView):
 
          orderstaff.complete=True
          orderstaff.save()
+
+         Notification.objects.create(stage='manufacturing',profile=request.user.profile,order=orderstaff.order)
 
       elif action == 'qa_chief':
          order=Orders.objects.filter(pk=pk).update(stage='finished')

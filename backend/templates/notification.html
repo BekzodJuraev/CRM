@@ -266,30 +266,12 @@
     {% elif item.stage == 'accounting_2' %}
    <div class="notification-wrapper">
         <div class="notification-header">Уведомление</div>
-        <form method="POST">
-            {% csrf_token %}
         <div class="notification-box">
-            <p><span class="highlight">Проект "{{item.order.order_name }}": технолог прикрепил файл</span></p>
-            <p>Комментарий: {{item.message}}</p>
-            <p>Прикрепленный файл:</p>
-    <div id="preview-{{ item.pk }}" class="file-preview">
-    {% for file in item.manager_photo.all %}
-        <div class="file-data"
-             data-url="{{ file.photo.url }}"
-             data-name="{{ file.photo.name }}"
-             data-type="{{ file.photo.file.content_type }}">
-        </div>
-    {% endfor %}
-</div>
-
-      <input name="pk" value="{{item.order.pk }}" hidden>
-        <input name="action" value="accounting" hidden>
-       <button class="btn" >Передать проект бухгалтеру</button>
-
+            <p><span class="highlight">Проект "{{item.order.order_name }}": Подтвердите оплату в 100%</span></p>
   </div>
-        </form>
+
     </div>
-    {% elif item.stage == 'design' or item.stage == 'technologist' %}
+    {% elif item.stage == 'design' or item.stage == 'technologist' or item.stage == 'manufacturing' or item.stage == 'delivery'%}
   <div class="notification-wrapper">
         <div class="notification-header">Уведомление</div>
         {% if item.profile %}
