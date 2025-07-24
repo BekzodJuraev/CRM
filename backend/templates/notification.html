@@ -247,7 +247,23 @@
   </div>
         </form>
     </div>
-    {% elif item.stage == 'manager_2' %}
+ {% elif item.stage == 'accounting' %}
+ <div class="notification-wrapper">
+        <div class="notification-header">Уведомление</div>
+        <div class="notification-box">
+            <p><span class="highlight">Проект "{{item.order.order_name }}": Подтвердите оплату в 80%</span></p>
+  </div>
+
+    </div>
+  {% elif item.stage == 'accounting' %}
+ <div class="notification-wrapper">
+        <div class="notification-header">Уведомление</div>
+        <div class="notification-box">
+            <p><span class="highlight">Проект "{{item.order.order_name }}": Подтвердите оплату в 80%</span></p>
+  </div>
+
+    </div>
+    {% elif item.stage == 'accounting_2' %}
    <div class="notification-wrapper">
         <div class="notification-header">Уведомление</div>
         <form method="POST">
@@ -267,8 +283,7 @@
 </div>
 
       <input name="pk" value="{{item.order.pk }}" hidden>
-        <input name="staff_pk"  value="{{item.profile.pk}}" hidden>
-        <input name="action" value="manager_qa" hidden>
+        <input name="action" value="accounting" hidden>
        <button class="btn" >Передать проект бухгалтеру</button>
 
   </div>

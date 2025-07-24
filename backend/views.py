@@ -291,6 +291,11 @@ class NotificationVIew(LoginRequiredMixin,DetailView):
          else:
             Notification.objects.create(order_id=pk, stage='manager_qa_back',profile_id=request.POST.get('staff_pk'), message=message)
 
+      elif action == 'accounting':
+         Orders.objects.filter(pk=pk).update(stage=action)
+         Notification.objects.create(order_id=pk,stage=action)
+
+
 
 
 
