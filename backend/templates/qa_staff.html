@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+        <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
   <title>Мои проекты</title>
   <style>
     body {
@@ -171,49 +171,10 @@
 .file-label {
   pointer-events: none;
 }
-#geoModal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
-}
-
-#geoModalContent {
-  position: relative;
-  width: 80%;
-  height: 70%;
-  margin: 5% auto;
-  background: #fff;
-  padding: 10px;
-  border-radius: 10px;
-}
-
-#map {
-  width: 100%;
-  height: 100%;
-}
   </style>
 </head>
 <body>
-<div id="assignModal" class="modal hidden">
-  <div class="modal-content" style="max-width: 500px;">
-    <span class="close" onclick="closeAssignModal()">&times;</span>
 
-    <h3>Выберите сотрудника </h3>
-
-
-
-    <div id="employeeList" style="max-height: 200px; overflow-y: auto; margin-top: 10px;"></div>
-
-    <div id="confirmBlock" style="margin-top: 20px; display: none;">
-      <p>Вы уверены, что хотите передать проект <strong id="selectedName"></strong>?</p>
-      <button class="btn" onclick="confirmAssign()">Да</button>
-      <button class="btn" onclick="closeAssignModal()">Нет</button>
-    </div>
-  </div>
-</div>
   <div class="container">
     <header>
       <span class="back-arrow" onclick="history.back()">←</span>
@@ -222,31 +183,17 @@
     </header>
 
     <div id="client-list" class="client-list">
-      {% for item in installer_chief %}
+      {% for item in quality_control_staff %}
 
-        <div class="client-card" data-name="{{ item.order_name}}">
+        <div class="client-card" data-name="{{ item.order.order_name}}">
           <div>
-          <strong>{{ item.order_name }}</strong>
+          <strong>{{ item.order.order_name }}</strong>
       <button class="btn" onclick="openStaticModal('modal-{{ item.id }}')">Перейти</button>
   </div>
-            {% if item.designer_staff %}
-  <p>{{ item.designer_staff.0.profile.name }}</p> {# ✅ First only #}
-    {% else %}
-             {% if not item.uploaded_by_chief  %}
-            <button class="btn" onclick="openAssignModal({{ item.id }})">Назначить сотрудника</button>
-                {% endif %}
-              {% endif %}
 
 
 
-              {% if item.uploaded_by_chief  %}
-            <form method="post">
-                 {% csrf_token %}
-                <input name="action" value="installer" hidden>
-                <input name="pk" value="{{item.pk}}" hidden>
-                <button class="btn"  type="submit">Подтвердить установку</button>
-            </form>
-            {% endif %}
+
 
 
 
@@ -259,51 +206,68 @@
 
         <!-- Static Modal for this project -->
         <div id="modal-{{ item.id }}" class="modal hidden">
-          <form method="post"  enctype="multipart/form-data">
-              {% csrf_token %}
-            <div class="modal-content">
+          <div class="modal-content">
             <span class="close" onclick="closeStaticModal('modal-{{ item.id }}')">&times;</span>
-            <h3>Проект: {{ item.order_name }}</h3>
+            <h3>Проект: {{ item.order.order_name }}</h3>
 
-            <p><strong>Категория заказа:</strong> {{ item.catigories }}</p>
+            <p><strong>Категория заказа:</strong> {{ item.order.catigories }}</p>
 
-             <p><strong>Описание / ТЗ:</strong> {{ item.description }}</p>
+            <p><strong>Размер:</strong> {{ item.order.razmer }}</p>
 
-              <p><strong>Местоположение установки:</strong></p>
+             <p><strong>Описание / ТЗ:</strong> {{ item.order.description }}</p>
+            <p><strong>Прикреплённые файлы:</strong></p>
+            <div id="preview_tz_{{ item.id }}"></div>
 
+           <p><strong>Дизайн:</strong> {{ item.order.description_design }}</p>
+            <p><strong>Прикреплённые фото:</strong></p>
 
+              <div id="preview_design_{{ item.id }}"></div>
+               <p><strong>Местоположение установки:</strong></p>
 
-  <input type="hidden" id="latitude-{{ item.pk }}" value="{{ item.latitude|default:'' }}">
-  <input type="hidden" id="longitude-{{ item.pk }}" value="{{ item.longitude|default:'' }}">
+  <input type="hidden" id="latitude-{{ item.pk }}" value="{{ item.order.latitude|default:'' }}">
+  <input type="hidden" id="longitude-{{ item.pk }}" value="{{ item.order.longitude|default:'' }}">
   <div id="geo-status-{{ item.pk }}"></div>
-  <div id="mini-map-{{ item.pk }}" style="width: 100%; max-width: 400px; height: 200px; margin-top: 10px; display: none;"></div>
+<div id="mini-map-{{ item.pk }}"
+     style="
+        width: 100%;
+        height: auto;
+        min-height: 150px;
+        max-height: 300px;
+        margin-top: 10px;
+        border-radius: 8px;
+        display: none;
+        overflow: hidden;
+        position: relative;
+        background-color: #f0f0f0;
+        z-index: 0;">
+</div>
+             <p><strong>Загруженное доставщиком:</strong></p>
+              {% for photo in item.order.delivery_photo.all %}
+    <div style="margin-bottom: 10px;">
+        <img id="preview-image" src="{{ photo.photo.url }}" alt="Preview" style="max-width: 100%; max-height: 100px; border: 1px solid #ccc; padding: 5px; border-radius: 5px; display: block;">
+    </div>
+{% endfor %}
+            <p><strong>Дата добавления заказа:</strong> {{ item.order.add_order|date:"d.m.Y" }}</p>
+            <p><strong>Срок выполнения:</strong> {{ item.order.complete_order|date:"d.m.Y" }}</p>
+
+            <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+
+              <button  type="button" onclick="submitSaveForm({{item.pk}})">Подтвердить</button>
+              <button type="button"">Вернуть на доработку</button>
 
 
-<!-- Status & result -->
+            </div>
+                <form method="post" id="save_{{item.pk}}">
+                   {% csrf_token %}
+                   <div id="designContainer_{{ item.pk }}"></div>
+               <input type="text" name="action" value="qa_staff" hidden>
+                <input type="text" name="pk" value="{{item.pk}}" hidden>
+                <input type="text" name="order_pk" value="{{item.order.pk}}" hidden>
 
-<div id="mini-map" style="width: 100%; max-width: 400px; height: 200px; margin-top: 10px; display: none;"></div>
-{% if not item.designer_staff %}
-                      <label class="file-input-wrapper">
-  <span class="file-label">📎 Прикрепить фото</span>
-  <input
-    type="file"
-    name="photo"
-    accept="image/*"
-    multiple
-    class="file-input"
-    onchange="handleFile(this, 'preview_design_{{ item.pk }}')"
-    required
-  />
-</label>
+              </form>
 
-<div id="preview_design_{{ item.pk }}"></div>
-               <input name="pk" value="{{item.pk}}" hidden>
-                <input name="action" value="installer" hidden>
-          <button  type="submit"  class="btn-complete" >Сохранить</button>
-{% endif %}
           </div>
         </div>
-          </form>
       {% endfor %}
     </div>
 
@@ -312,7 +276,86 @@
       <button id="nextPage">❯</button>
     </div>
   </div>
+    {% for item in quality_control_staff %}
+     <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        {% if item.order.design %}
+          showExistingFilePreview("{{ item.order.design.url }}", "preview_design_{{ item.id }}");
+        {% endif %}
+        {% if item.order.tz %}
+          showExistingFilePreview("{{ item.order.tz.url }}", "preview_tz_{{ item.id }}");
+        {% endif %}
+      });
+    </script>
+  {% endfor %}
+<script>
+  function addDesignBlock(pk) {
+  const container = document.getElementById(`designContainer_${pk}`);
+  if (!container) return;
 
+  container.innerHTML = '';  // очищаем, если уже добавлено
+
+  const previewId = `preview_designn_${pk}`;
+
+  const block = document.createElement('div');
+  block.innerHTML = `
+    <label>Описание дизайна:</label>
+    <label class="file-input-wrapper">
+      <span class="file-label">📎 Прикрепить файл</span>
+      <input type="file" name="design" class="file-input" onchange="handleFile(this, '${previewId}')">
+    </label>
+    <div id="${previewId}"></div>
+    <textarea class="form-control" rows="3" name="description_design"></textarea>
+  `;
+
+  container.appendChild(block);
+}
+function handleFile(input, previewId) {
+  const file = input.files[0];
+  const container = document.getElementById(previewId);
+  container.innerHTML = '';
+
+  if (!file) return;
+
+  const preview = document.createElement('div');
+  preview.className = 'file-preview';
+
+  const removeBtn = document.createElement('button');
+  removeBtn.innerText = '×';
+  removeBtn.className = 'remove-btn';
+  removeBtn.onclick = () => {
+    input.value = '';
+    container.innerHTML = '';
+  };
+
+  preview.appendChild(removeBtn);
+
+  const isImage = file.type.startsWith('image/');
+
+  if (isImage) {
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    img.alt = 'Предпросмотр изображения';
+    img.style.cursor = 'pointer';
+    img.onclick = () => window.open(img.src, '_blank');
+    preview.appendChild(img);
+  } else {
+    const fileIcon = document.createElement('div');
+    fileIcon.className = 'file-icon';
+    fileIcon.innerHTML = `📄 ${file.name}`;
+    fileIcon.style.cursor = 'pointer';
+    fileIcon.onclick = () => {
+      const url = URL.createObjectURL(file);
+      window.open(url, '_blank');
+    };
+    preview.appendChild(fileIcon);
+  }
+
+  container.appendChild(preview);
+}
+
+
+</script>
 <script>
 
   function showMiniMap(lat, lon, containerId, statusId) {
@@ -351,9 +394,50 @@
     });
   });
 </script>
+<script>
+      function submitSaveForm(pk) {
+    document.getElementById(`save_${pk}`).submit();
+}
+</script>
+<script>
+
+  function showExistingFilePreview(fileUrl, previewId) {
+  const container = document.getElementById(previewId);
+  if (!container) return;
+
+  container.innerHTML = ''; // clear previous
+  const preview = document.createElement('div');
+  preview.className = 'file-preview';
+
+  const removeBtn = document.createElement('button');
 
 
 
+
+
+  const isImage = /\.(jpg|jpeg|png|gif)$/i.test(fileUrl);
+  if (isImage) {
+    const img = document.createElement('img');
+    img.src = fileUrl;
+    img.alt = 'Предпросмотр изображения';
+    img.style.cursor = 'pointer';
+    img.onclick = () => window.open(fileUrl, '_blank');
+    preview.appendChild(img);
+  } else {
+    const fileIcon = document.createElement('div');
+    fileIcon.className = 'file-icon';
+    fileIcon.innerHTML = `📄 ${fileUrl.split('/').pop()}`;
+    fileIcon.style.cursor = 'pointer';
+    fileIcon.onclick = () => {
+      window.open(fileUrl, '_blank');
+    };
+    preview.appendChild(fileIcon);
+  }
+
+  container.appendChild(preview);
+}
+
+</script>
   <script>
     const allCards = Array.from(document.querySelectorAll(".client-card"));
     const itemsPerPage = 5;
@@ -399,108 +483,6 @@
 
     renderPage();
   </script>
-
-<script>
-  let currentProjectId = null;
-let selectedEmployeeId = null;
-
-function openAssignModal(projectId) {
-  currentProjectId = projectId;
-  selectedEmployeeId = null;
-  document.getElementById('employeeList').innerHTML = '';
-  document.getElementById('confirmBlock').style.display = 'none';
-  document.getElementById('assignModal').classList.remove('hidden');
-
-  // ✅ Fetch employees when modal is opened
-  fetch('/search-profile/?position=installer')
-    .then(res => res.json())
-    .then(data => {
-      const list = document.getElementById('employeeList');
-      list.innerHTML = '';
-      data.forEach(user => {
-        const div = document.createElement('div');
-        div.textContent = user.full_name;
-        div.style.cursor = 'pointer';
-        div.style.padding = '5px 10px';
-        div.style.borderBottom = '1px solid #ddd';
-        div.onclick = () => {
-          selectedEmployeeId = user.id;
-          document.getElementById('selectedName').textContent = user.full_name;
-          document.getElementById('confirmBlock').style.display = 'block';
-        };
-        list.appendChild(div);
-      });
-    });
-}
-
-function closeAssignModal() {
-  document.getElementById('assignModal').classList.add('hidden');
-}
-
-// Confirm project assignment
-function confirmAssign() {
-  fetch(`/assign/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'X-CSRFToken': '{{ csrf_token }}',
-    },
-    body: new URLSearchParams({
-      project_id: currentProjectId,
-      profile_id: selectedEmployeeId
-    })
-  }).then(res => {
-    if (res.ok) {
-      alert('Проект успешно передан!');
-      closeAssignModal();
-      location.reload();
-    } else {
-      alert('Ошибка при передаче!');
-    }
-  });
-}
-
-</script>
-<script>
-function handleFile(input, previewId) {
-  const files = input.files;
-  const container = document.getElementById(previewId);
-
-  if (!files.length) return;
-
-  Array.from(files).forEach(file => {
-    if (!file.type.startsWith('image/')) {
-      alert('Только изображения разрешены.');
-      return;
-    }
-
-    const preview = document.createElement('div');
-    preview.className = 'file-preview';
-
-    const removeBtn = document.createElement('button');
-    removeBtn.innerText = '×';
-    removeBtn.className = 'remove-btn';
-    removeBtn.onclick = () => {
-      preview.remove();
-      // Optionally, remove this file from a custom list if managing manually
-    };
-
-    const img = document.createElement('img');
-    img.src = URL.createObjectURL(file);
-    img.alt = 'Предпросмотр изображения';
-    img.style.cursor = 'pointer';
-    img.onclick = () => window.open(img.src, '_blank');
-
-    preview.appendChild(removeBtn);
-    preview.appendChild(img);
-
-    container.appendChild(preview);
-  });
-
-  // DO NOT clear input here, or form won't send files
-  // input.value = '';
-}
-</script>
 
 
 </body>

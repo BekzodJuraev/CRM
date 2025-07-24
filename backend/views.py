@@ -657,7 +657,9 @@ class MyProjects(LoginRequiredMixin, TemplateView):
        Orders.objects.filter(pk=pk).update(stage='installation')
        order_staff.complete = True
        order_staff.save(update_fields=['complete'])
-       Notification.objects.create(order_id=pk,profile=request.user.profile,stage=action)
+       if not created:
+          Notification.objects.create(order_id=pk, profile=request.user.profile, stage=action)
+       Notification.objects.create(order_id=pk,stage='installation')
 
       elif action == 'installer':
          order_staff, created = OrderStaff.objects.get_or_create(order_id=pk, profile=request.user.profile)
@@ -665,6 +667,10 @@ class MyProjects(LoginRequiredMixin, TemplateView):
             Orders.objects.filter(pk=pk).update(stage='quality_control')
             order_staff.complete = True
             order_staff.save(update_fields=['complete'])
+
+            if request.user.profile.position == 'installer':
+               Notification.objects.create(order_id=pk, profile=request.user.profile, stage='installation')
+            Notification.objects.create(order_id=pk, stage='quality_control')
 
 
          else:
@@ -678,6 +684,8 @@ class MyProjects(LoginRequiredMixin, TemplateView):
             if photo:
                order_staff.upload = True
                order_staff.save(update_fields=['upload'])
+
+
 
       elif action == 'chief_staff':
          rezka = request.POST.get('rezka') == 'on'
@@ -766,7 +774,10 @@ class MyProjects(LoginRequiredMixin, TemplateView):
          order=Orders.objects.filter(pk=pk).update(stage='finished')
          #OrderStaff.objects.create(order=order,profile=request.user.profile,complete=True)
 
-
+      elif action == 'qa_staff':
+         order_pk=request.POST.get('order_pk')
+         OrderStaff.objects.filter(pk=pk).update(complete=True)
+         Notification.objects.create(stage='quality_control',profile=request.user.profile,order_id=order_pk)
 
 
 
@@ -857,6 +868,10 @@ class MyProjects(LoginRequiredMixin, TemplateView):
             queryset=OrderStaff.objects.filter(profile__position='qa_staff').select_related('profile'),
             to_attr='designer_staff'
          ))
+
+      context['quality_control_staff'] = OrderStaff.objects.filter(profile=profile, order__stage='quality_control',
+                                                       complete=False).select_related('order')
+
       context['accounting_or_delivery']=Orders.objects.filter(stage__in=['accounting_2','delivery'])
       context['rezka'] = [o for o in context['manufacturing'] if o.stage_pod == 'rezka']
       context['svarka'] = [o for o in context['manufacturing'] if o.stage_pod == 'svarka']
