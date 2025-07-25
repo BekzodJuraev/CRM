@@ -70,14 +70,10 @@
                 <br></br>
                 <h5 class="text-center">{{request.user.profile.lastname}} {{request.user.profile.name}}  {{request.user.profile.middle_name}} </h5>
                 <p class="text-center"> {{request.user.profile.get_position_display}}</p>
-              <a href="{% url 'profile'%}">👤 Профиль</a>
-                <a href="">📦 Заказы</a>
-                <a href="{% url 'warehouse' %}">📁 Склад</a>
 
-                <a href="{% url 'money' %}">📊 Финансы</a>
-                <a href="{% url 'rezident' %}">💳 Резиденты</a>
-                <a href="{% url 'staff' %}">👥 Сотрудники</a>
-                <a href="{% url 'apply'%}">📝 Заявки</a>
+                <a href="{% url 'profile'%}">👤 Профиль</a>
+                <a href="{% url 'my_projects' %}">📦 Проекты</a>
+                <a href="{% url 'finance_profile' %}">📊 Финансы</a>
                 <hr>
 
     <!-- Logout as a styled button -->
@@ -140,8 +136,7 @@
                    <div class="header-section d-flex justify-content-between align-items-center">
     <h2 class="mb-0">Заказы - Самарканд</h2>
     <div class="button-group d-flex gap-2">
-        <button class="btn btn-custom" onclick="window.location.href='{% url 'clients' %}'">Клиенты</button>
-        <button class="btn btn-custom" onclick="window.location.href='{% url 'order' %}'">Создать заказ</button>
+
         <button class="btn btn-custom" onclick="window.location.href='{% url 'archive' %}'">Архив</button>
     </div>
 </div>
@@ -149,19 +144,6 @@
                         <div class="kanban-column"  data-stage="marketing" ondrop="drop(event)" ondragover="allowDrop(event)">
                             <h5>Соц. маркетинг</h5>
 
-                            {% for item in marketing %}
-
-                             {% if item.today >= item.complete_order %}
-
-
-
-                              <div class="kanban-item"  style="background-color: red;" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.marketing.client_name}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
-                            {% else %}
-                              <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.marketing.client_name}}<br><small></small></div>
-
-
-                             {% endif %}
-                             {% endfor %}
                         </div>
                         <div class="kanban-column"  data-stage="call_center" ondrop="drop(event)" ondragover="allowDrop(event)">
                             <h5>Колл-центр</h5>
@@ -413,51 +395,8 @@
 
 
    <script>
-function allowDrop(event) {
-    event.preventDefault();
-}
 
-function drag(event) {
-    event.dataTransfer.setData("text", event.target.id);
-}
 
-function drop(event) {
-    event.preventDefault();
-
-    const data = event.dataTransfer.getData("text");
-    const draggedItem = document.getElementById(data);
-
-    const dropZone = event.target.closest(".kanban-column");
-    if (dropZone && draggedItem) {
-        dropZone.appendChild(draggedItem);
-
-        const stage = dropZone.dataset.stage;
-        const pk = draggedItem.dataset.pk;
-
-        fetch("{% url 'dashboard' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': '{{ csrf_token }}',
-            },
-            body: new URLSearchParams({
-                action: 'admin',
-                stage: stage,
-                pk: pk
-            })
-        })
-        .then(res => res.json())
-        .then(data => {
-            console.log("Updated:", data);
-            if (data.reload) {
-                location.reload();  // 🔁 Reload the page
-            }
-        })
-        .catch(err => console.error("Error:", err));
-    }
-}
-
-    // Пример: уведомление есть
     const hasNotification = true;  // Подставь свою логику (AJAX, WebSocket и т.п.)
 
     const badge = document.getElementById('notification-badge');
@@ -470,7 +409,7 @@ function drop(event) {
 </script>
 <script>
   const notifications = [
-  {% for item in Notifcation %}
+  {% for item in notify %}
 
     { id: {{item.id}}, text: "📢 Уведомление", read: {% if item.is_read %} true {% else %} false {% endif %} },
     {% endfor %}

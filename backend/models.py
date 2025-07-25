@@ -205,9 +205,10 @@ class Orders(models.Model):
 
 
 class Notification(models.Model):
-    order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name='notifications')
+    order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name='notifications',null=True)
     message = models.CharField(max_length=255,null=True)
     Stage_CHOICES = [
+        ('zayavki',"Заявки"),
         ("call_center", "Колл-центр"),
         ("call_center_back", "Колл-центр_назад"),
         ("manager", "Менеджер"),
@@ -224,6 +225,8 @@ class Notification(models.Model):
         ("delivery", "Доставка"),
         ("installation", "Установка"),
         ("quality_control", "Контроль качества"),
+        ("back","Назад"),
+        ("finished", "Завершён"),
 
     ]
     stage = models.CharField(max_length=20, choices=Stage_CHOICES,null=True)
@@ -250,6 +253,7 @@ class OrderStaff(models.Model):
     )
     complete = models.BooleanField(default=False)
     upload = models.BooleanField(default=False)
+    back =models.BooleanField(default=False)
 
 class Manager_Photo(models.Model):
     notification = models.ForeignKey(Notification, on_delete=models.CASCADE, related_name='manager_photo')

@@ -1,18 +1,20 @@
 {% if request.user.profile.approve %}
 {% if request.user.profile.position == "admin" or request.user.profile.position == "manager" %}
     {% include 'admin.html' %}
-{% elif request.user.profile.position == 'designer' %}
-    {% include 'designer.html' %}
-{% elif request.user.profile.position == 'technologist' %}
- {% include 'technolog.html' %}
-{% elif request.user.profile.position == 'chief' %}
- {% include 'chief.html' %}
-{% elif request.user.profile.position == 'installer' %}
- {% include 'dostavka.html' %}
-{% elif request.user.profile.position == 'supplier' %}
- <script>
-        window.location.href = "{% url 'warehouse' %}";
-    </script>
+{% elif request.user.profile.position == "accountant" %}
+    {% include 'profile_account.html' %}
+{% elif request.user.profile.position == "sales_marketing" %}
+    {% include 'profile_marketing.html' %}
+{% elif request.user.profile.position == "sales_call" %}
+ {% include 'profile_call.html' %}
+{% elif request.user.profile.position == "chief_staff" or request.user.profile.position == 'delivery' or request.user.profile.position == 'installer' or  request.user.profile.position == 'technologist' or request.user.profile.position == 'designer'  or  request.user.profile.position == 'qa_staff'%}
+ {% include 'profile_staff.html' %}
+{% elif request.user.profile.position == "supplier" %}
+ {% include 'profile_supplier.html' %}
+
+{% else %}
+{% include 'profile_all.html' %}
+
 {% endif %}
 {% else %}
 {% include 'waiting.html' %}

@@ -263,6 +263,24 @@
   </div>
 
     </div>
+ {% elif item.stage == 'finished' %}
+  <div class="notification-wrapper">
+        <div class="notification-header">Уведомление</div>
+        <div class="notification-box">
+            <p><span class="highlight">{{item.profile.lastname}} {{item.profile.name}} подтвердил завершение проекта "{{item.order.order_name}}".
+        Все этапы выполнены корректно, проект будет автоматически переведен на финальный этап.</span></p>
+  </div>
+
+    </div>
+ {% elif item.stage == 'zayavki' %}
+ <div class="notification-wrapper">
+        <div class="notification-header">Уведомление</div>
+        <div class="notification-box">
+            <p><span class="highlight">Поступила новая заявка на добавление сотрудника
+Пожалуйста, перейдите в раздел "Заявки", чтобы установить официальную и неофициальную заработную плату и обработать анкету.</span></p>
+  </div>
+
+    </div>
     {% elif item.stage == 'accounting_2' %}
    <div class="notification-wrapper">
         <div class="notification-header">Уведомление</div>
@@ -270,6 +288,33 @@
             <p><span class="highlight">Проект "{{item.order.order_name }}": Подтвердите оплату в 100%</span></p>
   </div>
 
+    </div>
+ {% elif item.stage == 'manager_2' %}
+   <div class="notification-wrapper">
+        <div class="notification-header">Уведомление</div>
+        <form method="POST">
+            {% csrf_token %}
+        <div class="notification-box">
+            <p><span class="highlight">Проект "{{item.order.order_name }}": технолог прикрепил файл</span></p>
+            <p>Комментарий: {{item.message}}</p>
+            <p>Прикрепленный файл:</p>
+    <div id="preview-{{ item.pk }}" class="file-preview">
+    {% for file in item.manager_photo.all %}
+        <div class="file-data"
+             data-url="{{ file.photo.url }}"
+             data-name="{{ file.photo.name }}"
+             data-type="{{ file.photo.file.content_type }}">
+        </div>
+    {% endfor %}
+</div>
+
+      <input name="pk" value="{{item.order.pk }}" hidden>
+        <input name="staff_pk"  value="{{item.profile.pk}}" hidden>
+        <input name="action" value="accounting" hidden>
+       <button class="btn" >Передать проект бухгалтеру</button>
+
+  </div>
+        </form>
     </div>
     {% elif item.stage == 'design' or item.stage == 'technologist' or item.stage == 'manufacturing' or item.stage == 'delivery' or item.stage == 'installation' or item.stage == 'quality_control'%}
   <div class="notification-wrapper">

@@ -409,9 +409,10 @@ custom-dropdown {
 
             <label>Срок выполнения:</label>
             <input type="date" class="form-control" name="complete_order"  value="{{item.complete_order|date:'Y-m-d'}}" >
-
+            {% if request.user.profile.position == "admin" or request.user.profile.position == "manager" %}
             <button type="submit" class="btn btn-primary w-100 mt-3">Сохранить</button>
             <button type="button" class="btn btn-primary w-100 mt-3" onclick="submitDeleteForm()">Удалить</button>
+            {% endif %}
             </form>
 
 

@@ -171,6 +171,50 @@
 .file-label {
   pointer-events: none;
 }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .popup {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      width: 600px;
+      max-width: 90%;
+      position: relative;
+    }
+
+    .popup h3 {
+      margin-top: 0;
+    }
+
+    .close-btn {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .employee-block {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .employee-block select,
+    .employee-block input {
+      flex: 1;
+    }
   </style>
 </head>
 <body>
@@ -253,10 +297,63 @@
             <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
 
               <button  type="button" onclick="submitSaveForm({{item.pk}})">Подтвердить</button>
-              <button type="button"">Вернуть на доработку</button>
+            <button type="button" onclick="openPopup({{ item.pk }})">Вернуть на доработку</button>
+
 
 
             </div>
+              <div class="overlay" id="popup-{{ item.pk }}" style="display: none;">
+      <form action="POST">
+       <div class="popup">
+        <span class="close-btn" onclick="closePopup({{ item.pk }})">✖</span>
+
+        <h3>Вернуть заказ на этап:</h3>
+        <select name='stage'>
+          {% if item.order.check_design %}
+          <option value="design">Проектирование</option>
+            {% endif %}
+          <option value="technologist">Технолог</option>
+            {% if item.order.rezka %}
+            <option value="rezka">Резка</option>
+            {% endif %}
+            {% if item.order.svarka %}
+          <option value="svarka">Сварка</option>
+            {% endif %}
+            {% if item.order.fill %}
+          <option value="fill">Покраска</option>
+            {% endif %}
+            {% if item.order.print %}
+          <option value="print">Печать</option>
+            {% endif %}
+            {% if item.order.sborka %}
+          <option value="sborka">Сборка</option>
+            {% endif %}
+            <option value="delivery">Доставка</option>
+         <option value="installation">Установка</option>
+        </select>
+
+        <h4>Введите комментарий:</h4>
+        <textarea name="message" rows="4" style="width: 100%;" required></textarea>
+
+        <div class="employeeList" id="employeeList-{{ item.pk }}">
+          <div class="employee-block">
+            <select name="staff">
+              {% for employee in item.order.order_staff.all %}
+                <option value="{{employee.profile.pk}}">{{ employee.profile.lastname }} {{ employee.profile.name }}</option>
+              {% endfor %}
+            </select>
+            <input type="number" placeholder="Сумма штрафа (UZS)" />
+          </div>
+        </div>
+            <input type="text" name="pk" value="{{item.pk}}" hidden>
+             <input type="text" name="order_pk" value="{{item.order.pk}}" hidden>
+        <input name="action" value="back" hidden>
+        <button onclick="addEmployee({{ item.pk }})">Добавить сотрудника</button>
+        <button type="submit">Отправить</button>
+      </div>
+          </form>
+    </div>
+  </div>
                 <form method="post" id="save_{{item.pk}}">
                    {% csrf_token %}
                    <div id="designContainer_{{ item.pk }}"></div>
@@ -484,6 +581,26 @@ function handleFile(input, previewId) {
     renderPage();
   </script>
 
+<script>
+  function openPopup(pk) {
+    document.getElementById(`popup-${pk}`).style.display = 'flex';
+  }
+
+  function closePopup(pk) {
+    document.getElementById(`popup-${pk}`).style.display = 'none';
+  }
+
+function addEmployee(pk) {
+  const employeeList = document.getElementById(`employeeList-${pk}`);
+  const firstBlock = employeeList.querySelector('.employee-block');
+  const newBlock = firstBlock.cloneNode(true);
+  newBlock.querySelector('input').value = ''; // clear the input
+  employeeList.appendChild(newBlock);
+}
+
+
+
+</script>
 
 </body>
 </html>

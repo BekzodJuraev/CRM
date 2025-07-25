@@ -469,7 +469,6 @@ class Dashboard(LoginRequiredMixin,TemplateView):
          "accounting",
          "warehouse",
          "manufacturing",
-         "assembly_stage",
          "accounting_2",
          "delivery",
          "installation",
@@ -477,17 +476,72 @@ class Dashboard(LoginRequiredMixin,TemplateView):
          "finished",
       ]
 
+      if self.request.user.profile.position == 'delivery_cheif':
+         context['notify'] = Notification.objects.filter(
+            stage='design').order_by('-id')
+         stages = [s for s in stages if s not in ["marketing", "call_center", "manager"]]
+
+      elif self.request.user.profile.position == 'technologist_cheif':
+         context['notify'] = Notification.objects.filter(
+            stage='technologist').order_by('-id')
+         stages = [s for s in stages if s not in ['design',"marketing", "call_center", "manager"]]
+
+      elif self.request.user.profile.position == 'chief':
+         context['notify'] = Notification.objects.filter(
+            stage='manufacturing').order_by('-id')
+         stages = [s for s in stages if s not in ["marketing","call_center","manager","design","technologist","manager_2","accounting","warehouse"]]
+      elif self.request.user.profile.position == 'delivery_cheif':
+         context['notify'] = Notification.objects.filter(
+            stage='delivery').order_by('-id')
+         stages = [s for s in stages if s not in["marketing","call_center",
+         "manager",
+         "design",
+         "technologist",
+         "manager_2",
+         "accounting",
+         "warehouse",
+         "manufacturing",
+         "accounting_2",]]
+
+      elif self.request.user.profile.position == 'installer_cheif':
+         context['notify'] = Notification.objects.filter(
+            stage='installation').order_by('-id')
+         stages = [s for s in stages if s not in ["marketing", "call_center",
+                                                  "manager",
+                                                  "design",
+                                                  "technologist",
+                                                  "manager_2",
+                                                  "accounting",
+                                                  "warehouse",
+                                                  "manufacturing",
+                                                  "accounting_2","delivery" ]]
+
+      elif self.request.user.profile.position == 'qa_cheif':
+         context['notify'] = Notification.objects.filter(
+            stage__in=['quality_control','back']).order_by('-id')
+         stages = [s for s in stages if s not in ["marketing", "call_center",
+                                                  "manager",
+                                                  "design",
+                                                  "technologist",
+                                                  "manager_2",
+                                                  "accounting",
+                                                  "warehouse",
+                                                  "manufacturing",
+                                                  "accounting_2","delivery",'installation' ]]
 
       for stage in stages:
-         queryset = Orders.objects.filter(stage=stage).prefetch_related('consumables').annotate(today=Value(now().date()))
+         if self.request.user.profile.position == 'sales_call':
+            queryset = Orders.objects.filter(stage=stage,call_center=self.request.user.profile)
+         elif self.request.user.profile.position == 'delivery_cheif':
+            queryset = Orders.objects.filter(stage=stage, check_design=True)
+         else:
+            queryset = Orders.objects.filter(stage=stage).annotate(
+               today=Value(now().date()))
+         marketing = Social_clients.objects.filter(order__stage=stage).select_related('order')
+         staff=OrderStaff.objects.filter(order__stage=stage,profile=self.request.user.profile,complete=True).select_related('order')
 
-
-
-         if search:
-            queryset = queryset.filter(client__icontains=search)
-
-
-
+         context[f"{stage}_staff"] = staff
+         context[f"{stage}_marketing"]=marketing
          context[stage] = queryset
 
 
@@ -497,7 +551,22 @@ class Dashboard(LoginRequiredMixin,TemplateView):
       context['fill'] = [o for o in context['manufacturing'] if o.stage_pod == 'fill']
       context['print'] = [o for o in context['manufacturing'] if o.stage_pod == 'print']
 
-      context['Notifcation']=Notification.objects.all().order_by('-id')
+
+
+
+
+
+
+
+
+
+
+
+
+      context['Notifcation']=Notification.objects.filter(stage__in=['manager','manager_qa','manager_qa_back','manager_2','back','finished']).order_by('-id')
+      context['Notifcation_account'] = Notification.objects.filter(stage__in=['accounting','accounting_2','zayavki']).order_by('-id')
+      context['Notifcation_call'] = Notification.objects.filter(
+         stage__in=['call_center', 'call_center_back']).order_by('-id')
       return context
 
 
@@ -771,8 +840,16 @@ class MyProjects(LoginRequiredMixin, TemplateView):
          Notification.objects.create(stage='manufacturing',profile=request.user.profile,order=orderstaff.order)
 
       elif action == 'qa_chief':
+         staff_pk=request.POST.get('staff_pk')
          order=Orders.objects.filter(pk=pk).update(stage='finished')
-         #OrderStaff.objects.create(order=order,profile=request.user.profile,complete=True)
+         OrderStaff.objects.create(profile=request.user.profile,order_id=pk,complete=True)
+         if staff_pk:
+            Notification.objects.create(order_id=pk, stage='finished', profile_id=staff_pk)
+         else:
+            Notification.objects.create(order_id=pk, stage='finished', profile=request.user.profile)
+
+
+         #OrderStaff.objects.create(order=order,profile=request.user.profile,complete)
 
       elif action == 'qa_staff':
          order_pk=request.POST.get('order_pk')
@@ -780,7 +857,11 @@ class MyProjects(LoginRequiredMixin, TemplateView):
          Notification.objects.create(stage='quality_control',profile=request.user.profile,order_id=order_pk)
 
 
-
+      elif action == 'back':
+         order_pk = request.POST.get('order_pk')
+         message = request.POST.get('message')
+         OrderStaff.objects.filter(pk=pk).update(back=True)
+         Notification.objects.create(stage='back', profile=request.user.profile, order_id=order_pk,message=message)
 
 
 
@@ -870,7 +951,9 @@ class MyProjects(LoginRequiredMixin, TemplateView):
          ))
 
       context['quality_control_staff'] = OrderStaff.objects.filter(profile=profile, order__stage='quality_control',
-                                                       complete=False).select_related('order')
+                                                       complete=False).select_related('order', 'profile').prefetch_related('order__order_staff')
+
+
 
       context['accounting_or_delivery']=Orders.objects.filter(stage__in=['accounting_2','delivery'])
       context['rezka'] = [o for o in context['manufacturing'] if o.stage_pod == 'rezka']
@@ -1149,8 +1232,10 @@ class Applications(LoginRequiredMixin,TemplateView):
       salary_black = request.POST.get('salary_black') or 0
       if action == "approve" and who =='manager':
          Profile.objects.filter(id=pk).update(approve=True)
+         Notification.objects.create(stage='zayavki')
       elif action == 'approve' and who == 'admin':
          Profile.objects.filter(id=pk).update(approve=True,salary_pure=salary_pure,salary_black=salary_black)
+         Notification.objects.create(stage='zayavki')
       elif action == 'approve' and who == 'account':
 
          Profile.objects.filter(id=pk).update(approve_accounting=True,salary_pure=salary_pure,salary_black=salary_black)
@@ -1431,7 +1516,7 @@ class Call_center(LoginRequiredMixin,TemplateView):
 
    def post(self, request, *args, **kwargs):
       pk = request.POST.get('pk')
-      Orders.objects.filter(id=pk).update(stage='manager')
+      Orders.objects.filter(id=pk).update(stage='manager',call_center=request.user.profile)
       Notification.objects.create(order_id=pk,stage='manager')
       return redirect(request.path)
 

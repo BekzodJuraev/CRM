@@ -220,7 +220,8 @@
         {% if item.designer_staff.0.complete  %}
            <form method="post" >
                  {% csrf_token %}
-                   <input type="text" name="action" value="designer_chief_complete" hidden>
+                 <input type="text" name="action" value="qa_chief" hidden>
+                    <input type="text" name="staff_pk" value="{{item.designer_staff.0.profile.pk }}" hidden>
                 <input type="text" name="pk" value="{{item.pk}}" hidden>
           <button class="btn" >Завершить</button>
 
@@ -287,11 +288,16 @@
               <button type="button"">Вернуть на доработку</button>
 
                 {% endif %}
+                {% if item.designer_staff.0.complete %}
+                <p>Сотрудник {{ item.designer_staff.0.profile.lastname }} {{ item.designer_staff.0.profile.name }}  подтвердил корректное выполнение всех этапов по данному проекту.</p>
+                 <button  type="button" onclick="submitSaveForm({{item.pk}})">Подтвердить</button>
+                {% endif %}
             </div>
                 <form method="post" id="save_{{item.pk}}">
                    {% csrf_token %}
                    <div id="designContainer_{{ item.pk }}"></div>
                <input type="text" name="action" value="qa_chief" hidden>
+                    <input type="text" name="staff_pk" value="{{item.designer_staff.0.profile.pk }}" hidden>
                 <input type="text" name="pk" value="{{item.pk}}" hidden>
 
 

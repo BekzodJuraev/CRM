@@ -70,14 +70,23 @@
                 <br></br>
                 <h5 class="text-center">{{request.user.profile.lastname}} {{request.user.profile.name}}  {{request.user.profile.middle_name}} </h5>
                 <p class="text-center"> {{request.user.profile.get_position_display}}</p>
+
+                {% if request.user.profile.position == "accountant" %}
+                  <a href="{% url 'dashboard' %}">🏠 Главная</a>
+                <a href="{% url 'my_projects' %}">📦 Проекты</a>
+                <a href="{% url 'apply'%}">📝 Заявки</a>
+                <a href="">📁 Запросы на выплаты</a>
+                <a href="{% url 'money' %}">📊 Финансы</a>
+                <a href="{% url 'staff' %}">👥 Сотрудники</a>
+                {% else %}
                 <a href="{% url 'dashboard' %}">🏠 Главная</a>
                 <a href="">📦 Заказы</a>
                 <a href="{% url 'warehouse' %}">📁 Склад</a>
-                <a href="{% url 'debt' %}">💳 Задолженности</a>
                 <a href="{% url 'money' %}">📊 Финансы</a>
                 <a href="{% url 'rezident' %}">💳 Резиденты</a>
                 <a href="{% url 'staff' %}">👥 Сотрудники</a>
                 <a href="{% url 'apply'%}">📝 Заявки</a>
+                {% endif %}
                 <hr>
 
     <!-- Logout as a styled button -->

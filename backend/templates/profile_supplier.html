@@ -70,14 +70,13 @@
                 <br></br>
                 <h5 class="text-center">{{request.user.profile.lastname}} {{request.user.profile.name}}  {{request.user.profile.middle_name}} </h5>
                 <p class="text-center"> {{request.user.profile.get_position_display}}</p>
-              <a href="{% url 'profile'%}">👤 Профиль</a>
-                <a href="">📦 Заказы</a>
-                <a href="{% url 'warehouse' %}">📁 Склад</a>
 
+                <a href="{% url 'profile'%}">👤 Профиль</a>
+                <a href="{% url 'my_projects' %}">📦 Проекты</a>
+                <a href="{% url 'warehouse' %}">📁 Склад</a>
                 <a href="{% url 'money' %}">📊 Финансы</a>
-                <a href="{% url 'rezident' %}">💳 Резиденты</a>
-                <a href="{% url 'staff' %}">👥 Сотрудники</a>
-                <a href="{% url 'apply'%}">📝 Заявки</a>
+
+
                 <hr>
 
     <!-- Logout as a styled button -->
@@ -140,8 +139,7 @@
                    <div class="header-section d-flex justify-content-between align-items-center">
     <h2 class="mb-0">Заказы - Самарканд</h2>
     <div class="button-group d-flex gap-2">
-        <button class="btn btn-custom" onclick="window.location.href='{% url 'clients' %}'">Клиенты</button>
-        <button class="btn btn-custom" onclick="window.location.href='{% url 'order' %}'">Создать заказ</button>
+
         <button class="btn btn-custom" onclick="window.location.href='{% url 'archive' %}'">Архив</button>
     </div>
 </div>
@@ -412,114 +410,7 @@
 
 
 
-   <script>
-function allowDrop(event) {
-    event.preventDefault();
-}
 
-function drag(event) {
-    event.dataTransfer.setData("text", event.target.id);
-}
-
-function drop(event) {
-    event.preventDefault();
-
-    const data = event.dataTransfer.getData("text");
-    const draggedItem = document.getElementById(data);
-
-    const dropZone = event.target.closest(".kanban-column");
-    if (dropZone && draggedItem) {
-        dropZone.appendChild(draggedItem);
-
-        const stage = dropZone.dataset.stage;
-        const pk = draggedItem.dataset.pk;
-
-        fetch("{% url 'dashboard' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': '{{ csrf_token }}',
-            },
-            body: new URLSearchParams({
-                action: 'admin',
-                stage: stage,
-                pk: pk
-            })
-        })
-        .then(res => res.json())
-        .then(data => {
-            console.log("Updated:", data);
-            if (data.reload) {
-                location.reload();  // 🔁 Reload the page
-            }
-        })
-        .catch(err => console.error("Error:", err));
-    }
-}
-
-    // Пример: уведомление есть
-    const hasNotification = true;  // Подставь свою логику (AJAX, WebSocket и т.п.)
-
-    const badge = document.getElementById('notification-badge');
-    if (hasNotification) {
-        badge.style.display = 'block';
-    } else {
-        badge.style.display = 'none';
-    }
-
-</script>
-<script>
-  const notifications = [
-  {% for item in Notifcation %}
-
-    { id: {{item.id}}, text: "📢 Уведомление", read: {% if item.is_read %} true {% else %} false {% endif %} },
-    {% endfor %}
-  ];
-
-  function renderNotifications() {
-    const list = document.getElementById('notification-list');
-    list.innerHTML = '';
-
-    notifications.forEach(notif => {
-      const li = document.createElement('li');
-      li.style.display = 'flex';
-      li.style.justifyContent = 'space-between';
-      li.style.alignItems = 'center';
-      li.style.marginBottom = '10px';
-
-      li.innerHTML = `
-      <span onclick="window.location.href='/notify/' + ${notif.id}" style="cursor: pointer;">${notif.text}</span>
-        ${!notif.read ? '<span style="background:red; width:10px; height:10px; border-radius:50%; display:inline-block;"></span>' : ''}
-      `;
-
-      list.appendChild(li);
-    });
-
-    // Toggle bell icon badge
-    const hasUnread = notifications.some(n => !n.read);
-    document.getElementById('main-badge').style.display = hasUnread ? 'block' : 'none';
-  }
-
-  function togglePopup() {
-    document.getElementById('overlay').style.display = 'block';
-    renderNotifications();
-  }
-
-  function closePopup() {
-    document.getElementById('overlay').style.display = 'none';
-  }
-
-  // Close popup when clicking outside
-  document.getElementById('overlay').addEventListener('click', function (event) {
-    const popup = document.getElementById('notification-popup');
-    if (!popup.contains(event.target)) {
-      closePopup();
-    }
-  });
-
-  // Initial badge check on load
-  window.onload = renderNotifications;
-</script>
 
 
 </body>
