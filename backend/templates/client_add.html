@@ -88,7 +88,7 @@
 </head>
 <body>
   <header>
-    <h1>CRM — Добавить клиента</h1>
+   <h1 onclick="window.location.href='{% url 'dashboard' %}'" style="cursor: pointer;">CRM — Добавить клиента</h1>
     <div>👤 {{request.user.profile.name}}</div>
   </header>
 

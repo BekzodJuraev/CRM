@@ -187,7 +187,7 @@
 </head>
 <body>
   <header>
-    <h1>Маркетинг</h1>
+    <h1 onclick="window.location.href='{% url 'dashboard' %}'" style="cursor: pointer;">Маркетинг</h1>
     <div>👤 {{request.user.profile.name}}</div>
   </header>
 
@@ -195,7 +195,7 @@
 
     <div class="top-bar">
      <form action="" method="GET">
-      <input type="text" name="search" placeholder="🔍 Поиск клиента...">
+      <input type="text" name="search"  id="clientSearchInput" placeholder="🔍 Поиск клиента...">
        </form>
         <button onclick="window.location.href='{% url 'marketing_add' %}'">Добавить клиента</button>
 
@@ -205,7 +205,7 @@
 
 
      <div id="individual-fields">
-    <table>
+       <table id="clientTable">
       <thead>
         <tr>
           <th>Клиент</th>
@@ -262,6 +262,23 @@
 
     closePopup();
   }
+</script>
+<script>
+document.getElementById('clientSearchInput').addEventListener('keyup', function () {
+    let input = this.value.toLowerCase();
+    let rows = document.querySelectorAll('#clientTable tbody tr');
+
+    rows.forEach(function (row) {
+        let lastname = row.cells[0].textContent.toLowerCase();
+
+
+        if (lastname.includes(input)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
 </script>
 </body>
 </html>

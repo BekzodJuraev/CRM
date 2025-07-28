@@ -238,6 +238,25 @@ custom-dropdown {
       cursor: pointer;
       font-weight: bold;
     }
+    .toggle-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.toggle-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.order-id-box {
+  font-weight: bold;
+  font-size: 20px;
+  border: 2px solid black;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
 
     </style>
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
@@ -252,10 +271,13 @@ custom-dropdown {
     <div class="container">
         <h2 class="text-center">Добавить новый заказ</h2>
 
-             <div class="toggle-buttons">
-      <button id="btn-individual" class="active" >Физическое лицо</button>
-      <button id="btn-legal" >Юридическое лицо</button>
-    </div>
+  <div class="toggle-header">
+  <div class="toggle-buttons">
+    <button id="btn-individual" class="active">Физическое лицо</button>
+    <button id="btn-legal">Юридическое лицо</button>
+  </div>
+  <div class="order-id-box">#{{ item.id }}</div>
+</div>
 
         <form action="" method="POST" enctype="multipart/form-data">
             {% csrf_token %}

@@ -187,7 +187,7 @@
 </head>
 <body>
   <header>
-    <h1>Список сотрудников</h1>
+    <h1 onclick="window.location.href='{% url 'dashboard' %}'" style="cursor: pointer;">Список сотрудников</h1>
     <div>👤 {{request.user.profile.name}}</div>
   </header>
 

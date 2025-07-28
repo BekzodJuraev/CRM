@@ -73,8 +73,9 @@
               <a href="{% url 'profile'%}">👤 Профиль</a>
                 <a href="">📦 Заказы</a>
                 <a href="{% url 'warehouse' %}">📁 Склад</a>
+                <a href="{% url 'money' %}">📊 Финансы компании</a>
+                 <a href="{% url 'finance_profile' %}">📊 Финансы</a>
 
-                <a href="{% url 'money' %}">📊 Финансы</a>
                 <a href="{% url 'rezident' %}">💳 Резиденты</a>
                 <a href="{% url 'staff' %}">👥 Сотрудники</a>
                 <a href="{% url 'apply'%}">📝 Заявки</a>
@@ -174,7 +175,13 @@
 
                               <div class="kanban-item"  style="background-color: red;" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.order_name}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
                             {% else %}
-                              <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.order_name}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                              <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">
+                                  {% if item.order_name %}
+                                      {{ item.order_name }}
+                                    {% else %}
+                                      {{ item.marketing.client_name }}
+                                    {% endif %}
+                                  <br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
 
 
                              {% endif %}
@@ -191,7 +198,12 @@
 
                               <div class="kanban-item"  style="background-color: red;" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.order_name}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
                             {% else %}
-                              <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.order_name}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                              <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">
+                                  {% if item.order_name %}
+                                      {{ item.order_name }}
+                                    {% else %}
+                                      {{ item.marketing.client_name }}
+                                    {% endif %}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
 
 
                              {% endif %}
@@ -409,7 +421,12 @@
     </div>
   </div>
 </div>
-
+<div id="notifyPopup" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); width:80%; height:80%; background:white; border:2px solid black; z-index:9999; box-shadow:0 0 10px rgba(0,0,0,0.5);">
+  <div style="text-align:right; padding:10px;">
+    <button onclick="closeNotifyPopup()">❌ Закрыть</button>
+  </div>
+  <iframe id="notifyFrame" src="" style="width:100%; height:90%; border:none;"></iframe>
+</div>
 
 
    <script>
@@ -488,7 +505,7 @@ function drop(event) {
       li.style.marginBottom = '10px';
 
       li.innerHTML = `
-      <span onclick="window.location.href='/notify/' + ${notif.id}" style="cursor: pointer;">${notif.text}</span>
+      <span onclick="openNotifyPopup(${notif.id})" style="cursor: pointer;">${notif.text}</span>
         ${!notif.read ? '<span style="background:red; width:10px; height:10px; border-radius:50%; display:inline-block;"></span>' : ''}
       `;
 
@@ -520,7 +537,21 @@ function drop(event) {
   // Initial badge check on load
   window.onload = renderNotifications;
 </script>
+<script>
+function openNotifyPopup(notifId) {
+    const popup = document.getElementById('notifyPopup');
+    const frame = document.getElementById('notifyFrame');
+    frame.src = `/notify/${notifId}`;
+    popup.style.display = 'block';
+}
 
+function closeNotifyPopup() {
+    const popup = document.getElementById('notifyPopup');
+    const frame = document.getElementById('notifyFrame');
+    frame.src = ''; // Clear frame
+    popup.style.display = 'none';
+}
+</script>
 
 </body>
 </html>

@@ -358,11 +358,14 @@
             <p><span class="highlight">Новая заявка из колл-центра</span></p>
             <p>Клиент: <span class="highlight">{% if item.order.client.name %}
     {{ item.order.client.name }}
+   {% elif item.order.marketing.client_name %}
+          {{item.order.marketing.client_name }}
+
 {% else %}
     {{ item.order.client.company_name }}
 {% endif %}</span></p>
             <p>Номер телефона: <span class="highlight">{{item.order.client.phone}}</span></p>
-            <p>Тип встречи: {{item.order.get_vstrecha_display }}</p>
+            <p>Тип встречи: {{ item.order.get_vstrecha_display|default:'' }}</p>
         </div>
         <div>
             <button  type="button" onclick="openAssignModal({{ item.id }})">Принять проект</button>
@@ -381,10 +384,10 @@
         <input  id="fail" name="fail"  hidden>
         <input type="text" name="action"  value="fail" hidden>
         <input type="number" name="pk" value="{{item.order.pk}}" hidden>
-      <button class="yes-btn" onclick="confirmDelete_fail()">Да</button>
+      <button class="yes-btn" onclick="confirmDelete_fail()">Подтвердить</button>
 
         </form>
-       <button class="no-btn" onclick="closePopup()">Нет</button>
+
 
     </div>
 

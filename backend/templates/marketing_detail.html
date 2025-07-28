@@ -151,7 +151,7 @@
 </head>
 <body>
   <header>
-    <h1>CRM — Добавить клиента</h1>
+    <h1 onclick="window.location.href='{% url 'dashboard' %}'" style="cursor: pointer;">CRM — Добавить клиента</h1>
     <div>👤 {{request.user.profile.name}}</div>
   </header>
 
@@ -178,9 +178,11 @@
           <label>Комментарий:</label>
         <input type="text"  name="comment"  value="{{item.comment}}" >
          <button type="submit">Сохранить</button>
+        <button type="button" onclick="openPopup()">Сорвать</button>
       </div>
     </form>
-     <button type="submit" onclick="openPopup()">Сорвать</button>
+
+
 
   </div>
    <div class="overlay" id="overlay">
@@ -192,10 +194,10 @@
         {% csrf_token %}
         <input type="text" name="reason"  id="reason" hidden>
         <input type="number" name="pk" value="{{item.pk}}" hidden>
-      <button class="yes-btn" onclick="confirmDelete()">Да</button>
+      <button class="yes-btn" onclick="confirmDelete()">Подтвердить</button>
 
         </form>
-       <button class="no-btn" onclick="closePopup()">Нет</button>
+
 
     </div>
 

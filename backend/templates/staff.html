@@ -187,7 +187,7 @@
 </head>
 <body>
   <header>
-    <h1>Список сотрудников</h1>
+    <h1 onclick="window.location.href='{% url 'dashboard' %}'" style="cursor: pointer;">Список сотрудников</h1>
     <div>👤 {{request.user.profile.name}}</div>
   </header>
 
@@ -195,7 +195,7 @@
 
     <div class="top-bar">
      <form action="" method="GET">
-      <input type="text" name="search" placeholder="🔍 Поиск клиента...">
+      <input type="text" name="search"  id="clientSearchInput" placeholder="🔍 Поиск клиента...">
        </form>
         <button onclick="window.location.href='{% url 'staff_archive' %}'">Архив сотрудников</button>
 
@@ -205,7 +205,7 @@
 
 
      <div id="individual-fields">
-    <table>
+     <table id="clientTable">
       <thead>
         <tr>
           <th>Фото</th>
@@ -280,7 +280,24 @@
 </script>
 </body>
 </html>
+<script>
+document.getElementById('clientSearchInput').addEventListener('keyup', function () {
+    let input = this.value.toLowerCase();
+    let rows = document.querySelectorAll('#clientTable tbody tr');
 
+    rows.forEach(function (row) {
+        let lastname = row.cells[1].textContent.toLowerCase();
+        let name = row.cells[2].textContent.toLowerCase();
+        let middleName = row.cells[3].textContent.toLowerCase();
+
+        if (lastname.includes(input) || name.includes(input) || middleName.includes(input)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+</script>
 {% else %}
 {% include 'waiting.html' %}
 {% endif %}

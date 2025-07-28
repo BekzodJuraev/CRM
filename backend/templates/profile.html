@@ -76,16 +76,41 @@
                 <a href="{% url 'my_projects' %}">📦 Проекты</a>
                 <a href="{% url 'apply'%}">📝 Заявки</a>
                 <a href="">📁 Запросы на выплаты</a>
-                <a href="{% url 'money' %}">📊 Финансы</a>
+                <a href="{% url 'money' %}">📊 Финансы компании</a>
+                <a href="{% url 'finance_profile' %}">📊 Финансы</a>
                 <a href="{% url 'staff' %}">👥 Сотрудники</a>
-                {% else %}
+
+                {% elif request.user.profile.position == "manager" %}
                 <a href="{% url 'dashboard' %}">🏠 Главная</a>
                 <a href="">📦 Заказы</a>
                 <a href="{% url 'warehouse' %}">📁 Склад</a>
-                <a href="{% url 'money' %}">📊 Финансы</a>
+                 <a href="{% url 'money' %}">📊 Финансы компании</a>
+                 <a href="{% url 'finance_profile' %}">📊 Финансы</a>
                 <a href="{% url 'rezident' %}">💳 Резиденты</a>
                 <a href="{% url 'staff' %}">👥 Сотрудники</a>
                 <a href="{% url 'apply'%}">📝 Заявки</a>
+                {% elif request.user.profile.position == "admin"  %}
+                <a href="{% url 'dashboard' %}">🏠 Главная</a>
+                <a href="">📦 Заказы</a>
+                <a href="{% url 'warehouse' %}">📁 Склад</a>
+                 <a href="{% url 'money' %}">📊 Финансы компании</a>
+                <a href="{% url 'rezident' %}">💳 Резиденты</a>
+                <a href="{% url 'staff' %}">👥 Сотрудники</a>
+                <a href="{% url 'apply'%}">📝 Заявки</a>
+                {% elif request.user.profile.position == "supplier" %}
+
+                <a href="{% url 'dashboard' %}">🏠 Главная</a>
+                <a href="{% url 'my_projects' %}">📦 Проекты</a>
+                <a href="{% url 'warehouse' %}">📁 Склад</a>
+                 <a href="{% url 'finance_profile' %}">📊 Финансы</a>
+
+
+
+                {% else %}
+                <a href="{% url 'dashboard' %}">🏠 Главная</a>
+                <a href="{% url 'my_projects' %}">📦 Проекты</a>
+                <a href="{% url 'finance_profile' %}">📊 Финансы</a>
+
                 {% endif %}
                 <hr>
 
@@ -119,20 +144,23 @@
     </div>
 
     <!-- Колокольчик справа -->
-    <div id="notification-icon" class="position-relative">
-        <span style="font-size: 24px; cursor: pointer;">🔔</span>
-        <span id="notification-badge" style="
-            display: none;
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 10px;
-            height: 10px;
-            background: red;
-            border-radius: 50%;
-            border: 2px solid white;
-        "></span>
-    </div>
+<div style="position: relative;" onclick="togglePopup()">
+  <div id="notification-icon" style="cursor: pointer; font-size: 28px; position: relative;">
+    🔔
+    <!-- Red dot if there are unread notifications -->
+    <span id="main-badge" style="
+      display: none;
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 10px;
+      height: 10px;
+      background: red;
+      border-radius: 50%;
+      border: 2px solid white;
+    "></span>
+  </div>
+</div>
 
 </div>
 
@@ -192,60 +220,113 @@
 
 
 </div>
+<div id="overlay" style="
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+">
+  <div id="notification-popup" style="
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    color: black;
+    width: 400px;
+    max-height: 70vh;
+    overflow-y: auto;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  ">
+    <h4 style="margin-bottom: 15px;">🔔 Уведомления</h4>
+    <ul id="notification-list" style="list-style: none; padding: 0; margin: 0;"></ul>
+    <div style="text-align: right; margin-top: 15px;">
+      <button onclick="closePopup()" style="background: #f44336; color: white; border: none; padding: 6px 12px; border-radius: 5px;">Закрыть</button>
+    </div>
+  </div>
+</div>
+<div id="notifyPopup" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); width:80%; height:80%; background:white; border:2px solid black; z-index:9999; box-shadow:0 0 10px rgba(0,0,0,0.5);">
+  <div style="text-align:right; padding:10px;">
+    <button onclick="closeNotifyPopup()">❌ Закрыть</button>
+  </div>
+  <iframe id="notifyFrame" src="" style="width:100%; height:90%; border:none;"></iframe>
+</div>
 
             </main>
         </div>
     </div>
-   <script>
-function allowDrop(event) {
-    event.preventDefault();
-}
+<script>
+  const notifications = [
+  {% for item in Notifcation %}
 
-function drag(event) {
-    event.dataTransfer.setData("text", event.target.id);
-}
+    { id: {{item.id}}, text: "📢 Уведомление", read: {% if item.is_read %} true {% else %} false {% endif %} },
+    {% endfor %}
+  ];
 
-function drop(event) {
-    event.preventDefault();
+  function renderNotifications() {
+    const list = document.getElementById('notification-list');
+    list.innerHTML = '';
 
-    const data = event.dataTransfer.getData("text");
-    const draggedItem = document.getElementById(data);
+    notifications.forEach(notif => {
+      const li = document.createElement('li');
+      li.style.display = 'flex';
+      li.style.justifyContent = 'space-between';
+      li.style.alignItems = 'center';
+      li.style.marginBottom = '10px';
 
-    const dropZone = event.target.closest(".kanban-column");
-    if (dropZone && draggedItem) {
-        dropZone.appendChild(draggedItem);
+      li.innerHTML = `
+      <span onclick="openNotifyPopup(${notif.id})" style="cursor: pointer;">${notif.text}</span>
+        ${!notif.read ? '<span style="background:red; width:10px; height:10px; border-radius:50%; display:inline-block;"></span>' : ''}
+      `;
 
-        const stage = dropZone.dataset.stage;
-        const pk = draggedItem.dataset.pk;
+      list.appendChild(li);
+    });
 
-        fetch("{% url 'dashboard' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': '{{ csrf_token }}',
-            },
-            body: new URLSearchParams({
-                action: 'admin',
-                stage: stage,
-                pk: pk
-            })
-        })
-        .then(res => res.json())
-        .then(data => console.log("Updated:", data))
-        .catch(err => console.error("Error:", err));
+    // Toggle bell icon badge
+    const hasUnread = notifications.some(n => !n.read);
+    document.getElementById('main-badge').style.display = hasUnread ? 'block' : 'none';
+  }
+
+  function togglePopup() {
+    document.getElementById('overlay').style.display = 'block';
+    renderNotifications();
+  }
+
+  function closePopup() {
+    document.getElementById('overlay').style.display = 'none';
+  }
+
+  // Close popup when clicking outside
+  document.getElementById('overlay').addEventListener('click', function (event) {
+    const popup = document.getElementById('notification-popup');
+    if (!popup.contains(event.target)) {
+      closePopup();
     }
+  });
+
+  // Initial badge check on load
+  window.onload = renderNotifications;
+</script>
+<script>
+function openNotifyPopup(notifId) {
+    const popup = document.getElementById('notifyPopup');
+    const frame = document.getElementById('notifyFrame');
+    frame.src = `/notify/${notifId}`;
+    popup.style.display = 'block';
 }
 
-    // Пример: уведомление есть
-    const hasNotification = true;  // Подставь свою логику (AJAX, WebSocket и т.п.)
-
-    const badge = document.getElementById('notification-badge');
-    if (hasNotification) {
-        badge.style.display = 'block';
-    } else {
-        badge.style.display = 'none';
-    }
-
+function closeNotifyPopup() {
+    const popup = document.getElementById('notifyPopup');
+    const frame = document.getElementById('notifyFrame');
+    frame.src = ''; // Clear frame
+    popup.style.display = 'none';
+}
 </script>
 </body>
 </html>

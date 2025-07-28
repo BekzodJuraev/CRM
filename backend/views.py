@@ -1138,6 +1138,48 @@ class OrderDetail(LoginRequiredMixin,DetailView):
       return redirect('dashboard')
 
 
+def notification(profile):
+   if profile == 'delivery_cheif':
+       return Notification.objects.filter(
+         stage='design').order_by('-id')
+
+   elif profile == 'technologist_cheif':
+      return Notification.objects.filter(
+         stage='technologist').order_by('-id')
+
+
+   elif profile == 'chief':
+      return Notification.objects.filter(
+         stage='manufacturing').order_by('-id')
+
+   elif profile == 'delivery_cheif':
+      return Notification.objects.filter(
+         stage='delivery').order_by('-id')
+
+
+   elif profile ==  'installer_cheif':
+      return Notification.objects.filter(
+         stage='installation').order_by('-id')
+
+   elif profile == 'qa_cheif':
+      return Notification.objects.filter(
+         stage__in=['quality_control', 'back']).order_by('-id')
+
+
+   elif profile == 'manager' or profile == 'admin':
+        return Notification.objects.filter(
+         stage__in=['manager', 'manager_qa', 'manager_qa_back', 'manager_2', 'back', 'finished']).order_by('-id')
+   elif profile == 'accountant':
+       return Notification.objects.filter(
+      stage__in=['accounting', 'accounting_2', 'zayavki']).order_by('-id')
+
+
+
+   elif profile == 'sales_call':
+      return Notification.objects.filter(
+         stage__in=['call_center', 'call_center_back']).order_by('-id')
+
+
 
 class Order(LoginRequiredMixin,TemplateView):
    template_name = 'order.html'
@@ -1203,6 +1245,13 @@ class Order(LoginRequiredMixin,TemplateView):
 class FinanceProfileView(LoginRequiredMixin,TemplateView):
    template_name = 'finance_profile.html'
    login_url = reverse_lazy('login')
+
+
+
+   def get_context_data(self, *, object_list=None, **kwargs):
+      context = super().get_context_data(**kwargs)
+      context['Notifcation']=notification(self.request.user.profile.position)
+      return context
 class ProfileView(LoginRequiredMixin,TemplateView):
    template_name = 'profile.html'
    login_url = reverse_lazy('login')
@@ -1219,6 +1268,12 @@ class ProfileView(LoginRequiredMixin,TemplateView):
 
 
       return redirect(request.path)
+
+
+   def get_context_data(self, *, object_list=None, **kwargs):
+      context = super().get_context_data(**kwargs)
+      context['Notifcation']=notification(self.request.user.profile.position)
+      return context
 
 class Applications(LoginRequiredMixin,TemplateView):
    template_name = 'applications.html'
@@ -1398,8 +1453,8 @@ class ClietView(LoginRequiredMixin,TemplateView):
 
    def get_context_data(self, *, object_list=None, **kwargs):
       context = super().get_context_data(**kwargs)
-      context['client_fiz']=Clients.objects.filter(client_type='INDIVIDUAL')
-      context['client_leg'] = Clients.objects.filter(client_type='LEGAL_ENTITY')
+      context['client_fiz']=Clients.objects.filter(client_type='INDIVIDUAL').order_by('-id')
+      context['client_leg'] = Clients.objects.filter(client_type='LEGAL_ENTITY').order_by('-id')
 
       return context
 

@@ -121,7 +121,7 @@
 </head>
 <body>
   <header>
-    <h1>CRM — Список клиентов</h1>
+   <h1 onclick="window.location.href='{% url 'dashboard' %}'" style="cursor: pointer;">CRM — Список клиентов</h1>
     <div>👤 {{request.user.profile.name}}</div>
   </header>
 
@@ -132,11 +132,11 @@
     </div>
 
     <div class="top-bar">
-      <input type="text" placeholder="🔍 Поиск клиента...">
+      <input type="text" id="clientSearchInput" placeholder="🔍 Поиск клиента...">
       <button onclick="window.location.href='{% url 'client_add' %}'">+ Добавить клиента</button>
     </div>
      <div id="individual-fields">
-    <table>
+    <table id="clientTable">
       <thead>
         <tr>
           <th>Фамилия</th>
@@ -164,8 +164,8 @@
       </div>
 
 
-    <div id="legal-fields" class="hidden">
-      <table>
+    <div id="legal-fields" class="hidden" >
+      <table id="clientTable">
       <thead>
         <tr>
           <th>Организация</th>
@@ -216,5 +216,23 @@
       individualFields.classList.add('hidden');
     });
   </script>
+<script>
+document.getElementById('clientSearchInput').addEventListener('keyup', function () {
+    let input = this.value.toLowerCase();
+    let rows = document.querySelectorAll('#clientTable tbody tr');
+
+    rows.forEach(function (row) {
+        let lastname = row.cells[0].textContent.toLowerCase();
+        let name = row.cells[1].textContent.toLowerCase();
+        let middleName = row.cells[2].textContent.toLowerCase();
+
+        if (lastname.includes(input) || name.includes(input) || middleName.includes(input)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+</script>
 </body>
 </html>
