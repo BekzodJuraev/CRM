@@ -328,15 +328,21 @@ class Dashboard(LoginRequiredMixin,TemplateView):
       stage=request.POST.get('stage')
 
 
+
+
+
       if action == "admin":
+
          if stage == "finished":
             Orders.objects.filter(pk=pk).update(stage=stage, complete_date=now().date())
 
          elif stage == 'delivery':
+
             Orders.objects.filter(pk=pk).update(stage=stage)
            # admin_tech(pk)
 
          elif stage == 'design':
+
             order=Orders.objects.filter(pk=pk).first()
             if order.check_design:
                order.stage=stage
@@ -350,11 +356,12 @@ class Dashboard(LoginRequiredMixin,TemplateView):
             return JsonResponse({'status': 'success', 'reload': True})
          else:
             Orders.objects.filter(pk=pk).update(stage=stage)
+         # mess(pk)
+         return JsonResponse({'status': 'success'}, status=200)
 
 
-         #mess(pk)
+      if action == 'chief':
 
-      elif action == 'chief':
          stage_pod = request.POST.get('pod_stage')
          order = Orders.objects.filter(pk=pk).first()
          check = getattr(order, stage_pod, None)
@@ -387,7 +394,7 @@ class Dashboard(LoginRequiredMixin,TemplateView):
 
 
 
-         return JsonResponse({'status': 'success'})
+         return JsonResponse({'status': 'success'},status=200)
       return JsonResponse({'status': 'error', 'message': 'Invalid action'}, status=400)
 
 
@@ -531,14 +538,18 @@ class Dashboard(LoginRequiredMixin,TemplateView):
 
       for stage in stages:
          if self.request.user.profile.position == 'sales_call':
-            queryset = Orders.objects.filter(stage=stage,call_center=self.request.user.profile)
+            if stage == 'call_center':
+               queryset = Orders.objects.filter(stage=stage)
+            else:
+               queryset = Orders.objects.filter(stage=stage, call_center=self.request.user.profile)
+
          elif self.request.user.profile.position == 'delivery_cheif':
             queryset = Orders.objects.filter(stage=stage, check_design=True)
          else:
             queryset = Orders.objects.filter(stage=stage).annotate(
                today=Value(now().date()))
          marketing = Social_clients.objects.filter(order__stage=stage).select_related('order')
-         staff=OrderStaff.objects.filter(order__stage=stage,profile=self.request.user.profile,complete=True).select_related('order')
+         staff=OrderStaff.objects.filter(order__stage=stage,profile=self.request.user.profile).select_related('order')
 
          context[f"{stage}_staff"] = staff
          context[f"{stage}_marketing"]=marketing
@@ -1082,18 +1093,20 @@ class OrderDetail(LoginRequiredMixin,DetailView):
          name = request.POST.get('name')
          lastname = request.POST.get('lastname')
          middle_name = request.POST.get('middle_name')
-         obj.client.adress = None
-         obj.client.inn = None
-         obj.client.account = None
-         obj.client.phone = phone
-         obj.client.company_name = None
-         obj.client.name = name
-         obj.client.lastname = lastname
-         obj.client.middle_name = middle_name
-         obj.client.phone = phone
-         obj.client.client_type = "INDIVIDUAL"
-         obj.client.active = True
-         obj.client.save()
+         if obj.client:
+            obj.client.phone = phone
+            obj.client.name = name
+            obj.client.lastname = lastname
+            obj.client.middle_name = middle_name
+            obj.client.client_type = "INDIVIDUAL"
+            obj.client.active = True
+            obj.client.save()
+         else:
+            c = Clients.objects.create(phone=phone, name=name, lastname=lastname, middle_name=middle_name,
+                                       client_type="INDIVIDUAL",active=True)
+            obj.client = c
+
+
 
       else:
          adress = request.POST.get('adress')
@@ -1102,17 +1115,19 @@ class OrderDetail(LoginRequiredMixin,DetailView):
          account = request.POST.get('account') or None
          mfo = request.POST.get('mfo') or None
 
-         obj.client.name = None
-         obj.client.lastname = None
-         obj.client.middle_name = None
-         obj.client.company_name = company_name
-         obj.client.adress = adress
-         obj.client.inn = inn
-         obj.client.account = account
-         obj.client.phone = phone
-         obj.client.client_type = "LEGAL_ENTITY"
-         obj.client.active=True
-         obj.client.save()
+         if obj.client:
+            obj.client.company_name = company_name
+            obj.client.adress = adress
+            obj.client.inn = inn
+            obj.client.account = account
+            obj.client.phone = phone
+            obj.client.client_type = "LEGAL_ENTITY"
+            obj.client.active = True
+            obj.client.save()
+         else:
+            c = Clients.objects.create(company_name=company_name, adress=adress, inn=inn, account=account,
+                                       client_type="LEGAL_ENTITY", phone=phone,active=True)
+            obj.client = c
 
       obj.order_name = order_name
       obj.zayavki = zayavki
@@ -1121,9 +1136,13 @@ class OrderDetail(LoginRequiredMixin,DetailView):
       obj.order_predoplata = order_predoplata
       obj.description = description
       obj.catigories = catigories
-      obj.tz = tz
+      if tz:
+         obj.tz = tz
+
+      if design:
+         obj.design = design
       obj.check_design = check_design
-      obj.design = design
+
       obj.latitude = latitude
       obj.longitude = longitude
       obj.razmer = razmer

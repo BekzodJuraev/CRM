@@ -156,7 +156,11 @@
 
                               <div class="kanban-item"  style="background-color: red;" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.order_name}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
                             {% else %}
-                              <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.order_name}}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
+                              <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">  {% if item.order_name %}
+                                      {{ item.order_name }}
+                                    {% else %}
+                                      {{ item.marketing.client_name }}
+                                    {% endif %}<br><small>Срок: {{item.complete_order|date:"d.m.Y"}}</small></div>
 
 
                              {% endif %}

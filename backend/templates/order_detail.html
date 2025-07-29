@@ -333,7 +333,7 @@ custom-dropdown {
        pattern="^\+998\d{9}$"
        title="+998901234567"
        class="form-control"
-                value="{% if item.client.phone %}{{item.client.phone}}{% else %} {{ item.marketing.phone }}{% endif %}">
+                value="{% if item.client.phone %}{{item.client.phone}}{% else %}{{item.marketing.phone }}{% endif %}">
                   <label>Наименование проекта:</label>
             <input type="text" class="form-control" placeholder="Проект 1" name="order_name" value="{{item.order_name }}" required>
                     <label>Источник:</label>
