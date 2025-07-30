@@ -473,6 +473,9 @@ class Dashboard(LoginRequiredMixin,TemplateView):
    def get_context_data(self, *, object_list=None, **kwargs):
       context = super().get_context_data(**kwargs)
       search = self.request.GET.get('search')
+      has_accounter=Profile.objects.filter(position='accountant',approve=True,approve_accounting=True).exists()
+      context['has_accounter']=has_accounter
+
 
       stages = [
          "marketing",
@@ -589,6 +592,10 @@ class Dashboard(LoginRequiredMixin,TemplateView):
          stage__in=['call_center', 'call_center_back']).order_by('-id')
       return context
 
+
+class Account_Pay(LoginRequiredMixin,TemplateView):
+   login_url = reverse_lazy('login')
+   template_name = 'account_pay.html'
 
 class MyProjects(LoginRequiredMixin, TemplateView):
    login_url = reverse_lazy('login')

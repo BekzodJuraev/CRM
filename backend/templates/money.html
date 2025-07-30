@@ -186,9 +186,9 @@ background 0.3s;
 <!-- Popup -->
 <div id="popup">
   <input type="text" id="popup-input" placeholder="Введите наименование">
-  <button onclick="addValue()">Добавить</button>
+  <button onclick="addValue()">Искать</button>
 </div>
-    <form action="" method="GET">
+    <form action="" method="GET"  id="search-form" >
         <input type="text" name="rasxod" id="rasxod-hidden" placeholder="Введите наименование" hidden>
 
 
@@ -236,7 +236,7 @@ background 0.3s;
           <td>{{item.name}}</td>
 
           <td>{{item.created_at|date:"d.m.Y"}}</td>
-          <td>{{item.sum}}сум</td>
+          <td>{{item.sum}} сум</td>
         </tr>
       {% endfor %}
 
@@ -265,14 +265,12 @@ background 0.3s;
   }
 
   // Add value from input to hidden field
-  function addValue() {
-    const value = input.value.trim();
-    if (value) {
-      hiddenField.value = value;
-       // Optional: make it visible if needed
-      closePopup();
-    }
-  }
+function addValue() {
+    const inputValue = document.getElementById('popup-input').value;
+    document.getElementById('rasxod-hidden').value = inputValue;
+    document.getElementById('search-form').submit();  // Submit the form manually
+}
+
 
   // Allow Enter key in popup
   input.addEventListener("keydown", function (e) {

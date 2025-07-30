@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Запросы на выплату</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 900px;
+      margin: auto;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      position: relative;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    .back-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: #f0f0f0;
+      color: #333;
+      border: 1px solid #ccc;
+      padding: 6px 12px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 40px;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .btn {
+      background-color: #e0e0e0;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .modal,
+    .notification {
+      display: none;
+      position: fixed;
+      background: white;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 100;
+    }
+
+    .modal-buttons {
+      text-align: right;
+      margin-top: 15px;
+    }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 99;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a class="back-button" href="/dashboard/">← Назад </a>
+
+    <h2>📋 Запросы на выплату</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Сотрудник</th>
+          <th>Должность</th>
+          <th>Сумма</th>
+          <th>Дата подачи</th>
+          <th>Действие</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Иванов И.И.</td>
+          <td>Архитектор</td>
+          <td>100 000 UZS</td>
+          <td>05.04.2025</td>
+          <td>
+            <button class="btn" onclick="openModal('Иванов И.И.', '100 000')">Выплатить</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal -->
+  <div class="overlay" id="overlay"></div>
+  <div class="modal" id="confirmModal">
+    <p id="confirmText"></p>
+    <div class="modal-buttons">
+      <button onclick="confirmPayout()">Да</button>
+      <button onclick="closeModal()">Нет</button>
+    </div>
+  </div>
+
+  <!-- Notification -->
+  <div class="notification" id="notification">
+    <p>Сумма в размере 100 000 UZS была подтверждена бухгалтером и списана с вашего лицевого счёта.</p>
+  </div>
+
+  <script>
+    function openModal(employee, amount) {
+      document.getElementById("confirmText").textContent = `Вы подтверждаете выплату сотруднику ${employee} на сумму ${amount} UZS?`;
+      document.getElementById("overlay").style.display = "block";
+      document.getElementById("confirmModal").style.display = "block";
+    }
+
+    function closeModal() {
+      document.getElementById("overlay").style.display = "none";
+      document.getElementById("confirmModal").style.display = "none";
+    }
+
+    function confirmPayout() {
+      closeModal();
+      showNotification();
+    }
+
+    function showNotification() {
+      const notification = document.getElementById("notification");
+      notification.style.display = "block";
+      setTimeout(() => {
+        notification.style.display = "none";
+      }, 4000);
+    }
+  </script>
+</body>
+</html>

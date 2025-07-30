@@ -221,7 +221,11 @@
       {% for item in profile %}
       <tbody>
         <tr>
-            <td> <img src="{{item.photo.url}}" alt="Фото сотрудника" class="photo-placeholder" width="100px" height="100px"></td>
+            <td>
+              {% if item.photo %}
+              <img src="{{item.photo.url}}" alt="Фото сотрудника" class="photo-placeholder" width="100px" height="100px">
+            {% endif %}
+            </td>
           <td>{{item.lastname}}</td>
           <td>{{item.name}}</td>
           <td>{{item.middle_name}}</td>

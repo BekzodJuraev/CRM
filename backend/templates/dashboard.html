@@ -1,4 +1,4 @@
-{% if request.user.profile.approve and request.user.profile.approve_accounting %}
+{% if request.user.profile.approve and request.user.profile.approve_accounting or request.user.profile.approve and not has_accounter  %}
 {% if request.user.profile.position == "admin" or request.user.profile.position == "manager" %}
     {% include 'admin.html' %}
 {% elif request.user.profile.position == "accountant" %}

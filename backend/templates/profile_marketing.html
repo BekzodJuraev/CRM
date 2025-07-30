@@ -56,6 +56,22 @@
             color: #000;
             font-weight: bold;
         }
+                        .kanban-column[data-stage="marketing"] .kanban-item {
+    background-color: #a53292; /* розовый */
+}
+        .kanban-column[data-stage="call_center"] .kanban-item {
+    background-color: #a53292; /* розовый */
+}
+        .kanban-column[data-stage="finished"] .kanban-item {
+    background-color: #029300; /* розовый */
+}
+        .kanban-column[data-stage="manager_2"] .kanban-item {
+    background-color: #0024a7; /* розовый */
+}
+
+        .kanban-column[data-stage="manager"] .kanban-item {
+    background-color: #435fc1; /* розовый */
+}
     </style>
 </head>
 <body>
@@ -170,8 +186,18 @@
 
 
                               <div class="kanban-item"  style="background-color: red;" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.order.pk%}'" ondragstart="drag(event)">{{item.order.order_name}}<br><small>Срок: {{item.order.complete_order|date:"d.m.Y"}}</small></div>
+                            {% elif item.order.zayavki == 'cool' %}
+                            <div class="kanban-item"  style="background-color: #25c3ad;" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.pk %}'" ondragstart="drag(event)">{{item.order.order_name}}<br><small>Срок: {{item.order.complete_order|date:"d.m.Y"}}</small></div>
                             {% else %}
-                              <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.order.pk%}'" ondragstart="drag(event)">{{item.order.order_name}}<br><small>Срок: {{item.order.complete_order|date:"d.m.Y"}}</small></div>
+                              <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.order.pk%}'" ondragstart="drag(event)">
+
+                                 {% if item.order.order_name %}
+                                      {{ item.order.order_name }}
+                                    {% else %}
+                                      {{ item.client_name }}
+                                    {% endif %}
+
+                                  <br><small>Срок: {{item.order.complete_order|date:"d.m.Y"}}</small></div>
 
 
                              {% endif %}
@@ -187,8 +213,15 @@
 
 
                               <div class="kanban-item"  style="background-color: red;" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.order.pk %}'" ondragstart="drag(event)">{{item.order.order_name}}<br><small>Срок: {{item.order.complete_order|date:"d.m.Y"}}</small></div>
-                            {% else %}
-                              <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.order.pk%}'" ondragstart="drag(event)">{{item.order.order_name}}<br><small>Срок: {{item.order.complete_order|date:"d.m.Y"}}</small></div>
+                             {% elif item.order.vstrecha == 'viezd' %}
+                            <div class="kanban-item"  style="background-color: #9b254b;" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.order.pk %}'" ondragstart="drag(event)">{{item.order.order_name}}<br><small>Срок: {{item.order.complete_order|date:"d.m.Y"}}</small></div>
+                             {% else %}
+                              <div class="kanban-item" id="order{{item.pk}}" data-pk="{{ item.id }}" draggable="true"   onclick="window.location.href='{% url 'order_detail' item.order.pk%}'" ondragstart="drag(event)"> {% if item.order.order_name %}
+                                      {{ item.order.order_name }}
+                                    {% else %}
+                                      {{ item.client_name }}
+                                    {% endif %}
+<br><small>Срок: {{item.order.complete_order|date:"d.m.Y"}}</small></div>
 
 
                              {% endif %}

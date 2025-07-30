@@ -40,5 +40,6 @@ urlpatterns=[
     path('provider/',views.ProviderView.as_view(),name='provider'),
     path('provider/add',views.ProvideCreateView.as_view(),name='provider_add'),
     path('finance-profile/',views.FinanceProfileView.as_view(),name='finance_profile'),
-    path('notify/<int:pk>',views.NotificationVIew.as_view(),name='notify')
+    path('notify/<int:pk>',views.NotificationVIew.as_view(),name='notify'),
+    path('account_pay/',views.Account_Pay.as_view(),name='account_pay')
 ]
