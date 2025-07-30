@@ -271,18 +271,23 @@ class NotificationVIew(LoginRequiredMixin,DetailView):
       action=request.POST.get('action')
       message=request.POST.get('message')
       pk=request.POST.get('pk')
+      notify=request.POST.get('notify')
       if action == 'call_center_back':
          Orders.objects.filter(pk=pk).update(stage='call_center')
+
          Notification.objects.create(order_id=pk,stage=action,message=message)
+         Notification.objects.filter(pk=notify).update(complete=True)
 
       elif action == 'fail':
          fail=request.POST.get('fail')
          Orders.objects.filter(pk=pk).update(stage='failed',fail=fail,by_who_fail='менеджером')
+         Notification.objects.filter(pk=notify).update(complete=True)
 
       elif action == 'manager':
          staff_pk=request.POST.get('staff_pk')
          if staff_pk:
             Notification.objects.create(order_id=pk,stage='manager_qa',profile_id=staff_pk)
+         Notification.objects.filter(pk=notify).update(complete=True)
 
       elif action == 'manager_qa':
          message=request.POST.get('message')
@@ -290,6 +295,8 @@ class NotificationVIew(LoginRequiredMixin,DetailView):
             Notification.objects.create(order_id=pk, stage='manager_qa_back', profile_id=request.POST.get('staff_pk'),message=message)
          else:
             Notification.objects.create(order_id=pk, stage='manager_qa_back',profile_id=request.POST.get('staff_pk'), message=message)
+
+         Notification.objects.filter(pk=notify).update(complete=True)
 
       elif action == 'accounting':
          Orders.objects.filter(pk=pk).update(stage=action)
@@ -311,6 +318,7 @@ class NotificationVIew(LoginRequiredMixin,DetailView):
       )
    def get_context_data(self, *, object_list=None, **kwargs):
       context = super().get_context_data(**kwargs)
+      context['qa_staff']=Profile.objects.filter(position='qa_staff')
       notify=self.object
       notify.is_read=True
       notify.save()
@@ -482,7 +490,7 @@ class Dashboard(LoginRequiredMixin,TemplateView):
          "quality_control",
          "finished",
       ]
-
+      context['notify']= Notification.objects.filter(profile=self.request.user.profile)
       if self.request.user.profile.position == 'delivery_cheif':
          context['notify'] = Notification.objects.filter(
             stage='design').order_by('-id')
@@ -574,8 +582,9 @@ class Dashboard(LoginRequiredMixin,TemplateView):
 
 
 
-      context['Notifcation']=Notification.objects.filter(stage__in=['manager','manager_qa','manager_qa_back','manager_2','back','finished']).order_by('-id')
+      context['Notifcation']=Notification.objects.filter(stage__in=['manager','manager_qa_back','manager_2','back','finished']).order_by('-id')
       context['Notifcation_account'] = Notification.objects.filter(stage__in=['accounting','accounting_2','zayavki']).order_by('-id')
+
       context['Notifcation_call'] = Notification.objects.filter(
          stage__in=['call_center', 'call_center_back']).order_by('-id')
       return context
@@ -1187,7 +1196,7 @@ def notification(profile):
 
    elif profile == 'manager' or profile == 'admin':
         return Notification.objects.filter(
-         stage__in=['manager', 'manager_qa', 'manager_qa_back', 'manager_2', 'back', 'finished']).order_by('-id')
+         stage__in=['manager', 'manager_qa_back', 'manager_2', 'back', 'finished']).order_by('-id')
    elif profile == 'accountant':
        return Notification.objects.filter(
       stage__in=['accounting', 'accounting_2', 'zayavki']).order_by('-id')
@@ -1596,20 +1605,8 @@ class Call_center(LoginRequiredMixin,TemplateView):
 
    def get_context_data(self, *, object_list=None, **kwargs):
       context = super().get_context_data(**kwargs)
-      context['order']=Orders.objects.filter(stage='call_center')
-      search = self.request.GET.get('search')
+      context['order']=Orders.objects.filter(stage='call_center').order_by('-id')
 
-      if search:
-         context['order'] = Orders.objects.filter(
-    Q(stage='call_center') &
-      ( Q(client__name__icontains=search) |
-        Q(client__company_name__icontains=search) |
-        Q(marketing__client_name__icontains=search)
-    )
-).select_related('client','marketing')
-
-      else:
-         context['order'] = Orders.objects.filter(stage='call_center').select_related('client','marketing')
       return context
 class Call_center_add(LoginRequiredMixin,TemplateView):
    template_name = 'call_center_add.html'

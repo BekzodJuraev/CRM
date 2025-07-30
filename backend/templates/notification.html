@@ -178,6 +178,16 @@
     content: "📄";
     font-size: 18px;
 }
+ .employee-block {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .employee-block select,
+    .employee-block input {
+      flex: 1;
+    }
     </style>
 </head>
 <body>
@@ -188,20 +198,28 @@
     <span class="close" onclick="closeAssignModal()">&times;</span>
 
     <h3>Выберите сотрудника</h3>
+        <div class="employee-block">
+            <select name="staff_pk">
+                   <option ></option>
+              {% for employee in qa_staff %}
+                <option value="{{employee.pk}}">{{ employee.lastname }} {{ employee.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
 
 
-
-    <div id="employeeList" style="max-height: 200px; overflow-y: auto; margin-top: 10px;"></div>
 
     <div id="confirmBlock" style="margin-top: 20px; ">
       <p>Вы уверены, что хотите передать проект <strong id="selectedName"></strong></p>
       <button type="button" class="btn" onclick="confirmAssign()">Да</button>
 
     </div>
+       <input type="text" name="notify"  value="{{item.pk}}" hidden>
       <input name="pk" value="{{item.order.pk }}" hidden>
-        <input name="staff_pk"  id="staff_pk" hidden>
         <input name="action" value="manager" hidden>
+
        <button class="btn">Подтвердить</button>
+
   </div>
              </form>
 </div>
@@ -219,7 +237,7 @@
        <div class="notification-wrapper">
         <div class="notification-header">Уведомление</div>
         <div class="notification-box">
-            <p><span class="highlight">Новая заявка из колл-центра</span></p>
+            <p><span class="highlight">Заявка возвращена из отдела менеджеров</span></p>
             <p>Клиент: <span class="highlight">{% if item.order.client.name %}
     {{ item.order.client.name }}
 {% else %}
@@ -242,8 +260,11 @@
       <input name="pk" value="{{item.order.pk }}" hidden>
         <input name="staff_pk"  value="{{item.profile.pk}}" hidden>
         <input name="action" value="manager_qa" hidden>
+            <input type="text" name="notify"  value="{{item.pk}}" hidden>
+            {% if not item.compelete %}
        <button class="btn" name="message" value="approve">Подтвердить</button>
        <button class="btn" name="message" value="reject">Отклонить</button>
+            {% endif %}
   </div>
         </form>
     </div>
@@ -344,9 +365,9 @@
             <div class="notification-box">
 
             <p><span class="highlight">Сотрудник контроля качества {{item.profile.lastname}} {{item.profile.name}} не подтвердил свое участие </span></p>
-
+                {% if not item.complete %}
             <button  type="button" onclick="openAssignModal({{ item.id }})">Подтвердить</button>
-
+            {% endif %}
         </div>
             {% endif %}
         </form>
@@ -367,11 +388,13 @@
             <p>Номер телефона: <span class="highlight">{{item.order.client.phone}}</span></p>
             <p>Тип встречи: {{ item.order.get_vstrecha_display|default:'' }}</p>
         </div>
+        {% if not item.complete %}
         <div>
             <button  type="button" onclick="openAssignModal({{ item.id }})">Принять проект</button>
             <button type="button" onclick="openPopup_back()">Вернуть в колл-центр</button>
             <button type="button" onclick="openPopup()">Сорвать</button>
         </div>
+        {% endif %}
     </div>
 
     <div class="overlay" id="overlay">
@@ -383,6 +406,7 @@
         {% csrf_token %}
         <input  id="fail" name="fail"  hidden>
         <input type="text" name="action"  value="fail" hidden>
+            <input type="text" name="notify"  value="{{item.pk}}" hidden>
         <input type="number" name="pk" value="{{item.order.pk}}" hidden>
       <button class="yes-btn" onclick="confirmDelete_fail()">Подтвердить</button>
 
@@ -396,12 +420,13 @@
     <div class="overlay" id="overlay_back">
   <div class="popup">
         <h2>Комментарий:</h2>
-    <input type="text"  id="comment">
+      <textarea type="text" id="comment"></textarea>
     <div class="popup-buttons">
       <form method="post" >
         {% csrf_token %}
         <input name="message" id="message" hidden>
         <input type="text" name="action"  value="call_center_back" hidden>
+           <input type="text" name="notify"  value="{{item.pk}}" hidden>
         <input type="number" name="pk" value="{{item.order.pk}}" hidden>
       <button class="yes-btn" onclick="confirmDelete()">Да</button>
 
@@ -454,7 +479,7 @@ let selectedEmployeeId = null;
 function openAssignModal(projectId) {
   currentProjectId = projectId;
   selectedEmployeeId = null;
-  document.getElementById('employeeList').innerHTML = '';
+
   document.getElementById('confirmBlock').style.display = 'none';
   document.getElementById('assignModal').classList.remove('hidden');
 

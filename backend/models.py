@@ -232,6 +232,7 @@ class Notification(models.Model):
     stage = models.CharField(max_length=20, choices=Stage_CHOICES,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
+    complete=models.BooleanField(default=False)
     profile = models.ForeignKey(
         'Profile', on_delete=models.CASCADE, related_name='profile_notifcation', verbose_name="Профиль", null=True,
     blank=True)

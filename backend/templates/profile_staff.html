@@ -107,7 +107,7 @@
         <h1 class="mb-0">Главная</h1>
     </div>
 
-<div style="position: relative;" >
+<div style="position: relative;" onclick="togglePopup()">
   <div id="notification-icon" style="cursor: pointer; font-size: 28px; position: relative;">
     🔔
     <!-- Red dot if there are unread notifications -->
@@ -371,7 +371,58 @@
   </div>
 </div>
 
+<script>
+  const notifications = [
+  {% for item in notify %}
 
+    { id: {{item.id}}, text: "📢 Уведомление", read: {% if item.is_read %} true {% else %} false {% endif %} },
+    {% endfor %}
+  ];
+
+  function renderNotifications() {
+    const list = document.getElementById('notification-list');
+    list.innerHTML = '';
+
+    notifications.forEach(notif => {
+      const li = document.createElement('li');
+      li.style.display = 'flex';
+      li.style.justifyContent = 'space-between';
+      li.style.alignItems = 'center';
+      li.style.marginBottom = '10px';
+
+      li.innerHTML = `
+      <span onclick="window.location.href='/notify/' + ${notif.id}" style="cursor: pointer;">${notif.text}</span>
+        ${!notif.read ? '<span style="background:red; width:10px; height:10px; border-radius:50%; display:inline-block;"></span>' : ''}
+      `;
+
+      list.appendChild(li);
+    });
+
+    // Toggle bell icon badge
+    const hasUnread = notifications.some(n => !n.read);
+    document.getElementById('main-badge').style.display = hasUnread ? 'block' : 'none';
+  }
+
+  function togglePopup() {
+    document.getElementById('overlay').style.display = 'block';
+    renderNotifications();
+  }
+
+  function closePopup() {
+    document.getElementById('overlay').style.display = 'none';
+  }
+
+  // Close popup when clicking outside
+  document.getElementById('overlay').addEventListener('click', function (event) {
+    const popup = document.getElementById('notification-popup');
+    if (!popup.contains(event.target)) {
+      closePopup();
+    }
+  });
+
+  // Initial badge check on load
+  window.onload = renderNotifications;
+</script>
 
 
 
