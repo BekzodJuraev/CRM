@@ -284,7 +284,7 @@ custom-dropdown {
               <p><strong>Дата регистрации:</strong> <span id="registered_at2"></span></p>
             </div>
             <label>Наименование проекта:</label>
-            <input type="text" class="form-control" name="order_name">
+            <input type="text" class="form-control" name="order_name" required>
 
               <label>Тип встречи:</label>
             <select class="form-select" name="vstrecha" required>
@@ -397,56 +397,7 @@ custom-dropdown {
       predoplataInput.value = '';
     }
   });
-        function addCategoryGroup() {
-    let container = document.getElementById("categories-container");
-    let newGroup = document.createElement("div");
-    newGroup.classList.add("category-group");
 
-    // Create a unique ID for the new dropdown
-
-
-    newGroup.innerHTML = `
-        <label>Категория заказа:</label>
-        <select class="form-select" name="catigories" >
-            <option value="Наружная реклама и макеты">Наружная реклама и макеты</option>
-            <option value="Типография">Типография</option>
-            <option value="Полиграфия">Полиграфия</option>
-        </select>
-        <label>Расходник:</label>
-        <div class="input-group">
-            <div class="custom-dropdown">
-                <div class="selected" onclick="toggleDropdown(this)">-- Выберите --</div>
-                <ul class="dropdown-options" id="dropdown-list"></ul><br>
-                <input type="hidden" name="add" value="selectedValue" id="selectedValue">
-            </div>
-            <input type="number" class="form-control" placeholder="Стоимость" name="price" required>
-            <input type="number" class="form-control" placeholder="Количество" name="quantity" min="1" required>
-            <button type="button" class="btn btn-remove" onclick="removeCategoryGroup(this)">-</button>
-        </div>
-    `;
-
-    container.appendChild(newGroup);
-
-    // Initialize the dropdown for this newly added group
-    const select = newGroup.querySelector('.form-select');
-const dropdownList = newGroup.querySelector('.dropdown-options');
-const selectedDisplay = newGroup.querySelector('.selected');
-const hiddenInput = newGroup.querySelector('input[type="hidden"]');
-
-// Initial dropdown build
-const selectedCategory = select.value;
-buildDropdown(categoriesMap[selectedCategory] || [], dropdownList, selectedDisplay, hiddenInput);
-
-// ⛳️ Add change listener to update dropdown on category switch
-select.addEventListener("change", () => {
-    const newCategory = select.value;
-    buildDropdown(categoriesMap[newCategory] || [], dropdownList, selectedDisplay, hiddenInput);
-});
-}
-
-        function removeCategoryGroup(button) {
-            button.closest(".category-group").remove();
-        }
 
 </script>
 
@@ -672,6 +623,13 @@ window.onclick = function(event) {
 
     container.appendChild(preview);
   }
+  document.querySelector('form').addEventListener('submit', function(e) {
+  const clientId = document.getElementById('client-id').value;
+  if (!clientId) {
+    e.preventDefault();
+    alert("Пожалуйста, выберите клиента из списка.");
+  }
+});
 </script>
 </body>
 </html>

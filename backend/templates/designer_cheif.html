@@ -170,9 +170,43 @@
 .file-label {
   pointer-events: none;
 }
+.image-modal {
+  position: fixed;
+  z-index: 9999;
+  padding-top: 60px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.8);
+}
+
+.image-modal-content {
+  margin: auto;
+  display: block;
+  max-width: 80%;
+  max-height: 80%;
+  border-radius: 8px;
+}
+
+.image-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 35px;
+  color: white;
+  font-size: 40px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
   </style>
 </head>
 <body>
+<div id="imageModal" class="image-modal" style="display:none;">
+  <span class="image-modal-close" onclick="closeImageModal()">&times;</span>
+  <img class="image-modal-content" id="modalImage">
+</div>
 <div id="assignModal" class="modal hidden">
   <div class="modal-content" style="max-width: 500px;">
     <span class="close" onclick="closeAssignModal()">&times;</span>
@@ -206,7 +240,7 @@
       <button class="btn" onclick="openStaticModal('modal-{{ item.id }}')">Перейти</button>
   </div>
             {% if item.designer_staff %}
-  <p>{{ item.designer_staff.0.profile.name }}</p>
+  <p>{{ item.designer_staff.0.profile.lastname }} {{ item.designer_staff.0.profile.name }}</p>
     {% else %}
 
             <button class="btn" onclick="openAssignModal({{ item.id }})">Назначить сотрудника</button>
@@ -253,11 +287,11 @@
             <p><strong>Размер:</strong> {{ item.razmer }}</p>
 
              <p><strong>Описание / ТЗ:</strong> {{ item.description }}</p>
-            <p><strong>Прикреплённые файлы:</strong></p>
+            <p style="margin-bottom: -10px;"><strong>Прикреплённые файлы:</strong></p>
             <div id="preview_tz_{{ item.id }}"></div>
 
-           <p><strong>Дизайн:</strong> {{ item.description_design }}</p>
-            <p><strong>Прикреплённые фото:</strong></p>
+           <p style="margin-top: 20px;"><strong>Дизайн:</strong> {{ item.description_design }}</p>
+            <p style="margin-bottom: -10px;"><strong>Прикреплённые фото:</strong></p>
 
               <div id="preview_design_{{ item.id }}"></div>
 
@@ -268,7 +302,7 @@
             <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
                    {% if not item.designer_staff %}
               <button type="button" onclick="addDesignBlock({{ item.pk }})">Добавить</button>
-              <button  type="button" onclick="submitSaveForm({{item.pk}})">Сохранить</button>
+
                 {% endif %}
             </div>
                 <form method="post" id="save_{{item.pk}}" enctype="multipart/form-data">
@@ -320,7 +354,9 @@
     </label>
     <div id="${previewId}"></div>
     <textarea class="form-control" rows="3" name="description_design"></textarea>
+    <button  type="button" onclick="submitSaveForm(${pk})">Сохранить</button>
   `;
+
 
   container.appendChild(block);
 }
@@ -397,7 +433,6 @@ function handleFile(input, previewId) {
     img.src = fileUrl;
     img.alt = 'Предпросмотр изображения';
     img.style.cursor = 'pointer';
-    img.onclick = () => window.open(fileUrl, '_blank');
     preview.appendChild(img);
   } else {
     const fileIcon = document.createElement('div');
@@ -444,7 +479,7 @@ function handleFile(input, previewId) {
     document.getElementById("search").addEventListener("input", function () {
       const searchTerm = this.value.toLowerCase();
       allCards.forEach(card => {
-        const name = card.dataset.name;
+        const name = card.dataset.name?.toLowerCase() || "";
         card.style.display = name.includes(searchTerm) ? "block" : "none";
       });
     });
@@ -521,6 +556,34 @@ function confirmAssign() {
 }
 
 </script>
+<script>
+function openImageModal(src) {
+  const modal = document.getElementById('imageModal');
+  const modalImg = document.getElementById('modalImage');
 
+  modalImg.src = src;
+  modal.style.display = 'block';
+}
+
+function closeImageModal() {
+  document.getElementById('imageModal').style.display = 'none';
+}
+
+// Optional: close on ESC
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    closeImageModal();
+  }
+});
+
+// Apply to all <img> tags on the page
+document.addEventListener('DOMContentLoaded', () => {
+  const images = document.querySelectorAll('img');
+  images.forEach(img => {
+    img.style.cursor = 'zoom-in';
+    img.addEventListener('click', () => openImageModal(img.src));
+  });
+});
+</script>
 </body>
 </html>

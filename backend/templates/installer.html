@@ -376,7 +376,7 @@
     document.getElementById("search").addEventListener("input", function () {
       const searchTerm = this.value.toLowerCase();
       allCards.forEach(card => {
-        const name = card.dataset.name;
+        const name = card.dataset.name?.toLowerCase() || "";
         card.style.display = name.includes(searchTerm) ? "block" : "none";
       });
     });

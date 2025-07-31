@@ -108,7 +108,13 @@
 
                 {% else %}
                 <a href="{% url 'dashboard' %}">🏠 Главная</a>
+                     {% if request.user.profile.position == "sales_call" %}
+                 <a href="{% url 'call_center' %}">📦 Проекты</a>
+                {% elif request.user.profile.position == "sales_marketing" %}
+                 <a href="{% url 'marketing' %}">📦 Проекты</a>
+                {% else %}
                 <a href="{% url 'my_projects' %}">📦 Проекты</a>
+                {% endif %}
                 <a href="{% url 'finance_profile' %}">📊 Финансы</a>
 
                 {% endif %}

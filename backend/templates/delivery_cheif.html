@@ -230,7 +230,7 @@
       <button class="btn" onclick="openStaticModal('modal-{{ item.id }}')">Перейти</button>
   </div>
             {% if item.designer_staff %}
-  <p>{{ item.designer_staff.0.profile.name }}</p> {# ✅ First only #}
+  <p>{{ item.designer_staff.0.profile.lastname }} {{ item.designer_staff.0.profile.name }}</p> {# ✅ First only #}
     {% else %}
 
             <button class="btn" onclick="openAssignModal({{ item.id }})">Назначить сотрудника</button>
@@ -358,7 +358,7 @@
     document.getElementById("search").addEventListener("input", function () {
       const searchTerm = this.value.toLowerCase();
       allCards.forEach(card => {
-        const name = card.dataset.name;
+         const name = card.dataset.name?.toLowerCase() || "";
         card.style.display = name.includes(searchTerm) ? "block" : "none";
       });
     });

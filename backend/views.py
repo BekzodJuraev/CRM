@@ -494,7 +494,7 @@ class Dashboard(LoginRequiredMixin,TemplateView):
          "finished",
       ]
       context['notify']= Notification.objects.filter(profile=self.request.user.profile)
-      if self.request.user.profile.position == 'delivery_cheif':
+      if self.request.user.profile.position == 'designer_cheif':
          context['notify'] = Notification.objects.filter(
             stage='design').order_by('-id')
          stages = [s for s in stages if s not in ["marketing", "call_center", "manager"]]
@@ -554,7 +554,7 @@ class Dashboard(LoginRequiredMixin,TemplateView):
             else:
                queryset = Orders.objects.filter(stage=stage, call_center=self.request.user.profile)
 
-         elif self.request.user.profile.position == 'delivery_cheif':
+         elif self.request.user.profile.position == 'designer_cheif':
             queryset = Orders.objects.filter(stage=stage, check_design=True)
          else:
             queryset = Orders.objects.filter(stage=stage).annotate(

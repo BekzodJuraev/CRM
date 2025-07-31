@@ -118,6 +118,7 @@
   <div class="container">
     <header>
       <div class="tabs">
+         <button class="tab" onclick="window.location.href='{% url 'dashboard' %}'">Назад</button>
         <button class="tab active" data-tab="completed">Завершённые</button>
         <button class="tab" data-tab="failed">Сорванные</button>
       </div>
@@ -143,10 +144,10 @@
     const clients = [
     {% for item in failed %}
       {
-        name: "{{item.order_name}}",
+        name:"{{ item.marketing.client_name }}",
         date: "{{item.fail_date|date:"d.m.Y"}}",
-        phone: "{{item.client.phone}}",
-        type: "{{item.get_vstrecha_display}}",
+        phone: "{{item.marketing.phone}}",
+        type: "{{item.get_vstrecha_display|default:""}}",
         description: "{{item.description}}",
         reason: "{{item.fail}}",
         reason_fail:"{{item.by_who_fail}}",

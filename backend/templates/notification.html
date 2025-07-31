@@ -385,7 +385,14 @@
 {% else %}
     {{ item.order.client.company_name }}
 {% endif %}</span></p>
-            <p>Номер телефона: <span class="highlight">{{item.order.client.phone}}</span></p>
+            <p>Номер телефона: <span class="highlight">
+                {% if item.order.client.phone %}
+                {{item.order.client.phone}}
+                {% else %}
+                {{ item.order.marketing.phone }}
+                {% endif %}
+
+            </span></p>
             <p>Тип встречи: {{ item.order.get_vstrecha_display|default:'' }}</p>
         </div>
         {% if not item.complete %}
