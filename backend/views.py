@@ -6,7 +6,7 @@ from django.db.models import Prefetch
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django.views.generic import View,TemplateView,DetailView,UpdateView
-from .models import Profile,Rezident,Finance,Warehouse,WarehouseLimit,Consumables,Orders,Delivery_Photo,Compelete_Photo,Telegram_users,Clients,Social_clients,OrderStaff,Provider,Notification,Manager_Photo
+from .models import Profile,Rezident,Finance,Warehouse,WarehouseLimit,Consumables,Orders,Delivery_Photo,Compelete_Photo,Telegram_users,Clients,Social_clients,OrderStaff,Provider,Notification,Manager_Photo,Payments
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
@@ -1282,10 +1282,15 @@ class FinanceProfileView(LoginRequiredMixin,TemplateView):
    login_url = reverse_lazy('login')
 
 
-
+   def post(self,request):
+      summa=request.POST.get('summa')
+      print(summa)
+      return redirect(request.path)
    def get_context_data(self, *, object_list=None, **kwargs):
       context = super().get_context_data(**kwargs)
       context['Notifcation']=notification(self.request.user.profile.position)
+      context['payment']=Payments.objects.filter(profile=self.request.user.profile)
+
       return context
 class ProfileView(LoginRequiredMixin,TemplateView):
    template_name = 'profile.html'

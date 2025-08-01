@@ -45,12 +45,7 @@ class Profile(models.Model):
     approve_accounting=models.BooleanField(default=False)
 
 
-class Shtraff(models.Model):
-    profile = models.ForeignKey(
-        'Profile', on_delete=models.CASCADE, related_name='shtraff_profile', verbose_name="Профиль"
-    )
-    created_at = models.DateField(auto_now_add=True)
-    summa=models.DecimalField(max_digits=10, decimal_places=2,default=0)
+
 class Social_clients(models.Model):
     profile = models.ForeignKey(
         'Profile', on_delete=models.CASCADE, related_name='social_client', verbose_name="Профиль"
@@ -201,7 +196,21 @@ class Orders(models.Model):
 
 
 
+class Payments(models.Model):
+    Stage_CHOICES = [
+        ('payment', "Пополнение"),
+        ("withdraw", "Вывод"),
+        ("fail", "Отклонено"),
+        ("shtraff", "Штраф"),
 
+
+    ]
+    stage = models.CharField(max_length=20, choices=Stage_CHOICES)
+    profile = models.ForeignKey(
+        'Profile', on_delete=models.CASCADE, related_name='payment', verbose_name="Профиль")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    summa = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
 
 class Notification(models.Model):

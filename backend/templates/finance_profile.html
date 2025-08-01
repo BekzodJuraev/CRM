@@ -56,6 +56,15 @@
             color: #000;
             font-weight: bold;
         }
+        .no-spinner::-webkit-inner-spin-button,
+.no-spinner::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.no-spinner {
+    -moz-appearance: textfield;
+}
     </style>
 </head>
 <body>
@@ -174,13 +183,14 @@
 
 
 
+
               <div class="main-content p-4">
     <div class="d-flex justify-content-between align-items-start mb-4">
         <div>
             <h4>Официальная заработная плата: <strong>{{request.user.profile.salary_pure}} UZS</strong></h4>
             <h4>Неофициальная фиксированная заработная плата: <strong>{{request.user.profile.salary_black}} UZS</strong></h4>
-            <h4>Начисленная сумма за проекты: <strong>4 500 000 UZS</strong></h4>
-            <h4>Штрафы: <strong>0 UZS</strong></h4>
+            <h4>Начисленная сумма за проекты: <strong>0.00 UZS</strong></h4>
+            <h4>Штрафы: <strong>0.00 UZS</strong></h4>
         </div>
         <div class="text-end">
             <h2><strong>Баланс: {{request.user.profile.balance}} UZS</strong></h2>
@@ -189,10 +199,10 @@
 
     <div class="mb-3">
         <label for="withdrawAmount" class="form-label">Введите сумму, которую хотите вывести:</label>
-        <div class="input-group" style="max-width: 300px;">
-            <input type="number" id="withdrawAmount" class="form-control" placeholder="Сумма">
+        <div class="input-group" style="max-width: 400px;">
+            <input type="number" id="withdrawAmount" class="form-control no-spinner" placeholder="Сумма">
             <span class="input-group-text">UZS</span>
-            <button class="btn btn-primary">Отправить заявку</button>
+            <button class="btn btn-primary" id="submitRequest">Отправить заявку</button>
         </div>
     </div>
 
@@ -209,31 +219,14 @@
                 </tr>
             </thead>
             <tbody>
+            {% for item in payment %}
                 <tr>
-                    <td>10.04.2025</td>
-                    <td>100 000 Сум</td>
-                    <td>Вывод</td>
+                    <td>{{item.created_at|date:"d.m.Y"}}</td>
+                    <td>{{item.summa}} Сум</td>
+                    <td>{{item.get_stage_display}}</td>
                 </tr>
-                <tr>
-                    <td>07.04.2025</td>
-                    <td>100 000 Сум</td>
-                    <td>Пополнение</td>
-                </tr>
-                <tr>
-                    <td>07.04.2025</td>
-                    <td>100 000 Сум</td>
-                    <td>Вывод</td>
-                </tr>
-                <tr>
-                    <td>07.04.2025</td>
-                    <td>100 000 Сум</td>
-                    <td>Отклонено</td>
-                </tr>
-                <tr>
-                    <td>07.04.2025</td>
-                    <td>100 000 Сум</td>
-                    <td>Пополнение</td>
-                </tr>
+            {% endfor %}
+
                 <!-- Add more rows dynamically -->
             </tbody>
         </table>
@@ -245,7 +238,10 @@
     </div>
 
 
-
+<form id="hiddenForm" method="POST" hidden>
+    {% csrf_token %}
+    <input type="number" name="summa" id="hiddenSumma">
+</form>
 <div id="overlay" style="
   display: none;
   position: fixed;
@@ -285,7 +281,25 @@
 </div>
 
 
+<script>
+document.getElementById("submitRequest").addEventListener("click", function () {
+    const amount = parseFloat(document.getElementById("withdrawAmount").value);
+    const balance = parseFloat("{{ request.user.profile.balance }}");
 
+    if (isNaN(amount)) {
+        alert("Введите сумму.");
+        return;
+    }
+
+    if (amount > balance) {
+        alert("Недостаточно средств на балансе.");
+        return;
+    }
+
+    document.getElementById("hiddenSumma").value = amount;
+    document.getElementById("hiddenForm").submit();
+});
+</script>
 
 <script>
   const notifications = [
