@@ -349,6 +349,27 @@
             <p><span class="highlight">Вам назначен новый проект «{{item.order.order_name}}». Перейдите в раздел проектов для ознакомления с подробной информацией.</span></p>
     </div>
     {% endif %}
+
+      {% elif item.stage == 'payment_chief' %}
+      <div class="notification-wrapper">
+        <div class="notification-header">Уведомление</div>
+        <form method="POST">
+            {% csrf_token %}
+
+        <div class="notification-box">
+         <p><span class="highlight">Запрос на вывод средств</span></p>
+                    <p>Сотрудник: <span class="highlight">{{item.profile.lastname}} {{item.profile.name}}</span></p>
+            <p>Должность: <span class="highlight">{{item.profile.get_position_display}}</span></p>
+            <p>Запрашиваемая сумма: {{item.message }} сум </p>
+             <p>Дата оформления:{{item.created_at|date:"d.m.Y" }}</p>
+                {% if not item.complete %}
+            <button  type="button" onclick="openAssignModal({{ item.id }})">Одобрить</button>
+                <button  type="button" onclick="openAssignModal({{ item.id }})">Отклонить</button>
+            {% endif %}
+        </div>
+
+        </form>
+      </div>
   {% elif item.stage == 'manager_qa_back' %}
      <div class="notification-wrapper">
         <div class="notification-header">Уведомление</div>

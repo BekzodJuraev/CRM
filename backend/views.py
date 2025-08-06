@@ -1284,7 +1284,12 @@ class FinanceProfileView(LoginRequiredMixin,TemplateView):
 
    def post(self,request):
       summa=request.POST.get('summa')
-      print(summa)
+      position=request.user.profile.position
+      profile=request.user.profile
+      if position == 'designer':
+         Notification.objects.create(profile=profile,message=summa,stage='payment_chief')
+
+
       return redirect(request.path)
    def get_context_data(self, *, object_list=None, **kwargs):
       context = super().get_context_data(**kwargs)
